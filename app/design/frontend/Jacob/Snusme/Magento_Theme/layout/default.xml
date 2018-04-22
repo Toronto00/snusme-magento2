@@ -10,11 +10,15 @@
         <link src="https://fonts.googleapis.com/css?family=Oswald:300,400,600,700" src_type="url" rel="stylesheet" type="text/css" />
     </head>
 
+    <!-- Remove unneeded blocks and containers -->
     <referenceContainer name="header.panel.wrapper" remove="true" />
     <referenceBlock name="navigation.sections" remove="true" />
     <referenceBlock name="catalog.compare.sidebar" remove="true"/>
     <referenceBlock name="view.addto.compare" remove="true" />
+    <referenceBlock name="footer" remove="true" />
+    <referenceBlock name="copyright" remove="true" />
 
+    <!-- Added static block to main menu -->
     <referenceBlock name="catalog.topnav">
         <block class="Magento\Cms\Block\Block" name="main_menu_static_links">
             <arguments>
@@ -23,6 +27,17 @@
         </block>
     </referenceBlock>
 
+    <referenceContainer name="footer-container">
+        <block class="Magento\Framework\View\Element\Template" name="static.footer" template="Magento_Theme::html/footer.phtml" />
+
+        <block class="Magento\Cms\Block\Block" name="footer_info">
+            <arguments>
+                <argument name="footer_info" xsi:type="string">footer_info</argument>
+            </arguments>
+        </block>
+    </referenceContainer>
+
+    <!-- Move menu into inside header -->
     <referenceContainer name="header-wrapper">
         <block class="Magento\Framework\View\Element\Template" name="navigation" after="logo" template="Magento_Theme::html/sections.phtml">
             <arguments>
