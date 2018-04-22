@@ -1,0 +1,125 @@
+header.page-header {
+    box-shadow: 0px 3px 20px 0px rgba(0, 0, 0, .2);
+    height: 80px;
+
+    & > .header {
+        margin: 0 auto;
+        padding: 0;
+        height: 80px;
+
+        .logo {
+            margin: 0;
+        }
+    }
+
+    .block-search {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        margin-top: 0;
+
+        & > .block {
+            position: relative;
+        }
+    }
+
+    .minicart-wrapper {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        margin-top: 0;
+        margin-right: 16px;
+
+        & > .action {
+            &.showcart:before {
+                font-size: 32px;
+            }
+        }
+    }
+
+    .nav-toggle {
+        top: 50%;
+        left: 18px;
+        transform: translateY(-50%);
+    }
+}
+
+.nav-open {
+    .nav-toggle:after {
+        background: transparent;
+    }
+} 
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .logo {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%)
+    }
+
+    .block-search {
+        float: right;
+
+        .control {
+            border-top: 0;
+        }
+
+        .minisearch {
+            &.active {
+                .control {
+                    opacity: 1;
+                    pointer-events: all;
+                }
+            }
+
+            .control {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, .8);
+                left: 0;
+                top: 0;
+                opacity: 0;
+                pointer-events: none;
+                z-index: 300;
+
+                input {
+                    position: fixed !important;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 90%;
+                    max-width: 360px;
+                    padding: 32px 16px;
+                    font-size: 18px;
+                    background: #fff;
+                }
+            }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    header.page-header {
+        .block-search {
+            margin-right: 100px;
+            align-items: flex-end !important;
+
+            & > .block {
+                padding-bottom: 16px;
+            }
+        }
+        .minicart-wrapper {
+            align-items: flex-end !important;
+
+            .block-minicart {
+                right: -18px;
+            }
+
+            & > .action {
+                padding-bottom: 18px;
+            }
+        }
+    }
+}

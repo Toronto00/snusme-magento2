@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page>
+    <head>
+        <link src="https://fonts.googleapis.com/css?family=Oswald:300,400,600,700" src_type="url" rel="stylesheet" type="text/css" />
+    </head>
+
+    <referenceContainer name="header.panel.wrapper" remove="true" />
+    <referenceBlock name="navigation.sections" remove="true" />
+    <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+    <referenceBlock name="view.addto.compare" remove="true" />
+
+    <referenceBlock name="catalog.topnav">
+        <block class="Magento\Cms\Block\Block" name="main_menu_static_links">
+            <arguments>
+                <argument name="main_menu_static_links" xsi:type="string">main_menu_static_links</argument>
+            </arguments>
+        </block>
+    </referenceBlock>
+
+    <referenceContainer name="header-wrapper">
+        <block class="Magento\Framework\View\Element\Template" name="navigation" after="logo" template="Magento_Theme::html/sections.phtml">
+            <arguments>
+                <argument name="group_name" xsi:type="string">navigation-sections</argument>
+                <argument name="group_css" xsi:type="string">nav-sections</argument>
+            </arguments>
+            <block class="Magento\Framework\View\Element\Template" name="store.menu" group="navigation-sections" template="Magento_Theme::html/container.phtml">
+                <arguments>
+                    <argument name="title" translate="true" xsi:type="string">Menu</argument>
+                </arguments>
+                <block class="Magento\Theme\Block\Html\Topmenu" name="catalog.topnav" template="Magento_Theme::html/topmenu.phtml" ttl="3600" before="-"/>
+            </block>
+            <block class="Magento\Framework\View\Element\Text" name="store.links" group="navigation-sections">
+                <arguments>
+                    <argument name="title" translate="true" xsi:type="string">Account</argument>
+                    <argument name="use_force" xsi:type="boolean">true</argument>
+                    <argument name="text" xsi:type="string"><![CDATA[<!-- Account links -->]]></argument>
+                </arguments>
+            </block>
+            <block class="Magento\Framework\View\Element\Template" name="store.settings" group="navigation-sections" template="Magento_Theme::html/container.phtml">
+                <arguments>
+                    <argument name="title" translate="true" xsi:type="string">Settings</argument>
+                </arguments>
+                <block class="Magento\Store\Block\Switcher" name="store.settings.language" template="Magento_Store::switch/languages.phtml">
+                    <arguments>
+                        <argument name="id_modifier" xsi:type="string">nav</argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Directory\Block\Currency" name="store.settings.currency" template="Magento_Directory::currency.phtml">
+                    <arguments>
+                        <argument name="id_modifier" xsi:type="string">nav</argument>
+                    </arguments>
+                </block>
+            </block>
+        </block>
+    </referenceContainer>
+</page>

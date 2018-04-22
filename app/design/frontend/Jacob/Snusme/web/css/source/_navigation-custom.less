@@ -1,0 +1,106 @@
+.navigation {
+    background: transparent;
+
+    & > ul {
+        width: auto;
+    }
+
+    li.level0 {
+        border-bottom: 4px transparent solid;
+        transition: .2s ease-out all;
+
+        &.active {
+            border-bottom: 4px @color-blue1 solid;
+
+            & > .level-top {
+                border: 0;
+            }
+        }
+            
+
+        & > a {
+            padding: 0 !important;
+            display: block;
+            height: 100%;
+            text-transform: uppercase;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            color: @color-brown !important;
+            transition: .2s ease-out all;
+        }
+
+        &:hover {
+            border-bottom: 4px @color-blue1 solid;
+
+            & > a {
+                color: @color-blue1 !important;
+            }
+        }
+    }
+}
+
+.nav-sections {
+    display: inline-block;
+    margin: 0;
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .navigation {
+        .level0 {
+            margin-right: 24px;
+
+            .submenu {
+                font-weight: 400;
+                box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+
+                a.ui-state-focus {
+                    background: @color-blue1;
+                    color: #fff;
+                }
+            }
+        }
+
+        & > ul {
+            align-items: flex-end;
+            height: 80px;
+            display: flex;
+
+            ul li {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .nav-sections {
+        background: transparent;
+        padding: 0 16px;
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .navigation  {
+        li.level0 {
+            padding: 16px;
+
+            &:hover {
+                border-bottom: 1px @color-gray82 solid !important;
+            }
+
+            ul.level0 {
+                border-top: 0;
+                margin-top: 8px;
+                font-size: 14px;
+            }
+        }
+
+        .parent  {
+            .level-top:after {
+                font-size: 32px;
+                top: 50%;
+                right: 0;
+                transform: translateY(-50%);
+            }
+        }
+    }
+}
