@@ -1,0 +1,117 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+use Magento\Framework\App\Action\Action;
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Product list template
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ */
+?>
+<?php
+$_productCollection = $block->getLoadedProductCollection();
+$_helper = $this->helper('Magento\Catalog\Helper\Output');
+$_checkoutHelper = $this->helper('Magento\Checkout\Helper\Data');
+$_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+?>
+<?php if (!$_productCollection->count()): ?>
+    <div class="message info empty"><div><?= /* @escapeNotVerified */ __('We can\'t find products matching the selection.') ?></div></div>
+<?php else: ?>
+    <?= $block->getToolbarHtml() ?>
+    <?= $block->getAdditionalHtml() ?>
+    <div class="products wrapper product-grid">
+        <?php $iterator = 1; ?>
+        <?php /** @var $_product \Magento\Catalog\Model\Product */ ?>
+        <?php foreach ($_productCollection as $_product): ?>
+            <div class="item" data-container="product-grid">
+                <div class="item-inner">
+                    <a href="<?= $_product->getProductUrl() ?>">
+                        <?= $block->getImage($_product, 'category_page_grid')->toHtml() ?>
+                    </a>
+
+                    <div class="item-details">
+                        <div class="product-name">
+                            <a href="<?= $_product->getProductUrl() ?>">
+                                <h3>
+                                    <?= $_helper->productAttribute($_product, $_product->getName(), 'name') ?>
+                                </h3>
+                                <h4>
+                                    Original Portion
+                                </h4>
+                            </a>
+                        </div>
+
+                        <?= /* @escapeNotVerified */ $block->getProductPrice($_product) ?>
+
+                        <div class="product actions product-actions">
+                            <div class="actions-primary">
+                                <?php if ($_product->isSaleable()): ?>
+                                    <?php $postParams = $block->getAddToCartPostParams($_product); ?>
+
+                                    <?php if ($_product->getProductOptionsCollection()->count()): ?>
+                                        <?php $customOptions = $_objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($_product); ?>
+
+                                        <input type="checkbox" name="product-buy-toggle" class="product-buy-toggle" id="product-buy-toggle__<?= $_product->getId() ?>" />
+                                        <label class="action tocart primary" for="product-buy-toggle__<?= $_product->getId() ?>">
+                                            <span><?= __('Buy') ?></span>
+                                        </label>
+
+                                        <div class="product-buy-options">
+                                            <?php foreach ($customOptions as $option): ?>
+                                                <?php $option->setProduct($_product); ?>
+                                                <?php foreach ($option->getValues() as $optionValue): ?>
+                                                    <?php $optionValue->setOption($option); ?>
+                                                    <form data-role="tocart-form" data-product-sku="<?= $_product->getSku() ?>" action="<?= $postParams['action'] ?>" method="post">
+                                                        <input type="hidden" name="product" value="<?= $postParams['data']['product'] ?>">
+                                                        <input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                                        <input type="hidden" name="options[<?= $option->getId() ?>]" value="<?= $optionValue->getId() ?>" />
+                                                        <?= $block->getBlockHtml('formkey') ?>
+                                                        <button type="submit"
+                                                                title="<?= $block->escapeHtml(__('Buy')) ?>"
+                                                                class="action tocart options">
+                                                            <span><?= __('Buy') ?> <?= $optionValue->getTitle() ?> (<?= $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) ?>)</span>
+                                                        </button>
+                                                    </form>
+                                                <?php endforeach ?>
+                                            <?php endforeach ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <form data-role="tocart-form" data-product-sku="<?= $_product->getSku() ?>" action="<?= $postParams['action'] ?>" method="post">
+                                            <input type="hidden" name="product" value="<?= $postParams['data']['product'] ?>">
+                                            <input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                            <?= $block->getBlockHtml('formkey') ?>
+                                            <button type="submit"
+                                                    title="<?= $block->escapeHtml(__('Buy')) ?>"
+                                                    class="action tocart primary">
+                                                <span><?= __('Buy') ?></span>
+                                            </button>
+                                        </form>
+                                    <?php endif ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?= $block->getToolbarHtml() ?>
+    <?php if (!$block->isRedirectToCartEnabled()) : ?>
+        <script type="text/x-magento-init">
+        {
+            "[data-role=tocart-form], .form.map.checkout": {
+                "catalogAddToCart": {
+                    "product_sku": "<?= /* @NoEscape */ $_product->getSku() ?>"
+                }
+            }
+        }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>
