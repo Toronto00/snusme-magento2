@@ -16,7 +16,7 @@ module.exports = {
         var cmdPlus = /^win/.test(process.platform) ? ' & ' : ' && ',
             command = 'grunt --force clean:' + themeName + cmdPlus;
 
-        command = command + 'php7.1 bin/magento dev:source-theme:deploy ' +
+        command = command + 'php bin/magento dev:source-theme:deploy ' +
             theme[themeName].files.join(' ') +
             ' --type=less' +
             ' --locale=' + theme[themeName].locale +
