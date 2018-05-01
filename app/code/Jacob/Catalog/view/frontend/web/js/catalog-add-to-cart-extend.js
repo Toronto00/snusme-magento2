@@ -7,46 +7,38 @@ define([
 
     return function (widget) {
         $.widget('mage.catalogAddToCart', widget, {
-            originalButtonText: '',
 
             /**
-             * Handler for the form 'submit' event
-             *
-             * @param {Object} form
+             * @param {String} form
              */
-            submitForm: function (form) {
-                var addToCartButton, self = this;
-                addToCartButton = $(form).find(this.options.addToCartButtonSelector);
-                console.log(addToCartButton);
+            disableAddToCartButton: function (form) {
+                var addToCartButtonTextWhileAdding = this.options.addToCartButtonTextWhileAdding || $t('Adding...'),
+                    addToCartButton = $(form).find(this.options.addToCartButtonSelector);
 
-                if (form.has('input[type="file"]').length && form.find('input[type="file"]').val() !== '') {
-                    self.element.off('submit');
-                    // disable 'Add to Cart' button
-                    addToCartButton.prop('disabled', true);
-                    addToCartButton.addClass(this.options.addToCartButtonDisabledClass);
-                    form.submit();
-                } else {
-                    self.ajaxSubmit(form);
-                }
+                addToCartButton.addClass(this.options.addToCartButtonDisabledClass);
+                addToCartButton.find('.display').text(addToCartButtonTextWhileAdding);
+                addToCartButton.attr('title', addToCartButtonTextWhileAdding);
             },
 
             /**
             * @param {String} form
             */
             enableAddToCartButton: function (form) {
-                console.log('d');
                 var addToCartButtonTextAdded = this.options.addToCartButtonTextAdded || $t('Added'),
                     self = this,
-                    addToCartButton = $(form).find(this.options.addToCartButtonSelector);
+                    addToCartButton = $(form).find(this.options.addToCartButtonSelector),
+                    originalTitle = $(form).find('.original-title').html();
 
-                addToCartButton.find('span').text(addToCartButtonTextAdded);
+                console.log(originalTitle);
+
+                addToCartButton.find('.display').text(addToCartButtonTextAdded);
                 addToCartButton.attr('title', addToCartButtonTextAdded);
 
                 setTimeout(function () {
-                    var addToCartButtonTextDefault = self.options.addToCartButtonTextDefault || $t('Add to Cart');
+                    var addToCartButtonTextDefault = originalTitle || $t('Buy');
 
                     addToCartButton.removeClass(self.options.addToCartButtonDisabledClass);
-                    addToCartButton.find('span').text(addToCartButtonTextDefault);
+                    addToCartButton.find('.display').html(addToCartButtonTextDefault);
                     addToCartButton.attr('title', addToCartButtonTextDefault);
                 }, 1000);
             }

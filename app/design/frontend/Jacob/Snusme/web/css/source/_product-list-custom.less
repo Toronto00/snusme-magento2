@@ -32,6 +32,21 @@
             .tocart.options {
                 white-space: nowrap;
                 width: 100%;
+                box-shadow: none;
+                border: 0;
+                background: @color-brown;
+                color: white;
+                transition: all .2s ease-out;
+                font-weight: 400;
+
+                &:hover {
+                    background: lighten(@color-brown, 5%);
+                }
+
+                &.disabled {
+                    opacity: 1;
+                    color: #aaa;
+                }
 
                 span {
                     font-size: 12px;
@@ -69,7 +84,6 @@
             background: rgba(255, 255, 255, .5);
 
             h3, h4 {
-                text-transform: uppercase;
                 font-family: 'Oswald', sans-serif;
                 color: #000;
             }
@@ -87,6 +101,7 @@
             h4 {
                 margin: 0;
                 font-weight: 600;
+                text-transform: uppercase;
                 font-size: 11px;
             }
 
@@ -102,6 +117,7 @@
                     font-family: 'Oswald', sans-serif;
                     padding: 7px 20px;
                     border-radius: 0;
+                    font-weight: 400;
                 }
             }
 

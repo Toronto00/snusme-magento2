@@ -68,15 +68,23 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                                                 <?php $option->setProduct($_product); ?>
                                                 <?php foreach ($option->getValues() as $optionValue): ?>
                                                     <?php $optionValue->setOption($option); ?>
+                                                    <?php $buttonTitle = __('Buy') . ' ' . $optionValue->getTitle() . ' (' . $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) . ')'; ?>
                                                     <form data-role="tocart-form" data-product-sku="<?= $_product->getSku() ?>" action="<?= $postParams['action'] ?>" method="post">
                                                         <input type="hidden" name="product" value="<?= $postParams['data']['product'] ?>">
                                                         <input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
                                                         <input type="hidden" name="options[<?= $option->getId() ?>]" value="<?= $optionValue->getId() ?>" />
                                                         <?= $block->getBlockHtml('formkey') ?>
-                                                        <button type="submit"
-                                                                title="<?= $block->escapeHtml(__('Buy')) ?>"
-                                                                class="action tocart options">
-                                                            <span><?= __('Buy') ?> <?= $optionValue->getTitle() ?> (<?= $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) ?>)</span>
+                                                        <button 
+                                                            type="submit"
+                                                            title="<?= $block->escapeHtml(__('Buy')) ?>"
+                                                            class="action tocart options"
+                                                        >
+                                                            <div class="original-title" style="display: none;">
+                                                                <?= $buttonTitle ?>
+                                                            </div>
+                                                            <span class="display">
+                                                                <?= $buttonTitle ?>
+                                                            </span>
                                                         </button>
                                                     </form>
                                                 <?php endforeach ?>
