@@ -40,17 +40,31 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                         <div class="product-name">
                             <a href="<?= $_product->getProductUrl() ?>">
                                 <h3>
-                                    <?= $_helper->productAttribute($_product, $_product->getName(), 'name') ?>
+                                    <?= 
+                                        $_helper->productAttribute(
+                                            $_product, 
+                                            $_product->getName(), 
+                                            'name') 
+                                    ?>
                                 </h3>
                                 <h4>
-                                    Original Portion
+                                    <?php if ($_product->getSubHeading()): ?>
+                                        <?= 
+                                            $_helper->productAttribute(
+                                                $_product, 
+                                                $_product->getSubHeading(), 
+                                                'sub_heading') 
+                                        ?>
+                                    <?php else: ?>
+                                        &nbsp;
+                                    <?php endif ?>
                                 </h4>
                             </a>
                         </div>
 
-                        <?= /* @escapeNotVerified */ $block->getProductPrice($_product) ?>
-
                         <div class="product actions product-actions">
+                            <?= $block->getProductPrice($_product) ?>
+
                             <div class="actions-primary">
                                 <?php if ($_product->isSaleable()): ?>
                                     <?php $postParams = $block->getAddToCartPostParams($_product); ?>
@@ -64,31 +78,37 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                                         </label>
 
                                         <div class="product-buy-options">
+                                            <form data-role="tocart-form" data-product-sku="<?= $_product->getSku() ?>" action="<?= $postParams['action'] ?>" method="post" class="addtocart-form">
+                                            <input type="hidden" name="product" value="<?= $postParams['data']['product'] ?>">
+                                            <input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                            <?= $block->getBlockHtml('formkey') ?>
+
                                             <?php foreach ($customOptions as $option): ?>
+                                                <input type="hidden" name="options[<?= $option->getId() ?>]" value="" />
+
                                                 <?php $option->setProduct($_product); ?>
-                                                <?php foreach ($option->getValues() as $optionValue): ?>
-                                                    <?php $optionValue->setOption($option); ?>
-                                                    <?php $buttonTitle = __('Buy') . ' ' . $optionValue->getTitle() . ' (' . $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) . ')'; ?>
-                                                    <form data-role="tocart-form" data-product-sku="<?= $_product->getSku() ?>" action="<?= $postParams['action'] ?>" method="post">
-                                                        <input type="hidden" name="product" value="<?= $postParams['data']['product'] ?>">
-                                                        <input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
-                                                        <input type="hidden" name="options[<?= $option->getId() ?>]" value="<?= $optionValue->getId() ?>" />
-                                                        <?= $block->getBlockHtml('formkey') ?>
-                                                        <button 
-                                                            type="submit"
-                                                            title="<?= $block->escapeHtml(__('Buy')) ?>"
-                                                            class="action tocart options"
-                                                        >
-                                                            <div class="original-title" style="display: none;">
-                                                                <?= $buttonTitle ?>
-                                                            </div>
-                                                            <span class="display">
-                                                                <?= $buttonTitle ?>
-                                                            </span>
-                                                        </button>
-                                                    </form>
+                                                    <?php foreach ($option->getValues() as $optionValue): ?>
+                                                        <div class="option-value">
+                                                            <?php $optionValue->setOption($option); ?>
+                                                            <?php $buttonTitle = __('Buy') . ' ' . $optionValue->getTitle() . ' (' . $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) . ')'; ?>
+                                                            <button 
+                                                                type="submit"
+                                                                title="<?= $block->escapeHtml(__('Buy')) ?>"
+                                                                class="action tocart options"
+                                                                data-option-value="<?= $optionValue->getId() ?>"
+                                                                data-option-id="<?= $option->getId() ?>"
+                                                            >
+                                                                <div class="original-title" style="display: none;">
+                                                                    <?= $buttonTitle ?>
+                                                                </div>
+                                                                <span class="display">
+                                                                    <?= $buttonTitle ?>
+                                                                </span>
+                                                            </button>
+                                                        </div>
+                                                    <?php endforeach ?>
                                                 <?php endforeach ?>
-                                            <?php endforeach ?>
+                                            </form>
                                         </div>
                                     <?php else: ?>
                                         <form data-role="tocart-form" data-product-sku="<?= $_product->getSku() ?>" action="<?= $postParams['action'] ?>" method="post">
@@ -122,4 +142,23 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         }
         </script>
     <?php endif; ?>
+
+    <script>
+        require([
+            'jquery',
+        ], function ($) {
+            $(function () { 
+                $('.product-buy-options button').click(function(e) {
+                    var button = $(e.currentTarget),
+                        optionValue = button.attr('data-option-value'),
+                        optionId = button.attr('data-option-id'),
+                        optionInput = button.closest('.addtocart-form').find('input[name="options[' + optionId + ']"]');
+
+                    if (optionInput) {
+                        optionInput.val(optionValue);
+                    }
+                });
+            });
+        });
+    </script>
 <?php endif; ?>

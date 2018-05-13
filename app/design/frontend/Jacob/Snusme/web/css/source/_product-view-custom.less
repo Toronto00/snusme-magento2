@@ -1,0 +1,99 @@
+.product-info-main {
+    .product-info-stock-sku {
+        width: 100%;
+        padding: 0;
+        text-align: left;
+        display: block;
+        background: #f3f3f3;
+        padding: 16px;
+        box-sizing: border-box;
+
+        .stock {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 400;
+
+            &.available {
+                color: #2fb92f;
+            }
+
+            &.out-of-stock {
+                color: #bb2c2c;
+            }
+        }
+    }
+
+    .page-title-wrapper.product {
+        .page-title {
+            margin-bottom: 0;
+        }
+    }
+
+    .product.attribute.overview {
+        margin-top: 0;
+        font-weight: 300;
+        font-family: 'Oswald', sans-serif;
+        font-size: 26px;
+    }
+
+    .product-info-price {
+        border-bottom: 0;
+        display: block;
+        margin-bottom: 0;
+    }
+
+    .product-add-form {
+        margin: 0;
+    }
+
+    .product-options-bottom {
+        .box-tocart {
+            margin: 0;
+
+            & > .fieldset {
+                margin: 0;
+                display: none;
+            }
+        }
+    }
+
+    .product-buy-options {
+        display: flex;
+        flex-flow: row wrap;
+        margin: 0 -2px;
+
+        .option-value {
+            width: 50%;
+            flex-basis: 50%;
+            box-sizing: border-box;
+            padding: 2px;
+
+            button {
+                width: 100%;
+                font-family: 'Oswald', sans-serif;
+            }
+        }
+    }
+
+    .product.info.detailed {
+        margin-top: 16px;
+
+        .product.data.items {
+            & > .item.title > .switch {
+                border: 1px #f3f3f3 solid;
+                border-bottom: 0;
+                font-family: 'Oswald', sans-serif;
+                font-weight: 300;
+            }
+        }
+
+        .data.item.content {
+            border: 1px #f3f3f3 solid;
+            font-size: 13px;
+        }
+
+        .additional-attributes > tbody > tr > th, 
+        .product.info.detailed .additional-attributes > tfoot > tr > th {
+            white-space: nowrap;
+        }
+    }
+}

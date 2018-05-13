@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page>
+    <referenceBlock name="reviews.tab" remove="true" />
+    <referenceBlock name="product.review.form" remove="true" />
+    <referenceBlock name="product.info.review" remove="true" />
+    <referenceBlock name="product.info.sku" remove="true" />
+    <referenceContainer name="product.info.extrahint" remove="true" />
+    <referenceBlock name="product.price.final" remove="true" />
+    <referenceBlock name="product.info.options" remove="true" />
+
+    <move element="product.info.overview" destination="product.info.main" before="product.info.price" />
+    <move element="product.info.details" destination="product.info.main" after="product.info" />
+</page>
