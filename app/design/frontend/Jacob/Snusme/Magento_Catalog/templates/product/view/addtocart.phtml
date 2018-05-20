@@ -11,6 +11,7 @@
 <?php $_product = $block->getProduct(); ?>
 <?php $_objectManager = \Magento\Framework\App\ObjectManager::getInstance(); ?>
 <?php $_checkoutHelper = $this->helper('Magento\Checkout\Helper\Data'); ?>
+<?php $_geoIpHelper = $this->helper('Jacob\Catalog\Helper\Data'); $_geoIpHelper->getIpLocation(); ?>
 <?php if ($_product->isSaleable()): ?>
 <div class="box-tocart">
     <div class="fieldset">

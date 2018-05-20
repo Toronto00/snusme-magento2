@@ -41,7 +41,7 @@ class InstallData implements InstallDataInterface
             'sub_heading' => [
                 'label'         => 'Sub heading',
                 'type'          => 'varchar',
-                'input'         => 'text'
+                'input'         => 'text',
                 'filterable'    => 0,
                 'visible_on_front' => false,
             ],
@@ -137,7 +137,7 @@ class InstallData implements InstallDataInterface
                 ]
             ],
             'table_of_content' => [
-                'label'         => 'Table of Content',
+                'label'         => 'Ingredients',
                 'type'          => 'text',
                 'input'         => 'textarea',
                 'filterable'    => 0,

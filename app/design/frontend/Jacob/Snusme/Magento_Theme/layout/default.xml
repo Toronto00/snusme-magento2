@@ -39,6 +39,8 @@
 
     <!-- Move menu into inside header -->
     <referenceContainer name="header-wrapper">
+        <block class="Magento\Framework\View\Element\Template" name="country" after="search" template="Magento_Theme::html/header/country.phtml" />
+
         <block class="Magento\Framework\View\Element\Template" name="navigation" after="logo" template="Magento_Theme::html/sections.phtml">
             <arguments>
                 <argument name="group_name" xsi:type="string">navigation-sections</argument>
