@@ -16,7 +16,8 @@ use Magento\Framework\App\Action\Action;
  */
 ?>
 <?php
-$_productCollection = $block->getLoadedProductCollection();
+$_productCollection = $block->getFromWidget() ? $block->getProductCollection() : $block->getLoadedProductCollection();
+
 $_helper = $this->helper('Magento\Catalog\Helper\Output');
 $_checkoutHelper = $this->helper('Magento\Checkout\Helper\Data');
 $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -24,8 +25,10 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 <?php if (!$_productCollection->count()): ?>
     <div class="message info empty"><div><?= /* @escapeNotVerified */ __('We can\'t find products matching the selection.') ?></div></div>
 <?php else: ?>
-    <?= $block->getToolbarHtml() ?>
-    <?= $block->getAdditionalHtml() ?>
+    <?php if (!$block->getFromWidget()): ?>
+        <?= $block->getToolbarHtml() ?>
+        <?= $block->getAdditionalHtml() ?>
+    <?php endif ?>
     <div class="products wrapper product-grid">
         <?php $iterator = 1; ?>
         <?php /** @var $_product \Magento\Catalog\Model\Product */ ?>
@@ -130,7 +133,9 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             </div>
         <?php endforeach; ?>
     </div>
-    <?= $block->getToolbarHtml() ?>
+    <?php if (!$block->getFromWidget()): ?>
+        <?= $block->getToolbarHtml() ?>
+    <?php endif ?>
     <?php if (!$block->isRedirectToCartEnabled()) : ?>
         <script type="text/x-magento-init">
         {

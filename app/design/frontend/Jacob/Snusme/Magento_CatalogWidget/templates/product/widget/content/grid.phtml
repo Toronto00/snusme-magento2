@@ -1,0 +1,18 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\CatalogWidget\Block\Product\ProductsList $block */
+?>
+<?= 
+    $block->getLayout()
+        ->createBlock('Magento\Catalog\Block\Product\ListProduct')
+        ->setTemplate('Magento_Catalog::product/list.phtml')
+        ->setProductCollection($block->getProductCollection())
+        ->setFromWidget(true)
+        ->toHtml();
+?>
