@@ -1,0 +1,104 @@
+#vconnect_allinone_html hr {
+    box-sizing: content-box; /* 1 */
+    height: 0; /* 1 */
+    overflow: visible; /* 2 */
+}
+
+#vconnect_allinone_html a {
+    background-color: transparent; /* 1 */
+    -webkit-text-decoration-skip: objects; /* 2 */
+}
+
+
+#vconnect_allinone_html a:active,
+#vconnect_allinone_html a:hover {
+    outline-width: 0;
+}
+
+#vconnect_allinone_html b,
+#vconnect_allinone_html strong {
+    font-weight: inherit;
+}
+
+#vconnect_allinone_html b,
+#vconnect_allinone_html strong {
+    font-weight: bolder;
+}
+
+#vconnect_allinone_html small {
+    font-size: 80%;
+}
+
+#vconnect_allinone_html sub,
+#vconnect_allinone_html sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+#vconnect_allinone_html sub {
+    bottom: -0.25em;
+}
+
+#vconnect_allinone_html sup {
+    top: -0.5em;
+}
+
+#vconnect_allinone_html img {
+    border-style: none;
+}
+
+#vconnect_allinone_html button,
+#vconnect_allinone_html input,
+#vconnect_allinone_html optgroup,
+#vconnect_allinone_html select,
+#vconnect_allinone_html textarea {
+    font-family: sans-serif; /* 1 */
+    font-size: 100%; /* 1 */
+    line-height: 1.15; /* 1 */
+    margin: 0; /* 2 */
+}
+
+#vconnect_allinone_html button,
+#vconnect_allinone_html input { /* 1 */
+    overflow: visible;
+}
+
+#vconnect_allinone_html button,
+#vconnect_allinone_html select { /* 1 */
+    text-transform: none;
+}
+
+
+#vconnect_allinone_html button,
+html #vconnect_allinone_html [type="button"], /* 1 */
+#vconnect_allinone_html [type="reset"],
+#vconnect_allinone_html [type="submit"] {
+    -webkit-appearance: button; /* 2 */
+}
+
+#vconnect_allinone_html button::-moz-focus-inner,
+#vconnect_allinone_html [type="button"]::-moz-focus-inner,
+#vconnect_allinone_html [type="reset"]::-moz-focus-inner,
+#vconnect_allinone_html [type="submit"]::-moz-focus-inner {
+    border-style: none;
+    padding: 0;
+}
+
+#vconnect_allinone_html button:-moz-focusring,
+#vconnect_allinone_html [type="button"]:-moz-focusring,
+#vconnect_allinone_html [type="reset"]:-moz-focusring,
+#vconnect_allinone_html [type="submit"]:-moz-focusring {
+    outline: 1px dotted ButtonText;
+}
+
+#vconnect_allinone_html textarea {
+    overflow: auto;
+}
+
+#vconnect_allinone_html [type="checkbox"],
+#vconnect_allinone_html [type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+}

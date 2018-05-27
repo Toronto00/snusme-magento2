@@ -1,0 +1,94 @@
+<?php
+/*
+ * The MIT License
+ *
+ * Copyright 2016 vConnect.dk
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * @category Magento
+ * @package Vconnect_AllInOne
+ * @author vConnect
+ * @email kontakt@vconnect.dk
+ * @template app/design/frontend/base/default/template/vconnect/embedded/commercial/tabHeader.phtml
+ */
+
+$allinone_data = $this->getData('allinone_data');
+$allinone_config = $this->getData('allinone_config');
+$dataHelper = $this->getDataHelper();
+?>
+
+<li data-code="<?php echo $allinone_data['code'] ?>">
+    <label class="shipping-method-label aino-collapse-trigger aino-input aino-checkbox">
+        <?php echo $allinone_data['method_title'] ?>
+        <input type="radio" name="delivery-option" value="test-<?php echo $allinone_data['code'] ?>" class="tinyCheck-done" />
+        <span>
+            <?php if(!empty($allinone_config['delivery_time'])): ?>
+                <span class="aino-delivery-days"><?php echo $allinone_config['delivery_time'] ?></span>
+            <?php endif;?>
+            <span class="aino-delivery-price"><?php echo $allinone_data['price_formated_withoutcontainer'] ?></span>
+            <?php if(!empty($allinone_config['method_description'])): ?>
+                <span><?php echo $allinone_config['method_description'] ?></span>
+            <?php endif;?>
+        </span>
+        <span class="aino-indicator"></span>
+        <span class="carrier-logo">
+            <span class="aino-postnord-logo"></span>
+        </span>
+    </label>
+
+    <div class="aino-collapse">
+        <?php if ($dataHelper->getStoreConfig('shipping/origin/country_id') == 'FI'): ?>
+        <div><b><?php echo __('Arvioitu toimitusaika'); ?></b></div>
+
+        <ul class="aino-nav aino-tabs cf">
+            <li class="aino-active">
+                <label class="aino-collapse-trigger aino-input aino-button aino-active">
+                    <?php echo __('1-3 arkipäivää Toimitus klo 8-16 välisenä aikana.'); ?>
+                </label>
+            </li>
+        </ul>
+
+        <div><b><?php echo __('Lähetyksen toimitustapa'); ?></b></div>
+
+        <ul class="aino-nav aino-tabs cf">
+            <li class="aino-active">
+                <label class="aino-collapse-trigger aino-input aino-button aino-active">
+                    <?php echo __('Lähetyksen toimitus kuittausta vastaan'); ?>
+                </label>
+            </li>
+        </ul>
+        <?php else: ?>
+        <div><b><?php echo __('Vi kommer till ditt jobb dagtid mellan kl 8-17'); ?></b></div>
+
+        <div class="aino-text-light">
+            <?php echo __('Vi lämnar av paketet på ditt jobb (exempelvis i entrén, receptionen, lastkajen). Du kan inte ändra leveransätt senare.'); ?>
+        </div>
+        <br>
+        <div class="aino-media aino-text-light">
+            <div class="aino-media-left">
+                <span class="aino-exclamation-sign"></span>
+            </div>
+            <div class="aino-media-body">
+                <?php echo __('Se till att ange en giltig företagsadress som leveransadress.'); ?>
+            </div>
+            <input style="display:none;" type="radio" name="arrival" value="<?php echo __('Se till att ange en giltig företagsadress som leveransadress.'); ?>" class="tinyCheck-done" checked />
+        </div>
+        <?php endif; ?>
+    </div>
+</li>

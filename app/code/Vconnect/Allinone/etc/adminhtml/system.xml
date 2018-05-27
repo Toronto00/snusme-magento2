@@ -1,0 +1,335 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="carriers" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="1000" translate="label">
+            <group id="vconnectpostnord" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="200" translate="label">
+                <label>PostNord - General</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="license_key" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>License Key</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Vconnect\Allinone\Model\System\Config\Backend\Shipping\License</backend_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="api_key" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+                    <label>Postnod API Key</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="google_maps_api_key" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40" translate="label">
+                    <label>Google Maps API Key</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="title" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Carrier Title</label>
+                </field>
+                <field id="shipping_methods_description" type="textarea" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="63" translate="label">
+                    <label>Shipping Methods Description</label>
+                </field>
+            </group>
+            <group id="vconnect_postnord_business" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="205" translate="label">
+                <label>PostNord - To bussines address</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>Method Name</label>
+                </field>
+                <field id="transit_time" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+                    <label>Transit Time</label>
+                </field>
+                <field id="description" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40" translate="label">
+                    <label>Method Description</label>
+                </field>
+                <field id="sort_order" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50" translate="label">
+                    <label>Sort Order</label>
+                </field>
+                <field id="arrival_option_text" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Option Text</label>
+                </field>
+                <field id="price" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="70" translate="label">
+                    <label>Price</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+            <group id="vconnect_postnord_home" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="210" translate="label">
+                <label>PostNord - To home address</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>Method Name</label>
+                </field>
+                <field id="transit_time" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+                    <label>Transit Time</label>
+                </field>
+                <field id="description" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40" translate="label">
+                    <label>Method Description</label>
+                </field>
+                <field id="sort_order" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50" translate="label">
+                    <label>Sort Order</label>
+                </field>
+                <field id="flex_delivery_active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Enable Flex Delivery</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="flex_delivery_label" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="70" translate="label comment">
+                    <label>Flex Delivery Label</label>
+                    <depends>
+                        <field id="flex_delivery_active">1</field>
+                    </depends>
+                </field>
+                <field id="price" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="80" translate="label">
+                    <label>Shipping Method Price</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="arrival_option_text" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="90" translate="label">
+                    <label>Option Text</label>
+                </field>
+                <field id="arrival_option_text_price" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="100" translate="label">
+                    <label>Option Text Price</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="additional_fee_active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="110" translate="label">
+                    <label>Enable Evening Delivery</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="additional_fee_label" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="120" translate="label comment">
+                    <label>Evening Delivery Label</label>
+                    <comment>This is the delivery time the customer sees during checkout</comment>
+                    <depends>
+                        <field id="additional_fee_active">1</field>
+                    </depends>
+                </field>
+                <field id="additional_fee_amount" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="130" translate="label comment">
+                    <label>Evening Delivery Price</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+            <group id="vconnect_postnord_pickup" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="215" translate="label">
+                <label>PostNord - Pickup</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>Method Name</label>
+                </field>
+                <field id="transit_time" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+                    <label>Transit Time</label>
+                </field>
+                <field id="description" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40" translate="label">
+                    <label>Method Description</label>
+                </field>
+                <field id="sort_order" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50" translate="label">
+                    <label>Sort Order</label>
+                </field>
+                <field id="price_dk" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Price to Danmark</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="price_se" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="65" translate="label">
+                    <label>Price to Sweden</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="price_no" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="70" translate="label">
+                    <label>Price to Norway</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="price_fi" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="75" translate="label">
+                    <label>Price to Finland</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+            <group id="vconnect_postnord_eupickup" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="220" translate="label">
+                <label>PostNord - EU Pickup</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>Method Name</label>
+                </field>
+                <field id="description" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="23" translate="label">
+                    <label>Method Description</label>
+                </field>
+                <field id="price" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Price</label>
+                    <comment><![CDATA[Countries can be entered as a comma-separated list in ISO 3166-1 alpha-2 format. Use * for all valid countries.]]></comment>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices2</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="sort_order" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="80" translate="label">
+                    <label>Sort Order</label>
+                </field>
+            </group>
+            <group id="vconnect_postnord_eu" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="225" translate="label">
+                <label>PostNord - EU</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>Method Name</label>
+                </field>
+                <field id="transit_time" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+                    <label>Transit Time</label>
+                </field>
+                <field id="description" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40" translate="label">
+                    <label>Method Description</label>
+                </field>
+                <field id="sort_order" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50" translate="label">
+                    <label>Sort Order</label>
+                </field>
+                <field id="price" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Price</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+            <group id="vconnect_postnord_intl" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="230" translate="label">
+                <label>PostNord - International</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>Method Name</label>
+                </field>
+                <field id="transit_time" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+                    <label>Transit Time</label>
+                </field>
+                <field id="description" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40" translate="label">
+                    <label>Method Description</label>
+                </field>
+                <field id="sort_order" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50" translate="label">
+                    <label>Sort Order</label>
+                </field>
+                <field id="price" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Price</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+            <group id="vconnect_postnord_pickupinshop" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="235" translate="label">
+                <label>PostNord - Pickup in Shop</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>Method Name</label>
+                </field>
+                <field id="transit_time" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+                    <label>Transit Time</label>
+                </field>
+                <field id="description" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40" translate="label">
+                    <label>Method Description</label>
+                </field>
+                <field id="sort_order" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50" translate="label">
+                    <label>Sort Order</label>
+                </field>
+                <field id="shops" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Shops</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Shops</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="logo" translate="label comment" type="image" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Logo</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">vconnect/allinone/pickinstore</upload_dir>
+                    <base_url type="media" scope_info="1">vconnect/allinone/pickinstore</base_url>
+                </field>
+                <field id="price" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="100" translate="label">
+                    <label>Price</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+            <group id="vconnect_postnord_mailbox" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="240" translate="label">
+                <label>PostNord - To mailbox</label>
+                <field id="active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10" translate="label">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label">
+                    <label>Method Name</label>
+                </field>
+                <field id="transit_time" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30" translate="label">
+                    <label>Transit Time</label>
+                </field>
+                <field id="description" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40" translate="label">
+                    <label>Method Description</label>
+                </field>
+                <field id="sort_order" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50" translate="label">
+                    <label>Sort Order</label>
+                </field>
+                <field id="arrival_option_text" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60" translate="label">
+                    <label>Option Text</label>
+                </field>
+                <field id="price_se" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="70" translate="label">
+                    <label>Price to Sweden</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="price_no" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="75" translate="label">
+                    <label>Price to Norway</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="price_dk" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="80" translate="label">
+                    <label>Price to Danmark</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="price_eu" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="85" translate="label">
+                    <label>Price to EU</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="price_intl" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="90" translate="label">
+                    <label>Price to International</label>
+                    <frontend_model>Vconnect\Allinone\Block\Adminhtml\System\Config\Form\Field\FieldArray\Prices</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="additional_fee_active" type="select" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="100" translate="label">
+                    <label>Enable Additional Fee</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="additional_fee_label" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="101" translate="label comment">
+                    <label>Fee Label</label>
+                    <comment>This is the delivery time the customer sees during checkout</comment>
+                    <depends>
+                        <field id="additional_fee_active">1</field>
+                    </depends>
+                </field>
+                <field id="additional_fee_amount" type="text" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="102" translate="label comment">
+                    <label>Fee Amount</label>
+                    <depends>
+                        <field id="additional_fee_active">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

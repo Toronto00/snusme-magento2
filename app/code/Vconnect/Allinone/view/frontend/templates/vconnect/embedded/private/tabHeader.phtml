@@ -1,0 +1,182 @@
+<?php
+/*
+ * The MIT License
+ *
+ * Copyright 2016 vConnect.dk
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * @category Magento
+ * @package Vconnect_AllInOne
+ * @author vConnect
+ * @email kontakt@vconnect.dk
+ * @template app/design/frontend/base/default/template/vconnect/aio_base/dk/home/tabHeader.phtml
+ */
+
+$allinone_data = $this->getData('allinone_data');
+$allinone_config = $this->getData('allinone_config');
+$dataHelper = $this->getDataHelper();
+$quote = $this->getBlockQuote();
+$additional_fee = $dataHelper->getAdditionalFeeData($allinone_config['system_path']);
+?>
+
+<li data-code="<?php echo $allinone_data['code'] ?>">
+    <label class="shipping-method-label aino-collapse-trigger aino-input aino-checkbox">
+        <?php echo $allinone_data['method_title'] ?>
+        <input type="radio" name="delivery-option" value="test-<?php echo $allinone_data['code'] ?>" class="tinyCheck-done" />
+        <span>
+            <?php if(!empty($allinone_config['delivery_time'])): ?>
+                <span class="aino-delivery-days"><?php echo $allinone_config['delivery_time'] ?></span>
+            <?php endif;?>
+            <span class="aino-delivery-price"><?php echo  $allinone_data['price_formated_withoutcontainer'] ?></span>
+            <?php if(!empty($allinone_config['method_description'])): ?>
+                <span><?php echo $allinone_config['method_description'] ?></span>
+            <?php endif;?>
+        </span>
+        <span class="aino-indicator"></span>
+        <span class="carrier-logo">
+            <span class="aino-postnord-logo"></span>
+        </span>
+    </label>
+
+    <div class="aino-collapse aino-big-package">
+        <?php if ($dataHelper->getStoreConfig('shipping/origin/country_id') == 'NO'): ?>
+        <div><b><?php echo __('Pakken kommer'); ?></b></div>
+
+        <ul class="aino-nav aino-tabs cf">
+            <li class="aino-active">
+                <label class="aino-collapse-trigger aino-input aino-button aino-active">
+                    <?php echo __('innen 1-5 dager 08:00 - 17:00'); ?>
+                </label>
+            </li>
+        </ul>
+
+        <div class="aino-text-light"><?php echo __('Du vil få mulighet til å velge tidspunkt for levering så snart vi har mottatt pakken din'); ?></div>
+
+        <div><b><?php echo __('Pakken leveres'); ?></b></div>
+
+        <ul class="aino-nav aino-tabs cf">
+            <li class="aino-active">
+                <label class="aino-collapse-trigger aino-input aino-button aino-active">
+                    <?php echo __('Levering mot signatur'); ?>
+                </label>
+            </li>
+        </ul>
+        <?php elseif ($dataHelper->getStoreConfig('shipping/origin/country_id') == 'FI'): ?>
+        <div><b><?php echo __('Arvioitu toimitusaika'); ?></b></div>
+    
+        <ul class="aino-nav aino-tabs cf">
+            <li class="aino-active">
+                <label class="aino-collapse-trigger aino-input aino-button aino-active">
+                    <?php echo __('1-3 arkipäivää Toimitus klo 8-17 välisenä aikana.'); ?>
+                </label>
+            </li>
+        </ul>
+    
+        <div><b><?php echo __('Lähetyksen toimitustapa'); ?></b></div>
+    
+        <ul class="aino-nav aino-tabs cf">
+            <li class="aino-active">
+                <label class="aino-collapse-trigger aino-input aino-button aino-active">
+                    <?php echo __('Lähetyksen toimitus kuittausta vastaan'); ?>
+                </label>
+            </li>
+        </ul>
+        <?php else: ?>
+        <div><b><?php echo __('När vill du att vi ska komma?'); ?></b></div>
+
+        <?php $count_arrival = count($allinone_config['arrival']) + ($additional_fee ? 1 : 0); ?>
+        <?php if ($count_arrival): ?>
+        <ul class="aino-nav aino-tabs cf">
+            <?php foreach ($allinone_config['arrival'] as $value => $label): ?>
+            <?php if (is_array($label) && $value == 'flexdelivery' && !empty($allinone_config['flex_delivery_data'])): ?>
+            <li>
+                <label class="aino-collapse-trigger aino-input aino-button" data-aino-control="<?php echo $allinone_data['code'] ?>_<?php echo $value ?>" data-aino-price="<?php echo $allinone_config['flex_delivery_data']['price'] ?>">
+                    <b><?php echo $allinone_config['flex_delivery_data']['label_with_price'] ?></b>
+                    <input class="aino-button tinyCheck-done" type="radio" name="arrival" value="<?php echo $label['label'] ?>"/>
+                </label>
+            </li>
+            <?php elseif (!empty($allinone_config['option_text_data'])): ?>
+            <li>
+                <label class="aino-collapse-trigger aino-input aino-button" data-aino-control="<?php echo $allinone_data['code'] ?>_<?php echo $value ?>" data-aino-price="<?php echo $allinone_config['option_text_data']['price'] ?>" data-additional-fee="<?php echo $allinone_config['option_text_data']['base_price'] ?>" data-additional-label="<?php echo $allinone_config['option_text_data']['label'] ?>">
+                    <b><?php echo $allinone_config['option_text_data']['label_with_price'] ?></b>
+                    <input class="aino-button tinyCheck-done" type="radio" name="arrival" value="<?php echo $allinone_config['option_text_data']['label'] ?>"/>
+                </label>
+            </li>
+            <?php endif; ?>
+            <?php endforeach; ?>
+
+            <?php if (!empty($allinone_config['additional_fee_data'])): ?>
+            <li style="display: none;" id="evening_delivery_additional_fee_element">
+                <label class="aino-collapse-trigger aino-input aino-button" data-aino-control="<?php echo $allinone_data['code'] ?>_<?php echo $additional_fee['label_with_price'] ?>" data-aino-price="<?php echo $allinone_config['additional_fee_data']['price'] ?>" data-additional-fee="<?php echo $allinone_config['additional_fee_data']['base_price'] ?>" data-additional-label="<?php echo $allinone_config['additional_fee_data']['label']; ?>">
+                    <b><?php echo $allinone_config['additional_fee_data']['label_with_price'] ?></b>
+                    <input class="aino-button tinyCheck-done" type="radio" name="arrival" value="<?php echo $allinone_config['additional_fee_data']['label'] ?>"/>
+                </label>
+            </li>
+            <?php endif; ?>
+        </ul>
+        <?php endif; ?>
+
+        <div class="aino-tab-content">
+            <?php foreach ($allinone_config['arrival'] as $value => $label): ?>
+            <?php if (!is_array($label)): ?>
+            <div class="aino-tab-panel" data-aino-target="<?php echo $allinone_data['code'] ?>_<?php echo $value ?>">
+                <span class="aino-text-light"><?php echo __('Dagen innan får du ett SMS med tidsintervaller. I SMS:et kan du välja backup-alternativ om du inte är hemma.'); ?></span>
+            </div>
+            <?php endif; ?>
+            <?php endforeach; ?>
+
+            <?php if (isset($allinone_config['arrival']['flexdelivery']) && isset($allinone_config['delivery']['Flex Delivery'])): ?>
+            <div class="aino-tab-panel" data-aino-target="<?php echo $allinone_data['code'] ?>_flexdelivery">
+                <span class="aino-text-light"><?php echo __('Vi lämnar paketet utanför din dörr och aviserar dig via SMS vid leverans. Du kan inte ändra leveransätt senare.'); ?></span>
+
+                <?php if ($dataHelper->getStoreConfigFlag("carriers/{$allinone_config['system_path']}/flex_delivery_active")): ?>
+                <div class="aino-dropdown">
+                    <button class="aino-dropdown-trigger">
+                        <?php echo __('Lämna paketet utanför dörren'); ?>
+                    </button>
+                    <ul class="aino-nav aino-dropdown-menu">
+                        <?php $i = 0; ?>
+                        <?php foreach ($allinone_config['delivery']['Flex Delivery'] as $value => $label) : ?>
+                        <li>
+                            <label class="aino-select-option">
+                                <?php echo __($label) ?>
+                                <input type="radio" name="delivery" value="<?php echo is_int($value)?$label:$value ?>" class="tinyCheck-done" />
+                                <span class="aino-indicator"></span>
+                            </label>
+                        </li>
+                        <?php $i++; ?>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <label class="aino-entry-code aio_other_field" style="<?php if ($dataHelper->getStoreConfig('shipping/origin/country_id') != 'SE'): ?>display:none;<?php endif; ?>">
+                    <input type="text" placeholder="Ange portkod" name="other">
+                </label>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($additional_fee): ?>
+            <div class="aino-tab-panel" data-aino-target="<?php echo $allinone_data['code'] ?>_<?php echo $additional_fee['label_with_price'] ?>">
+                <span class="aino-text-light"><?php echo __('Dagen innan leverans får du ett SMS med tidsintervaller. Du kan välja backup-alternativ om du inte skulle vara hemma.'); ?></span>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</li>

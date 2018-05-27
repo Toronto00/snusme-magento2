@@ -1,0 +1,1897 @@
+<?php
+
+/* 
+ * The MIT License
+ *
+ * Copyright 2016 vConnect.dk
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * @category Magento
+ * @package Vconnect_AllInOne
+ * @author vConnect
+ * @email kontakt@vconnect.dk
+ * @template app/design/frontend/base/default/template/vconnect/embedded/base.phtml
+ */
+
+/* @var $this Vconnect_AllInOne_Block_Shipping_Dialog */
+
+$dataHelper = $this->getDataHelper();
+$rates = $this->getRates();
+$quote = $this->getBlockQuote();
+
+$vconnect_postnord_data = $quote->getVconnectPostnordData();
+if (!empty($vconnect_postnord_data)) {
+    $vconnect_postnord_data = json_decode($vconnect_postnord_data);
+}
+$shippingCountryId = $this->getData('shippingCountryId');
+$shippingPostcode = $this->getData('shippingPostcode');
+$shippingStreet = $this->getData('shippingStreet');
+
+$shops = array();
+if ($dataHelper->getStoreConfigFlag('carriers/vconnect_postnord_pickupinshop/shops')) {
+    $shops = $dataHelper->unserialize($dataHelper->getStoreConfig('carriers/vconnect_postnord_pickupinshop/shops'));
+}
+
+$isAllinoneActive = false;
+if (!empty($rates)) {
+    foreach ($rates as $rate) {
+        if (!empty($rate['code']) && !empty($rate['vc_method_data'])) {
+            $isAllinoneActive = true;
+            break;
+        }
+    }
+}
+?>
+
+<?php if ($isAllinoneActive): ?>
+<div id="vconnect_allinone_html">
+    <div class="aino-container aino-1column">
+        <div class="aino-core">
+            <?php if ($dataHelper->getStoreConfigFlag('carriers/vconnectpostnord/shipping_methods_description')): ?>
+                <div class="aino-header">
+                    <p>
+                        <?php echo $dataHelper->getStoreConfig('carriers/vconnectpostnord/shipping_methods_description'); ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+            <div class="aino-delivery-methods cf">
+                <ul class="aino-nav aino-deliver-to">
+                    <li data-aino="map" class="method_pickup">
+                        <label class="shipping-method-label aino-input aino-radio">
+                            <button class="aino-backto-shipping"><?php echo __('Tillbaka'); ?></button>
+                            <?php echo __('Ändra ombud'); ?>
+                        </label>
+                        <div class="aino-collapse cf">
+                            <div class="aino-map-container"></div>
+                            <div class="aino-location-list">
+                                <ul class="aino-nav"></ul>
+                            </div>
+                            <div class="aino-locations-footer cf">
+                                <div class="aino-search-point">
+                                    <label>
+                                        <input type="text">
+
+                                        <span>
+                                            <span class="aino-icon-search"></span>
+                                            <?php echo __('Sök postnummer'); ?>
+                                        </span>
+                                    </label>
+                                    <button><?php echo __('Sök'); ?></button>
+                                </div>
+                                <div class="aino-loadmore-locations">
+                                    <button onclick="aino.loadMoreLocations(this)"><?php echo __('Visa fler ombud'); ?></button>
+                                </div>
+                            </div>
+                            <div class="aino-loadmore-locations">
+                                <button onclick="aino.loadMoreLocations(this)"><?php echo __('Visa fler ombud'); ?></button>
+                            </div>
+                        </div>
+                    </li>
+                    <li data-aino="map" class="method_pickupinshop">
+                        <label class="shipping-method-label aino-input aino-radio">
+                            <button class="aino-backto-shipping"><?php echo __('Tillbaka'); ?></button>
+                            <?php echo __('Ändra ombud'); ?>
+                        </label>
+                        <div class="aino-collapse cf">
+                            <div class="aino-map-container"></div>
+                            <div class="aino-location-list">
+                                <ul class="aino-nav"></ul>
+                            </div>
+                            <div class="aino-locations-footer cf">
+                                <div class="aino-search-point"></div>
+                                <div class="aino-loadmore-locations">
+                                    <button onclick="aino.loadMoreLocations_pickupinshop(this)"><?php echo __('Visa fler butiker'); ?></button>
+                                </div>
+                            </div>
+                            <div class="aino-loadmore-locations">
+                                <button onclick="aino.loadMoreLocations_pickupinshop(this)"><?php echo __('Visa fler butiker'); ?></button>
+                            </div>
+                        </div>
+                    </li>
+                    <li data-aino="customize-shipping">
+                        <ul class="aino-nav aino-delivery-detailed">
+                            <?php echo $this->getChildrenHtml('tab_headers') ?>
+                        </ul>
+                    </li>
+                </ul>
+
+                <input class="aio-hidden" type="hidden" id="vconnect_postnord_data" name="vconnect_postnord_data" value="" style="width: 1px; height: 1px;" />
+            </div>
+            <div class="aino-footer">
+                <span><?php echo __('Powered by'); ?></span>
+                <span class="aino-postnord-logo"></span>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var aio_country_id = '';
+        var aio_postcode = '';
+        var aio_street = '';
+        var aino;
+
+        window.pointsEndpoint = "<?php echo $this->getPostnordPointsUrl() ?>";
+        window.transitInformation = "<?php echo $this->getPostnordTransitUrl() ?>";
+        window.savePostnordData = "<?php echo $this->getPostnordDataUrl() ?>";
+    </script>
+
+    <script>
+        jQuery(document).ready(function ($) {
+            var onCoordsLoad = new Event('onCoordsLoad');
+            (function(d, id){
+                if (d.getElementById(id)) {
+                    return;
+                }
+                if (d.head === undefined && document.getElementsByTagName('head').length > 0) {
+                    head_element = document.getElementsByTagName('head')[0];
+                } else {
+                    head_element = d.head;
+                }
+                var css = d.createElement('link');
+                css.id      = id;
+                css.type    ='text/css';
+                css.href    = "https://fonts.googleapis.com/css?family=Roboto:400,700,800";
+                css.rel     = "stylesheet";
+                head_element.appendChild(css);
+
+                var css1    = d.createElement('link');
+                css1.type   = 'text/css';
+                css1.href   = "<?php echo $this->getViewFileUrl("Vconnect_Allinone/css/embedded/normalize.css") ?>";
+                css1.rel    = "stylesheet";
+                head_element.appendChild(css1);
+
+                var css2    = d.createElement('link');
+                css2.type   = 'text/css';
+                css2.href   = "<?php echo $this->getViewFileUrl("Vconnect_Allinone/css/embedded/styles.css") ?>";
+                css2.rel    = "stylesheet";
+                head_element.appendChild(css2);
+            }(document, 'vconnect_postnord_scripts' ));
+
+            if (typeof console === "undefined" || typeof console.log === "undefined") {
+                console = {};
+                console.log = function() {};
+                console.info = function() {};
+            }
+
+            function loadBootstrap(callback) {
+                if (document.head === undefined && document.getElementsByTagName('head').length > 0) {
+                    head_element = document.getElementsByTagName('head')[0];
+                } else {
+                    head_element = document.head;
+                }
+
+                if (typeof google === 'object' && typeof google.maps === 'object') {
+                    console.info('google maps is already here');
+                    callback();
+                } else {
+                    <?php
+                        $key  = $dataHelper->getStoreConfig('carriers/vconnectpostnord/google_maps_api_key');
+                        if($key){
+                            $key = ('&key=' . $key);
+                        }
+                    ?>
+
+                    var script5     = document.createElement('script');
+                    script5.type    = 'text/javascript';
+                    script5.src     = "//maps.googleapis.com/maps/api/js?libraries=geometry<?php echo $key; ?>" ;
+
+                    // bind the event to the callback function (callback)
+                    if(script5.addEventListener) {
+                        script5.addEventListener("load", callback, false); // IE9+, Chrome, Firefox
+                    } else if(script5.readyState) {
+                        script5.onreadystatechange = callback; // IE8
+                    }
+
+                    head_element.appendChild(script5);
+                }
+            }
+
+            loadBootstrap(function () {
+                aio_points = '';
+                aio_country_id = '<?php echo $shippingCountryId; ?>';
+                aio_postcode = '<?php echo $shippingPostcode; ?>';
+                aio_street = '<?php echo $shippingStreet; ?>';
+
+                // remove nearest pickup location for NO-NO
+                if ('<?php echo $dataHelper->getStoreConfig('shipping/origin/country_id'); ?>' == 'NO' && aio_country_id == 'NO') {
+                    jQuery('.aino-mailbox-nearest-title').hide();
+                    jQuery('.aino-mailbox-nearest-description').hide();
+                }
+                
+                if (aio_country_id != '' && aio_postcode == '') {
+                    if (aio_country_id == 'SE') {
+                        aio_postcode = '10044';
+                    } else if (aio_country_id == 'FI') {
+                        aio_postcode = '00100';
+                    } else if (aio_country_id == 'NO') {
+                        aio_postcode = '0107';
+                    } else if (aio_country_id == 'DK') {
+                        aio_postcode = '1000';
+                    }
+                }
+
+                if (aio_country_id && aio_postcode && aio_street) {
+                    var geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({
+                        address: aio_street + ',' + aio_postcode + ',' + aio_country_id
+                    }, function(results, status) {
+                        if (results.length > 0 && status == google.maps.GeocoderStatus.OK) {
+                            window.current_loc = results[0].geometry.location;
+                        } else {
+                            window.current_loc = false;
+                        }
+                        document.dispatchEvent(onCoordsLoad);
+                    });
+                }
+
+                jQuery(document).ready(function ($) {
+                    // MAP functons for "Pickup" method
+                    var AinoMapInit = function () {
+                        String.prototype.insertString = function (start, delCount, newSubStr) {
+                            return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount));
+                        };
+
+                        var markers = [], userChoice = {}, data = {}, sortedData = [], allData = [], carriers = [], limit,
+                            myLatLng, map, infowindow,
+                            bounds = new google.maps.LatLngBounds(),
+                            geocoder = new google.maps.Geocoder(),
+                            directionsService = new google.maps.DirectionsService;
+
+                        function mapHighlight() {
+                            if (typeof myLatLng != 'undefined') {
+                                var miniBounds = new google.maps.LatLngBounds();
+
+                                lat_max = '';
+                                lat_min = '';
+                                lng_max = '';
+                                lng_min = '';
+
+                                if (sortedData.length > 0) {
+                                    $.each( sortedData, function( i, v ) {
+                                        if (v.coordinate.northing > lat_max || lat_max == '') {
+                                            lat_max = v.coordinate.northing;
+                                        }
+                                        if (v.coordinate.northing < lat_min || lat_min == '') {
+                                            lat_min = v.coordinate.northing;
+                                        }
+                                        if (v.coordinate.easting > lng_max || lng_max == '') {
+                                            lng_max = v.coordinate.easting;
+                                        }
+                                        if (v.coordinate.easting < lng_min || lng_min == '') {
+                                            lng_min = v.coordinate.easting;
+                                        }
+                                    });
+                                }
+
+                                userChoiceItem = '';
+                                if (userChoice.servicePointId) {
+                                    userChoiceItem = userChoice;
+                                } else if (myLatLng) {
+                                    userChoiceItem = {lat: myLatLng.lat(), lng: myLatLng.lng()};
+                                }
+
+                                if (userChoiceItem) {
+                                     var miniMap = new google.maps.Map($('.aino-mini-map.method_pickup')[0], {
+                                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                                    });
+
+                                    google.maps.event.trigger(miniMap, 'resize');
+                                    miniMap.setZoom(miniMap.getZoom());
+
+                                    var choiceLatLng = new google.maps.LatLng({
+                                        lat: parseFloat(userChoiceItem.lat),
+                                        lng: parseFloat(userChoiceItem.lng)
+                                    });
+
+                                    var choiceDestinationMarker = new google.maps.Marker({
+                                        position: choiceLatLng,
+                                        map: miniMap,
+                                        icon: {
+                                            url: '<?php echo $this->getViewFileUrl('Vconnect_Allinone/images/embedded/marker-carrier.png') ?>',
+                                            scaledSize: new google.maps.Size(40, 40)
+                                        }
+                                    });
+
+                                    miniBounds.extend(choiceLatLng);
+                                    if (typeof infowindow !== 'undefined') {
+                                        infowindow.open(map, choiceDestinationMarker);
+                                    }
+
+                                    if (lat_max != '' && lat_min != '' && lng_max != '' && lng_min != '') {
+                                        miniMap.setCenter(choiceLatLng);
+
+                                        miniMap.fitBounds(new google.maps.LatLngBounds(
+                                          //bottom left
+                                          new google.maps.LatLng(lat_min, lng_min),
+                                          //top right
+                                          new google.maps.LatLng(lat_max, lng_max)
+                                        ));
+
+                                        miniMap.setZoom(miniMap.getZoom());
+                                    }
+                                }
+                            }
+                        }
+
+                        function getPickupPoints(country_id, street, postcode) {
+                            data = [];
+
+                            if (country_id && postcode) {
+                                console.log('getPickupPoints called');
+
+                                var dataToSend = {
+                                    country_id  : country_id,
+                                    postcode    : postcode
+                                };
+
+                                if(street){
+                                    dataToSend.street = street;
+                                }
+
+                                $.ajax({
+                                    url     : pointsEndpoint,
+                                    type    : 'POST',
+                                    global  : false,
+                                    data    : dataToSend
+                                }).done(function (points) {
+                                    if( typeof points.postnord.servicePointInformationResponse === 'undefined')
+                                    {
+                                        if( typeof points.postnord.message !== 'undefined'){
+                                            console.error(points.postnord.message);
+                                        }
+                                        return console.log('Pickup api\'s return unknown error');
+                                    }
+
+                                    data = points.postnord.servicePointInformationResponse.servicePoints;
+
+                                    showPickupPoints();
+                                });
+                            }
+
+                            return data;
+                        }
+
+                        function showPickupPoints() {
+                            if (window.current_loc) {
+                                myLatLng = new google.maps.LatLng({
+                                    lat: window.current_loc.lat(),
+                                    lng: window.current_loc.lng()
+                                });
+                            } else if (data.length > 0) {
+                                temp_data = data;
+                                temp_data.sort(function(a,b){
+                                    return a.routeDistance - b.routeDistance;
+                                });
+
+                                myLatLng = new google.maps.LatLng({
+                                    lat: temp_data[0].coordinate.northing,
+                                    lng: temp_data[0].coordinate.easting
+                                });
+                            }
+
+
+                            if (data) {
+                                if (data.length > 1) {
+                                    $('.aino-mini-map.method_pickup').parents('.aino-collapse:eq(0)').find('.aino-user-choicen-destination .aino-button').show();
+                                }
+
+                                $('.aino-failed').hide();
+                                _clearListLocations();
+
+                                _sortArrayData();
+
+                                //set up the list of locations so the map can get the dynamic height from it
+                                _setListLocations();
+                                _mapHeight();
+                                _startupMap();
+
+                                //set markers to the map
+                                _setMapContent();
+                                map.fitBounds(bounds);
+                                _triggerClosestLocationOnInit();
+                            } else {
+                                $('.aino-failed').show();
+                            }
+                        }
+
+                        function _startupMap() {
+                            map = new google.maps.Map($('.method_pickup .aino-map-container')[0], {
+                                center: myLatLng,
+                                disableDefaultUI: true,
+                                mapTypeId: google.maps.MapTypeId.ROADMAP
+                            });
+
+                            var homeMarker = new google.maps.Marker({
+                                position: myLatLng,
+                                map: map,
+                                icon: {
+                                    url: '<?php echo $this->getViewFileUrl('Vconnect_Allinone/images/embedded/home-marker.png') ?>',
+                                    scaledSize: new google.maps.Size(40, 40)
+                                }
+                            });
+
+                            infowindow = new google.maps.InfoWindow();
+                        }
+
+                        function _sortArrayData() {
+                            var dist;
+                            allData = data;
+
+                            for (var x = 0; x < data.length; x++) {
+                                dist = _calcDistance({lat: data[x].coordinate.northing, lng: data[x].coordinate.easting});
+                                allData[x].destination = dist;
+                            }
+
+                            allData = allData.sort(function (a, b) {
+                                return a.destination - b.destination;
+                            });
+
+                            sortedData = allData;
+                        }
+
+                        function _calcDistance(targetPosition) {
+                            if (typeof(Number.prototype.toRadians) === "undefined") {
+                                Number.prototype.toRadians = function () {
+                                    return this * (Math.PI / 180);
+                                }
+                            }
+
+                            if (typeof myLatLng === 'undefined') {
+                                return 0;
+                            }
+
+                            var R = 6371; // metres
+                            var f1 = myLatLng.lat().toRadians();
+                            var f2 = targetPosition.lat.toRadians();
+                            var df = (targetPosition.lat - myLatLng.lat()).toRadians();
+                            var dg = (targetPosition.lng - myLatLng.lng()).toRadians();
+
+                            var a = Math.sin(df / 2) * Math.sin(df / 2) +
+                                Math.cos(f1) * Math.cos(f2) *
+                                Math.sin(dg / 2) * Math.sin(dg / 2);
+                            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+                            var d = R * c;
+
+                            return d.toFixed(10);
+                        }
+
+                        function _setMapContent() {
+                            var image = {
+                                url: '<?php echo $this->getViewFileUrl('Vconnect_Allinone/images/embedded/marker-carrier.png') ?>',
+                                scaledSize: new google.maps.Size(40, 40)
+                            };
+
+                            var len = limit ? limit : sortedData.length;
+
+                            for (var i = 0; i < len; i++) {
+                                var pointsLatLng = new google.maps.LatLng(sortedData[i].coordinate.northing, sortedData[i].coordinate.easting);
+                                bounds.extend(pointsLatLng);
+
+                                var marker = new google.maps.Marker({
+                                    position: pointsLatLng,
+                                    map: map,
+                                    icon: image
+                                });
+
+                                markers.push(marker);
+
+                                marker.addListener('click', function () {
+                                    _showDuration(this);
+                                    _setActiveListItemFromMarker(this);
+                                });
+                            }
+                        }
+
+                        function _setListLocations() {
+                            var container = $('.method_pickup .aino-location-list > ul');
+                            var full = container.find('li').length > 0;
+                            var len = limit ? limit : sortedData.length;
+                            if (full) {
+                                container.find('li').remove();
+                            }
+
+                            for (var x = 0; x < len; x++) {
+                                var monFriOpen = (typeof sortedData[x].openingHours !== 'undefined')
+                                    ? sortedData[x].openingHours[0].from1.insertString(2, 0, ":") : '';
+                                var monFriClose = (typeof sortedData[x].openingHours !== 'undefined')
+                                    ? sortedData[x].openingHours[0].to1.insertString(2, 0, ":") : '';
+                                var satOpen = (typeof sortedData[x].openingHours !== 'undefined')
+                                    ? sortedData[x].openingHours[sortedData[x].openingHours.length - 1].from1.insertString(2, 0, ":") : '';
+                                var satClose = (typeof sortedData[x].openingHours !== 'undefined')
+                                    ? sortedData[x].openingHours[sortedData[x].openingHours.length - 1].to1.insertString(2, 0, ":") : '';
+
+
+                                var listItem = $('<li data-servicepointid="'+ sortedData[x].servicePointId +'"></li>');
+                                var shell = $('<label class="aino-location-container aino-input aino-checkbox"></label>')
+                                    .append($('<input type="radio" name="aino-location" value="" class="tinyCheck-done" >'))
+                                    .append($('<span class="aino-indicator"></span>'))
+                                    .append($('<b class="aino-location-title">' + sortedData[x].name + '</b>'))
+                                    .append($('<span class="aino-delivery-time aino-text-light"><?php echo __('Leveranstid 1 vardag'); ?></span>'))
+                                    .append($('<span class="aino-destination-info aino-text-light"> '
+                                        + sortedData[x].visitingAddress.streetName + ' ' + (sortedData[x].visitingAddress.streetNumber ? sortedData[x].visitingAddress.streetNumber : '') + ' <br> '
+                                        + ((monFriOpen || monFriClose) ? '<?php echo __('Mån-Fre'); ?>: ' + monFriOpen + ' - ' + monFriClose : '') + '<br>'
+                                        + ((satOpen || satClose) ? "<?php echo __('Lör-Sön'); ?>: " + satOpen + ' - ' + satClose : '') + '</span>'))
+                                    .append($('<span class="carrier-logo"><span class="aino-postnord-logo"></span></span>'))
+                                    .append($('<hr>'));
+
+                                shell.appendTo(listItem.appendTo(container));
+                            }
+
+                            _setActiveMarkerFromListItem();
+                        }
+
+                        function _triggerClosestLocationOnInit() {
+                            var listItems = $('.method_pickup .aino-location-list').find('.aino-location-container');
+                            var firstItem = $(listItems[0]);
+
+                            <?php if ($vconnect_postnord_data && isset($vconnect_postnord_data->code) && !empty($vconnect_postnord_data->data)  && !empty($vconnect_postnord_data->data->servicePointId)): ?>
+                            if ($(allinone_find_form_element_id + " input[type=radio]:checked").length > 0 && $(allinone_find_form_element_id + " input[type=radio]:checked").val().indexOf('vconnectpostnord_') != -1 && $(allinone_find_form_element_id + " input[type=radio]:checked").val() == '<?php echo $vconnect_postnord_data->code; ?>' && listItems.length > 0) {
+                                listItems.each(function (index) {
+                                    if ($(this).parent().data('servicepointid') && '<?php echo $vconnect_postnord_data->data->servicePointId; ?>' == $(this).parent().data('servicepointid')) {
+                                        firstItem = $(this);
+
+                                        return false;
+                                    }
+                                });
+                            }
+                            <?php endif; ?>
+
+                            $(firstItem).trigger('click');
+                        }
+
+                        function _setActiveMarkerFromListItem() {
+                            var listItems = $('.method_pickup .aino-location-container').find('input');
+
+                            listItems.each(function (index) {
+                                $(this).unbind('change').on('change', function () {
+
+                                    $(listItems).closest('.aino-location-container').removeClass('aino-active');
+                                    $(this).closest('.aino-location-container').addClass('aino-active');
+
+                                    _showDuration(markers[index]);
+                                    _setUserChoiceToFields(index);
+                                    userChoice = _makeUserChoice(index);
+                                    if ($(allinone_find_form_element_id + ' input[type=radio]:checked').length != 0 && $(allinone_find_form_element_id + ' input[type=radio]:checked').val().indexOf('vconnectpostnord_') != -1) {
+                                        addVconnectPostnordData($(allinone_find_form_element_id + ' input[type=radio]:checked'));
+                                    }
+                                });
+                            });
+                        }
+
+                        function _setActiveListItemFromMarker(self) {
+                            var index = 0;
+                            var x = 0;
+                            var locationList = $('.method_pickup .aino-location-list');
+                            var listItem = $(locationList).find('li');
+
+                            for (var i = 0; i < markers.length; i++) {
+                                if (markers[i] === self) {
+                                    index = $(listItem).index($(listItem[i]));
+                                    userChoice = _makeUserChoice(i);
+                                    if ($(allinone_find_form_element_id + ' input[type=radio]:checked').length != 0 && $(allinone_find_form_element_id + ' input[type=radio]:checked').val().indexOf('vconnectpostnord_') != -1) {
+                                        addVconnectPostnordData($(allinone_find_form_element_id + ' input[type=radio]:checked'));
+                                    }
+                                }
+
+                                x++;
+                            }
+
+                            $(listItem[index]).find('input').prop('checked', true);
+                            $(listItem).find('.aino-location-container').removeClass('aino-active');
+                            $(listItem[index]).find('.aino-location-container').addClass('aino-active');
+
+                            locationList.animate({
+                                scrollTop: 0
+                            }, 0);
+                            locationList.animate({
+                                scrollTop: $($(listItem[index])).position().top - locationList.offset().top + locationList.scrollTop()
+                            }, 0);
+                            _setUserChoiceToFields(index);
+                        }
+
+                        function _showDuration(marker) {
+                            var request = {
+                                destination: {lat: marker.position.lat(), lng: marker.position.lng()},
+                                origin: myLatLng,
+                                travelMode: google.maps.TravelMode['WALKING']
+                            };
+
+                            directionsService.route(request, function (response, status) {
+                                if (status == google.maps.DirectionsStatus.OK) {
+                                    // Display the route on the map.
+
+                                    var duration = response.routes[0].legs[0].duration.text;
+
+                                    infowindow.close();
+
+                                    infowindow.setContent('<img src="<?php echo $this->getViewFileUrl('Vconnect_Allinone/images/embedded/icon-walk.png') ?>" class="aino-travel-mode"/>' + duration + ' <?php echo __('bort'); ?>');
+
+                                    infowindow.open(map, marker);
+
+                                    _panToMarker(marker);
+                                }
+
+                                google.maps.event.addListenerOnce(map, 'zoom_changed', function () {
+                                    var oldZoom = map.getZoom();
+
+                                    if (oldZoom > 15) {
+                                        map.setZoom(oldZoom - 1);
+                                    }
+                                    else {
+                                        map.setZoom(oldZoom);
+                                    }
+                                });
+                            });
+                        }
+
+                        function _panToMarker(marker) {
+                            map.setZoom(16);
+                            map.panTo(marker.getPosition());
+                        }
+
+                        function _makeUserChoice(index) {
+                            return {
+                                'name': sortedData[index].name,
+                                'streetName': sortedData[index].visitingAddress.streetName,
+                                'streetNumber': sortedData[index].visitingAddress.streetNumber,
+                                'postcode': sortedData[index].visitingAddress.postalCode,
+                                'city': sortedData[index].visitingAddress.city,
+                                'servicePointId': sortedData[index].servicePointId,
+                                'countryCode': sortedData[index].visitingAddress.countryCode,
+                                'lat': sortedData[index].coordinate.northing,
+                                'lng': sortedData[index].coordinate.easting,
+                                'deliveryAddress': sortedData[index].visitingAddress
+                            }
+                        }
+
+                        function _mapHeight() {
+                            var h = 0;
+                            var listItems = $('.method_pickup .aino-location-list').find('li');
+
+                            for (var x = 0; x < 3; x++) {
+                                h += $(listItems).height();
+                            }
+
+                            $('.method_pickup .aino-map-container').height(h);
+                            $('.method_pickup .aino-location-list').height(h);
+
+                        }
+
+                        function _clearListLocations() {
+                            var container = $('.vcsa-location-list > ul');
+                            $(container).find('li').remove();
+
+                            for (var key in markers) {
+                                for (var i = 0; i < markers.length; i++) {
+                                    markers[i].setMap(null);
+                                }
+                            }
+
+                            sortedData = [];
+                            markers = [];
+                        }
+
+                        function _setUserChoiceToFields(index) {
+                            var monFriOpen = (typeof sortedData[index].openingHours !== 'undefined')
+                                ? sortedData[index].openingHours[0].from1.insertString(2, 0, ":") : '';
+                            var monFriClose = (typeof sortedData[index].openingHours !== 'undefined')
+                                ? sortedData[index].openingHours[0].to1.insertString(2, 0, ":") : '';
+                            var satOpen = (typeof sortedData[index].openingHours !== 'undefined')
+                                ? sortedData[index].openingHours[sortedData[index].openingHours.length - 1].from1.insertString(2, 0, ":") : '';
+                            var satClose = (typeof sortedData[index].openingHours !== 'undefined')
+                                ? sortedData[index].openingHours[sortedData[index].openingHours.length - 1].to1.insertString(2, 0, ":") : '';
+
+                            var name = sortedData[index].name;
+                            var info = sortedData[index].visitingAddress.streetName + ' ' + (sortedData[index].visitingAddress.streetNumber ? sortedData[index].visitingAddress.streetNumber : '') + ' <br> '
+                                + ((monFriOpen || monFriClose) ? '<?php echo __('Mån-Fre'); ?>: ' + monFriOpen + ' - ' + monFriClose : '') + '<br>'
+                                + ((satOpen || satClose) ? "<?php echo __('Lör-Sön'); ?>: " + satOpen + ' - ' + satClose : '');
+
+                            $('.aino-user-choicen-destination .aino-destination-name').html(name);
+                            $('.aino-user-choicen-destination .aino-destination-info').html(info);
+                        }
+
+                        return {
+                            limitOfLocations: function (value) {
+                                limit = value;
+                            },
+                            getPickupPoints: function (country_id, street, postcode) {
+                                getPickupPoints(country_id, street, postcode);
+                            },
+                            showPickupPoints: function (points) {
+                                data = points;
+                                showPickupPoints();
+                            },
+                            getUserChoice: function () {
+                                return userChoice;
+                            },
+                            mapHighlight: function () {
+                                mapHighlight();
+                            }
+                        }
+                    };
+
+                    // MAP functons for "Pickupinshop" method
+                    var AinoMapInitForPickupInShop = function () {
+                        String.prototype.insertString = function (start, delCount, newSubStr) {
+                            return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount));
+                        };
+
+                        var markers = [], userChoice = {}, data = {}, sortedData = [], allData = [], carriers = [], limit,
+                            myLatLng, map, infowindow,
+                            bounds = new google.maps.LatLngBounds(),
+                            geocoder = new google.maps.Geocoder(),
+                            directionsService = new google.maps.DirectionsService;
+
+                        function loadMapHighlight() {
+                            if (window.current_loc) {
+                                myLatLng = new google.maps.LatLng({
+                                    lat: window.current_loc.lat(),
+                                    lng: window.current_loc.lng()
+                                });
+                            }
+
+                            var miniBounds = new google.maps.LatLngBounds();
+
+                            lat_max = '';
+                            lat_min = '';
+                            lng_max = '';
+                            lng_min = '';
+
+                            first_pickupinshop_item = '';
+                            <?php if ($shops): ?>
+                            pickupinshop_points = JSON.parse('<?php echo json_encode(array_values($shops)); ?>');
+                            if (pickupinshop_points.length > 1) {
+                                $('.aino-mini-map.method_pickupinshop').parents('.aino-collapse:eq(0)').find('.aino-user-choicen-destination .aino-button').show();
+                            }
+
+                            $.each( pickupinshop_points, function( i, v ) {
+                                if (v.shop_lat > lat_max || lat_max == '') {
+                                    lat_max = v.shop_lat;
+                                }
+                                if (v.shop_lat < lat_min || lat_min == '') {
+                                    lat_min = v.shop_lat;
+                                }
+                                if (v.shop_lng > lng_max || lng_max == '') {
+                                    lng_max = v.shop_lng;
+                                }
+                                if (v.shop_lng < lng_min || lng_min == '') {
+                                    lng_min = v.shop_lng;
+                                }
+                            });
+
+                            if (typeof window.current_loc !== 'undefined' && window.current_loc) {
+                                $.each( pickupinshop_points, function( i, v ) {
+                                    distance = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(window.current_loc.lat(), window.current_loc.lng()), new google.maps.LatLng(parseFloat(v.shop_lat), parseFloat(v.shop_lng)));
+                                    pickupinshop_points[i].routeDistance = distance;
+                                });
+                            }
+
+                            pickupinshop_points.sort(function(a,b){
+                                return a.routeDistance - b.routeDistance;
+                            });
+
+                            first_pickupinshop_item = pickupinshop_points[0];
+                            <?php endif; ?>
+
+                            userChoiceItem = '';
+                            if (userChoice.servicePointId) {
+                                userChoiceItem = userChoice;
+                            } else if (first_pickupinshop_item) {
+                                userChoiceItem = {lat:first_pickupinshop_item.shop_lat, lng:first_pickupinshop_item.shop_lng};
+                            }
+
+                            if (userChoiceItem) {
+                                var miniMap = new google.maps.Map($('.aino-mini-map.method_pickupinshop')[0], {
+                                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                                });
+
+                                google.maps.event.trigger(miniMap, 'resize');
+                                miniMap.setZoom(miniMap.getZoom());
+
+                                var choiceLatLng = new google.maps.LatLng({
+                                    lat: parseFloat(userChoiceItem.lat),
+                                    lng: parseFloat(userChoiceItem.lng)
+                                });
+
+                                var choiceDestinationMarker = new google.maps.Marker({
+                                    position: choiceLatLng,
+                                    map: miniMap,
+                                    icon: {
+                                        url: '<?php echo $this->getViewFileUrl('Vconnect_Allinone/images/embedded/marker-carrier.png') ?>',
+                                        scaledSize: new google.maps.Size(40, 40)
+                                    }
+                                });
+
+                                miniBounds.extend(choiceLatLng);
+                                if (typeof infowindow !== 'undefined') {
+                                    infowindow.open(map, choiceDestinationMarker);
+                                }
+
+                                if (lat_max != '' && lat_min != '' && lng_max != '' && lng_min != '') {
+                                    miniMap.setCenter(choiceLatLng);
+
+                                    miniMap.fitBounds(new google.maps.LatLngBounds(
+                                      //bottom left
+                                      new google.maps.LatLng(lat_min, lng_min),
+                                      //top right
+                                      new google.maps.LatLng(lat_max, lng_max)
+                                    ));
+
+                                    miniMap.setZoom(miniMap.getZoom());
+                                }
+                            }
+                        }
+
+                        function mapHighlight() {
+                            if (typeof window.current_loc !== 'undefined') {
+                                loadMapHighlight();
+                            } else {
+                                if (aio_country_id && aio_postcode && !aio_street) {
+                                    loadMapHighlight();
+                                } else {
+                                    document.addEventListener('onCoordsLoad', function () {
+                                        loadMapHighlight();
+                                    }, false);
+                                }
+                            }
+                        }
+
+                        function getPickupPoints(country_id, street, postcode) {
+                            data = [];
+
+                            if (country_id && postcode) {
+                                console.log('getPickupPoints called');
+
+                                var dataToSend = {
+                                    country_id  : country_id,
+                                    postcode    : postcode
+                                };
+
+                                if(street){
+                                    dataToSend.street = street;
+                                }
+
+                                $.ajax({
+                                    url     : pointsEndpoint,
+                                    type    : 'POST',
+                                    global  : false,
+                                    data    : dataToSend,
+                                }).done(function (points) {
+                                    if( typeof points.postnord.servicePointInformationResponse === 'undefined')
+                                    {
+                                        if( typeof points.postnord.message !== 'undefined'){
+                                            console.error(points.postnord.message);
+                                        }
+                                        return console.log('Pickup api\'s return unknown error');
+                                    }
+
+                                    data = points.postnord.servicePointInformationResponse.servicePoints;
+
+                                    showPickupPoints();
+                                });
+                            }
+
+                            return data;
+                        }
+
+                        function showPickupPointsLoad() {
+                            <?php if ($shops): ?>
+                            pickupinshop_points = JSON.parse('<?php echo json_encode(array_values($shops)); ?>');
+
+                            if (window.current_loc) {
+                                $.each( pickupinshop_points, function( i, v ) {
+                                    distance = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(window.current_loc.lat(), window.current_loc.lng()), new google.maps.LatLng(parseFloat(v.shop_lat), parseFloat(v.shop_lng)));
+                                    pickupinshop_points[i].routeDistance = distance;
+                                });
+
+                                temp_data = pickupinshop_points;
+                                temp_data.sort(function(a,b){
+                                    return a.routeDistance - b.routeDistance;
+                                });
+
+                                pickupinshop_points = temp_data;
+                            }
+
+                            data = pickupinshop_points;
+
+                            if (window.current_loc) {
+                                myLatLng = new google.maps.LatLng({
+                                    lat: window.current_loc.lat(),
+                                    lng: window.current_loc.lng()
+                                });
+                            } else if (data.length > 0) {
+                                temp_data = data;
+                                temp_data.sort(function(a,b){
+                                    return a.routeDistance - b.routeDistance;
+                                });
+
+                                myLatLng = new google.maps.LatLng({
+                                    lat: parseFloat(temp_data[0].shop_lat),
+                                    lng: parseFloat(temp_data[0].shop_lng)
+                                });
+
+                                data = temp_data;
+                            }
+
+                            if (data) {
+                                $('.aino-failed').hide();
+                                _clearListLocations();
+
+                                sortedData = data;
+
+                                //set up the list of locations so the map can get the dynamic height from it
+                                _setListLocations();
+                                _mapHeight();
+                                _startupMap();
+
+                                //set markers to the map
+                                _setMapContent();
+                                map.fitBounds(bounds);
+                                _triggerClosestLocationOnInit();
+                            } else {
+                                $('.aino-failed').show();
+                            }
+                            <?php endif; ?>
+                        }
+
+                        function showPickupPoints() {
+                            if (typeof window.current_loc !== 'undefined') {
+                                showPickupPointsLoad();
+                            } else {
+                                if (aio_country_id && aio_postcode && !aio_street) {
+                                    showPickupPointsLoad();
+                                } else {
+                                    document.addEventListener('onCoordsLoad', function() {
+                                        showPickupPointsLoad();
+                                    }, false);
+                                }
+                            }
+                        }
+
+                        function _startupMap() {
+                            map = new google.maps.Map($('.method_pickupinshop .aino-map-container')[0], {
+                                center: myLatLng,
+                                disableDefaultUI: true,
+                                mapTypeId: google.maps.MapTypeId.ROADMAP
+                            });
+
+                            var homeMarker = new google.maps.Marker({
+                                position: myLatLng,
+                                map: map,
+                                icon: {
+                                    url: '<?php echo $this->getViewFileUrl('Vconnect_Allinone/images/embedded/home-marker.png') ?>',
+                                    scaledSize: new google.maps.Size(40, 40)
+                                }
+                            });
+
+                            infowindow = new google.maps.InfoWindow();
+                        }
+
+                        function _setMapContent() {
+                            var image = {
+                                url: '<?php echo $this->getViewFileUrl('Vconnect_Allinone/images/embedded/marker-carrier.png') ?>',
+                                scaledSize: new google.maps.Size(40, 40)
+                            };
+
+                            var len = limit ? limit : sortedData.length;
+
+                            for (var i = 0; i < len; i++) {
+                                var pointsLatLng = new google.maps.LatLng(parseFloat(sortedData[i].shop_lat), parseFloat(sortedData[i].shop_lng));
+                                bounds.extend(pointsLatLng);
+
+                                var marker = new google.maps.Marker({
+                                    position: pointsLatLng,
+                                    map: map,
+                                    icon: image
+                                });
+
+                                markers.push(marker);
+
+                                marker.addListener('click', function () {
+                                    _showDuration(this);
+                                    _setActiveListItemFromMarker(this);
+                                });
+                            }
+                        }
+
+                        function _setListLocations() {
+                            var container = $('.method_pickupinshop .aino-location-list > ul');
+                            var full = container.find('li').length > 0;
+                            var len = limit ? limit : sortedData.length;
+                            if (full) {
+                                container.find('li').remove();
+                            }
+
+                            var shippingMethodLogo = '';
+                            <?php if ($dataHelper->getStoreConfigFlag('carriers/vconnect_postnord_pickupinshop/logo')): ?>
+                                <?php $image = $this->getBaseUrl() . 'pub/media/vconnect/allinone/pickinstore/' . $dataHelper->getStoreConfig('carriers/vconnect_postnord_pickupinshop/logo');?>
+                                shippingMethodLogo = '<?php echo $image; ?>';
+                            <?php endif; ?>
+
+                            for (var x = 0; x < len; x++) {
+                                data_description = sortedData[x].shop_name + ' - ' + sortedData[x].shop_address + (sortedData[x].shop_postnord_id == '' ? '' : ' - Postnord ID: ' + sortedData[x].shop_postnord_id);
+                                var listItem = $('<li data-pickupinshoppointindex="'+ x +'"></li>');
+                                var shell = $('<label class="aino-location-container aino-input aino-checkbox"></label>')
+                                    .append($('<input type="radio" name="aino-location" value="" class="tinyCheck-done" >'))
+                                    .append($('<span class="aino-indicator"></span>'))
+                                    .append($('<b class="aino-location-title">' + sortedData[x].shop_name + '</b>'))
+                                    .append($('<span class="aino-delivery-time aino-text-light"><?php echo __('Leveranstid 1 vardag'); ?></span>'))
+                                    .append($('<span class="aino-destination-info aino-text-light"> '
+                                        + sortedData[x].shop_address + ' <br> '
+                                        + sortedData[x].shop_description + '</span>'))
+                                    .append($('<span class="carrier-logo">'+(shippingMethodLogo ? '<img src="'+shippingMethodLogo+'" height="30" alt="">' : '')+'</span>'))
+                                    .append($('<hr>'));
+
+                                shell.appendTo(listItem.appendTo(container));
+                            }
+
+                            _setActiveMarkerFromListItem();
+                        }
+
+                        function _triggerClosestLocationOnInit() {
+                            var listItems = $('.method_pickupinshop .aino-location-list').find('.aino-location-container');
+                            var firstItem = $(listItems[0]);
+
+                            <?php if ($vconnect_postnord_data && isset($vconnect_postnord_data->code) && !empty($vconnect_postnord_data->data) && strpos($vconnect_postnord_data->code, 'pickupinshop') !== false && isset($vconnect_postnord_data->data->index)): ?>
+                            listItems.each(function (index) {
+                                if (index == '<?php echo $vconnect_postnord_data->data->index; ?>') {
+                                    firstItem = $(this);
+                                    return false;
+                                }
+                            });
+                            <?php endif; ?>
+
+                            $(firstItem).trigger('click');
+                        }
+
+                        function _setActiveMarkerFromListItem() {
+                            var listItems = $('.method_pickupinshop .aino-location-container').find('input');
+
+                            listItems.each(function (index) {
+                                $(this).unbind('change').on('change', function () {
+                                    $(listItems).closest('.aino-location-container').removeClass('aino-active');
+                                    $(this).closest('.aino-location-container').addClass('aino-active');
+
+                                    _showDuration(markers[index]);
+                                    _setUserChoiceToFields(index);
+                                    userChoice = _makeUserChoice(index);
+                                    if ($(allinone_find_form_element_id + ' input[type=radio]:checked').length != 0 && $(allinone_find_form_element_id + ' input[type=radio]:checked').val().indexOf('vconnectpostnord_') != -1) {
+                                        addVconnectPostnordData($(allinone_find_form_element_id + ' input[type=radio]:checked'));
+                                    }
+                                });
+                            });
+                        }
+
+                        function _setActiveListItemFromMarker(self) {
+                            var index = 0;
+                            var x = 0;
+                            var locationList = $('.method_pickupinshop .aino-location-list');
+                            var listItem = $(locationList).find('li');
+
+                            for (var i = 0; i < markers.length; i++) {
+                                if (markers[i] === self) {
+                                    index = $(listItem).index($(listItem[i]));
+                                    userChoice = _makeUserChoice(i);
+                                    if ($(allinone_find_form_element_id + ' input[type=radio]:checked').length != 0 && $(allinone_find_form_element_id + ' input[type=radio]:checked').val().indexOf('vconnectpostnord_') != -1) {
+                                        addVconnectPostnordData($(allinone_find_form_element_id + ' input[type=radio]:checked'));
+                                    }
+                                }
+
+                                x++;
+                            }
+
+                            $(listItem[index]).find('input').prop('checked', true);
+                            $(listItem).find('.aino-location-container').removeClass('aino-active');
+                            $(listItem[index]).find('.aino-location-container').addClass('aino-active');
+
+                            locationList.animate({
+                                scrollTop: 0
+                            }, 0);
+                            locationList.animate({
+                                scrollTop: $($(listItem[index])).position().top - locationList.offset().top + locationList.scrollTop()
+                            }, 0);
+                            _setUserChoiceToFields(index);
+                        }
+
+                        function _showDuration(marker) {
+                            var request = {
+                                destination: {lat: marker.position.lat(), lng: marker.position.lng()},
+                                origin: myLatLng,
+                                travelMode: google.maps.TravelMode['WALKING']
+                            };
+
+                            directionsService.route(request, function (response, status) {
+                                if (status == google.maps.DirectionsStatus.OK) {
+                                    // Display the route on the map.
+
+                                    var duration = response.routes[0].legs[0].duration.text;
+
+                                    infowindow.close();
+
+                                    infowindow.setContent('<img src="<?php echo $this->getViewFileUrl('Vconnect_Allinone/images/embedded/icon-walk.png') ?>" class="aino-travel-mode"/>' + duration + ' <?php echo __('bort'); ?>');
+
+                                    infowindow.open(map, marker);
+
+                                    _panToMarker(marker);
+                                }
+
+                                google.maps.event.addListenerOnce(map, 'zoom_changed', function () {
+                                    var oldZoom = map.getZoom();
+
+                                    if (oldZoom > 15) {
+                                        map.setZoom(oldZoom - 1);
+                                    }
+                                    else {
+                                        map.setZoom(oldZoom);
+                                    }
+                                });
+                            });
+                        }
+
+                        function _panToMarker(marker) {
+                            map.setZoom(16);
+                            map.panTo(marker.getPosition());
+                        }
+
+                        function _makeUserChoice(index) {
+                            var pickupinshopDeliveryAddress = { 'streetName': sortedData[index].shop_address, 'streetNumber': '', 'city': '', 'postcode': '', 'countryCode': '' }
+
+                            return {
+                                'name': sortedData[index].shop_name,
+                                'streetName': sortedData[index].shop_address,
+                                'streetNumber': '',
+                                'postcode': '',
+                                'city': '',
+                                'servicePointId': sortedData[index].shop_postnord_id,
+                                'countryCode': '',
+                                'lat': parseFloat(sortedData[index].shop_lat),
+                                'lng': parseFloat(sortedData[index].shop_lng),
+                                'index': index,
+                                'deliveryAddress': pickupinshopDeliveryAddress,
+                            }
+                        }
+
+                        function _mapHeight() {
+                            var h = 0;
+                            var listItems = $('.method_pickupinshop .aino-location-list').find('li');
+
+                            for (var x = 0; x < 3; x++) {
+                                h += $(listItems).height();
+                            }
+
+                            $('.method_pickup .aino-map-container').height(h);
+                            $('.method_pickup .aino-location-list').height(h);
+                        }
+
+                        function _clearListLocations() {
+                            var container = $('.vcsa-location-list > ul');
+                            $(container).find('li').remove();
+
+                            for (var key in markers) {
+                                for (var i = 0; i < markers.length; i++) {
+                                    markers[i].setMap(null);
+                                }
+                            }
+
+                            sortedData = [];
+                            markers = [];
+                        }
+
+                        function _setUserChoiceToFields(index) {
+                            var name = sortedData[index].shop_name;
+                            var info = sortedData[index].shop_address + ' <br> '
+                                + sortedData[index].shop_description;
+
+                            $('.aino-user-choicen-destination .aino-destination-name-pickupinshop').html(name);
+                            $('.aino-user-choicen-destination .aino-destination-info-pickupinshop').html(info);
+                        }
+
+                        return {
+                            limitOfLocations: function (value) {
+                                limit = value;
+                            },
+                            getPickupPoints: function (country_id, street, postcode) {
+                                getPickupPoints(country_id, street, postcode);
+                            },
+                            showPickupPoints: function () {
+                                showPickupPoints();
+                            },
+                            getUserChoice: function () {
+                                return userChoice;
+                            },
+                            mapHighlight: function () {
+                                mapHighlight();
+                            }
+                        }
+                    };
+
+                    if (aio_country_id && aio_postcode && $('#evening_delivery_additional_fee_element').length != -1) {
+                        getTransitInformation(aio_country_id, aio_postcode);
+                    }
+
+                    function getTransitInformation(country_id, postcode)
+                    {
+                        console.log('getTransitInformation called');
+
+                        var dataToSend = {
+                            country_id   : country_id,
+                            postcode     : postcode,
+                            service_code : 32
+                        };
+
+                        var eveningDelivery = false;
+
+                        $.ajax({
+                            url     : transitInformation,
+                            type    : 'POST',
+                            global  : false,
+                            data    : dataToSend
+                        }).done(function (data) {
+                            if (!data || !data.postnord) {
+                                return;
+                            }
+
+                            if (data.postnord.error) {
+                                console.log(data.postnord.message);
+                            } else {
+                                if(typeof data.postnord['se.posten.loab.lisp.notis.publicapi.serviceapi.TransitTimeResponse'] !== 'undefined' && typeof data.postnord['se.posten.loab.lisp.notis.publicapi.serviceapi.TransitTimeResponse'].transitTimes !== 'undefined' && typeof data.postnord['se.posten.loab.lisp.notis.publicapi.serviceapi.TransitTimeResponse'].transitTimes[0] !== 'undefined' && typeof data.postnord['se.posten.loab.lisp.notis.publicapi.serviceapi.TransitTimeResponse'].transitTimes[0].deliveryTime !== 'undefined' && typeof data.postnord['se.posten.loab.lisp.notis.publicapi.serviceapi.TransitTimeResponse'].transitTimes[0].transitTimeInDays !== 'undefined')
+                                {
+                                    if (data.postnord['se.posten.loab.lisp.notis.publicapi.serviceapi.TransitTimeResponse'].transitTimes[0].transitTimeInDays == 1 && data.postnord['se.posten.loab.lisp.notis.publicapi.serviceapi.TransitTimeResponse'].transitTimes[0].deliveryTime == '21:00') {
+                                        eveningDelivery = true;
+                                    }
+                                }
+
+                                if (eveningDelivery) {
+                                    $('#evening_delivery_additional_fee_element').show();
+                                } else {
+                                    $('#evening_delivery_additional_fee_element').hide();
+                                }
+                            }
+                        });
+                    }
+
+                    (function () {
+                        $('#vconnect_allinone_html button').each(function(){
+                            $(this).unbind('click').on('click', function(){
+                                return false;
+                            });
+                        });
+
+                        <?php
+                        if ($rates) {
+                            foreach ($rates as $rate) {
+                                if (empty($rate['code']) || empty($rate['vc_method_data'])) {
+                                    continue;
+                                }
+
+                                $method_code = $rate['code'];
+                                $method_data = $rate['vc_method_data'];
+
+                                if ($method_data) {
+                                ?>
+                                    // ADD DEFAULT VALUES FOR SAVING DATA TO VCONNECT SHIPPING METHODS && Add Transit Time text before method price
+                                    $(allinone_find_form_element_id + ' input[type=radio]').each(function() {
+                                        if($(this).val() == '<?php echo $method_code; ?>') {
+                                            html_for_this_method = '';
+
+                                            method_data = {
+                                                code         : '<?php echo $rate['code']; ?>',
+                                                arrival      : false,
+                                                delivery     : false,
+                                                other        : false,
+                                                flexdelivery : false,
+                                                data         : false,
+                                                carrier      : '<?php echo $rate['carrier_title'] ?>',
+                                                method_title : '<?php echo $rate['method_title'] ?>',
+                                                description  : '<?php echo $rate['method_title'] ?>',
+                                                pointinfo    : html_for_this_method,
+                                            };
+
+                                            $(this).data('allinone-shipping', method_data);
+
+                                            <?php if (!empty($method_data->delivery_time)): ?>
+                                                $(this).parent().find('span.price').before('<span class="transit_time"> <?php echo $method_data->delivery_time; ?> </span>');
+                                            <?php endif; ?>
+                                        }
+                                    });
+                                <?php
+                                }
+                            }
+                        }
+                        ?>
+
+                        $(allinone_find_form_element_id + ' input[type=radio]').each(function() {
+                            // update info for shipping method if it's already saved
+                            <?php if ($vconnect_postnord_data && isset($vconnect_postnord_data->code)): ?>
+                            if ($(this).val() == '<?php echo $vconnect_postnord_data->code; ?>') {
+                                $(this).data('allinone-shipping', <?php echo json_encode($vconnect_postnord_data); ?>);
+                            }
+                            <?php endif; ?>
+                        });
+
+                        // Hide standart methods and move the new design instead them
+                        if ($('#vconnect_allinone_tr').length > 0) {
+                            $('#vconnect_allinone_tr').remove();
+                        }
+                        aio_inputs = $(allinone_find_form_element_id + ' input[type=radio][value^="vconnectpostnord_"]');
+                        aio_inputs.closest('tr').hide();
+                        $('<tr id="vconnect_allinone_tr"><td colspan="10"></td></tr>').insertAfter($(aio_inputs[aio_inputs.length -1 ]).closest('tr'));
+                        $('#vconnect_allinone_html').appendTo('#vconnect_allinone_tr td');
+                        $('#vconnect_allinone_tr #vconnect_allinone_html').show();
+
+                        aino = new ShippingAddressStandardView;
+                        aino.Create(null,null, document.getElementsByClassName('aino-container')[0]);
+                        aino.ShowPickupPoints_pickupinshop();
+
+                        if (aio_country_id && aio_postcode) {
+                            getPoints(aio_country_id, aio_postcode, aio_street);
+                        }
+
+                        jQuery('.aino-search-point button').click(function () {
+                            if (jQuery('.aino-search-point input').val() != '') {
+                                aio_postcode = jQuery('.aino-search-point input').val();
+                                getPoints();
+                            }
+                        });
+
+                        if (typeof window._klarnaCheckout !== 'undefined') {
+                            window._klarnaCheckout(function(api) {
+                                api.on({
+                                    'change': function(data) {
+                                        if (data.postal_code != aio_postcode) {
+                                            console.log('AIO: klarna on change event, postal code: ' + data.postal_code);
+
+                                            aio_postcode = data.postal_code;
+                                            method_code = '';
+                                            if (jQuery("input[name=shipping_method]:checked").val().indexOf('vconnectpostnord_') != -1 && jQuery('[data-aino="map"].method_pickup').length > 0) {
+                                                method_code = jQuery("input[name=shipping_method]:checked").val();
+                                            } else if (jQuery('.aino-search-point').first().find('input').data('method-code')) {
+                                                method_code = jQuery('.aino-search-point').first().find('input').data('method-code');
+                                            }
+
+                                            if (method_code) {
+                                                getPoints(method_code);
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        }
+
+                        function getPoints() {
+                            console.log('getPickupPoints called');
+
+                            var dataToSend = {
+                                country_id  : aio_country_id,
+                                postcode    : aio_postcode
+                            };
+
+                            if(aio_street){
+                                dataToSend.street = aio_street;
+                            }
+
+                            jQuery.ajax({
+                                url     : pointsEndpoint,
+                                type    : 'POST',
+                                global  : false,
+                                data    : dataToSend,
+                            }).done(function (points) {
+                                if( typeof points.postnord.servicePointInformationResponse === 'undefined')
+                                {
+                                    if( typeof points.postnord.message !== 'undefined'){
+                                        console.error(points.postnord.message);
+                                    }
+                                    return console.log('Pickup api\'s return unknown error');
+                                }
+
+                                aio_points = points.postnord.servicePointInformationResponse.servicePoints;
+
+                                aino.ShowPickupPoints(aio_points);
+                                aino.miniMap();
+                            });
+                        }
+                    })();
+
+                    function ShippingAddressStandardView() {
+                        _container = null;
+                        var _mapObj;
+                        var _mapObj_pickupinshop;
+
+                        function _create(widgetData, langData, container) {
+                            _mapObj = new AinoMapInit();
+                            _mapObj_pickupinshop = new AinoMapInitForPickupInShop();
+                            _container = container;
+                            $(container).find('.aino-user-choicen-destination .aino-button').hide();
+                            _toggleCollapse();
+                            _dropdownFunctionality();
+                            _tabFunctionality();
+                            _toggleActiveRadioButton();
+                            _toggleActiveCheckBoxButton();
+                            _jumpToStep();
+                            _placeholderToSearchField();
+                            _backButtonEvent();
+                            _setDeliveryPrice();
+                            _loadPreSelectedInputs();
+                        }
+
+                        function _getData() {
+                            var activeTabs = $(_container).find('input[type="radio"]').filter(function () {
+                                return $(this).prop("checked") === true
+                            });
+                            var result = {};
+                            result = _mapObj ? _mapObj.getUserChoice() : {};
+                            result.delivery = [];
+                            for (var x = 0; x < activeTabs.length; x++) {
+                                result.delivery.push($(activeTabs[x]).val());
+                            }
+
+                            var entryCode = $('.aino-deliver-to').find('> li.aino-active').find('.aino-entry-code input');
+                            entryCode.val() ? result.delivery.push(entryCode.val()) : '';
+
+                            return result;
+                        }
+
+                        function _getDataPickupinshop() {
+                            var activeTabs = $(_container).find('input[type="radio"]').filter(function () {
+                                return $(this).prop("checked") === true
+                            });
+                            var result = {};
+                            result = _mapObj_pickupinshop ? _mapObj_pickupinshop.getUserChoice() : {};
+                            result.delivery = [];
+                            for (var x = 0; x < activeTabs.length; x++) {
+                                result.delivery.push($(activeTabs[x]).val());
+                            }
+
+                            var entryCode = $('.aino-deliver-to').find('> li.aino-active').find('.aino-entry-code input');
+                            entryCode.val() ? result.delivery.push(entryCode.val()) : '';
+
+                            return result;
+                        }
+
+                        function _showPickupPoints(points) {
+                            _mapObj.showPickupPoints(points);
+                        }
+
+                        function _showPickupPoints_pickupinshop() {
+                            _mapObj_pickupinshop.showPickupPoints();
+                        }
+
+                        function createMapOnClick() {
+                            var target = $('[data-aino="map"].method_pickup');
+                            $(target).addClass('aino-active');
+                            $(target).siblings('li').removeClass('aino-active');
+
+                            _mapObj.limitOfLocations(3);
+                            _mapObj.showPickupPoints(aio_points);
+                        }
+
+                        function createMiniMap() {
+                            _mapObj.mapHighlight();
+                        }
+
+                        function createMapOnClick_pickupinshop() {
+                            var target = $('[data-aino="map"].method_pickupinshop');
+                            $(target).addClass('aino-active');
+                            $(target).siblings('li').removeClass('aino-active');
+
+                            _mapObj_pickupinshop.limitOfLocations(3);
+                            _mapObj_pickupinshop.showPickupPoints();
+                        }
+
+                        function createMiniMap_pickupinshop() {
+                            _mapObj_pickupinshop.mapHighlight();
+                        }
+
+                        function loadMoreLocations(self) {
+                            $(self).addClass('aino-disable');
+                            _mapObj.limitOfLocations(null);
+                            _mapObj.getPickupPoints(aio_country_id, aio_street, aio_postcode);
+                        }
+
+                        function loadMoreLocations_pickupinshop(self) {
+                            $(self).addClass('aino-disable');
+                            _mapObj_pickupinshop.limitOfLocations(null);
+                            _mapObj_pickupinshop.showPickupPoints();
+                        }
+
+                        function _toggleCollapse() {
+                            var collapse = $(_container).find('.aino-collapse-trigger');
+                            collapse.on('click', function () {
+                                var parent = $(this).parent();
+                                var parentSiblings = $(parent).siblings('li');
+
+                                if (parent.data('code') != '' && $('input[value='+parent.data('code')+']').length > 0) {
+                                    if ($("input[name=shipping_method]:checked").val() != parent.data('code')) {
+                                        $('input[value='+parent.data('code')+']').prop('checked',true).trigger('change');
+                                        $('input[value='+parent.data('code')+']').prop('checked',true).trigger('click');
+                                    }
+                                }
+
+                                $(parentSiblings).removeClass('aino-active');
+                                $(parentSiblings).find('.aino-active').removeClass('aino-active');
+                                $(parent).addClass('aino-active');
+
+                                $(parentSiblings).find('input[type="radio"]').removeAttr('checked').prop('checked', false);
+                                $(this).find('> input[type="radio"]').prop('checked', true);
+
+                                if ($(this).parent().find('.aino-collapse').find('input[name=arrival]').length > 0 && $(this).parent().find('.aino-collapse').find('input[name=arrival]:checked').length == 0) {
+                                    $(this).parent().find('.aino-collapse').find('input[name=arrival]').first().prop('checked', true);
+                                }
+
+                                if (typeof parent.attr('data-aino') !== typeof undefined && parent.attr('data-aino') == 'mini-map' && typeof parent.attr('data-code') !== typeof undefined) {
+                                    if (parent.attr('data-code').indexOf('_pickupinshop') != -1) {
+                                        createMiniMap_pickupinshop();
+                                    } else if (parent.attr('data-code').indexOf('_pickup') != -1) {
+                                        createMiniMap();
+                                    }
+                                }
+
+                                addVconnectPostnordData($(allinone_find_form_element_id + ' input[type=radio]:checked'));
+
+                                return false;
+                            });
+
+                            $(window).resize(function() {
+                                if ($('#vconnect_allinone_html').length > 0) {
+                                    $('#vconnect_allinone_html > .aino-container').removeClass('aino-1column');
+                                    $('#vconnect_allinone_html > .aino-container').removeClass('aino-3column');
+                                    if ($('#vconnect_allinone_html').width() > 728) {
+                                        $('#vconnect_allinone_html > .aino-container').addClass('aino-1column');
+                                    } else {
+                                        $('#vconnect_allinone_html > .aino-container').addClass('aino-3column');
+                                    }
+                                }
+                            });
+                            $(window).trigger('resize');
+
+                            if ($(allinone_find_form_element_id + ' input[type=radio]:checked').length != 0 && $(allinone_find_form_element_id + ' input[type=radio]:checked').val().indexOf('vconnectpostnord_') != -1 && $("li[data-code="+$(allinone_find_form_element_id + ' input[type=radio]:checked').val()+"]").length != 0) {
+                                $("li[data-code="+$(allinone_find_form_element_id + ' input[type=radio]:checked').val()+"] > .aino-collapse-trigger").trigger('click');
+                            }
+
+                            $("input[name=shipping_method]").on('change', function () {
+                                $('#vconnect_allinone_html').find('.aino-active').removeClass('aino-active');
+                                $('#vconnect_allinone_html').find('input[type="radio"]').removeAttr('checked').prop('checked', false);
+                                if ($(this).val().indexOf('vconnectpostnord_') != -1 && $("li[data-code="+$(this).val()+"]").length != 0) {
+                                    $("li[data-code="+$(this).val()+"]").addClass('aino-active');
+                                }
+                            });
+                        }
+
+                        function _dropdownFunctionality() {
+                            $(_container).find('.aino-dropdown-trigger').on('click', function () {
+                                $(this).closest('.aino-dropdown').toggleClass('aino-open');
+                            });
+
+                            $(_container).find('.aino-select-option').on('click', function () {
+                                var parent = $(this).parent();
+                                var parentSiblings = $(parent).siblings('li');
+
+                                var value = $(this).find('input').attr('value');
+
+                                $(parentSiblings).find('input[type="radio"]').removeAttr('checked').prop('checked', false);
+                                $(this).find('> input[type="radio"]').prop('checked', true);
+
+                                $(this).closest('.aino-dropdown-menu').siblings('.aino-dropdown-trigger').html(value);
+                                $(this).closest('.aino-dropdown').removeClass('aino-open');
+                                addVconnectPostnordData($(allinone_find_form_element_id + ' input[type=radio]:checked'));
+                            });
+
+                            $(document).on('click', function (e) {
+                                var dropdowns = $('.aino-dropdown-trigger');
+
+                                for (var x = 0; x < dropdowns.length; x++) {
+                                    if ((e.target) !== (dropdowns[x])) {
+                                        $(dropdowns[x]).closest('.aino-dropdown').removeClass('aino-open');
+                                    }
+                                }
+                            })
+                        }
+
+                        function _tabFunctionality() {
+                            var tabList = $(_container).find('.aino-tabs');
+
+                            tabList.find('[data-aino-control]').on('click', function () {
+                                var attr = $(this).attr('data-aino-control');
+                                var tabContent = $(this).closest('.aino-tabs').siblings('.aino-tab-content');
+                                $(tabContent).find('.aino-tab-panel').removeClass('aino-active');
+                                $(tabContent).find('[data-aino-target="'+ attr+ '"]').addClass('aino-active');
+                                setHeightToDetailedDelivery();
+                            });
+                        }
+
+                        function _toggleActiveRadioButton() {
+                            $('.aino-collapse-trigger.aino-button').on('click', function () {
+                                $(this).siblings('.aino-collapse-trigger.aino-button').removeClass('aino-active');
+                                $(this).addClass('aino-active');
+                            });
+                        }
+
+                        function _toggleActiveCheckBoxButton() {
+                            $('[data-aino="customize-shipping"] .aino-checkbox').on('click', function () {
+                                var siblings = $(this).closest('[data-aino]').siblings('li');
+
+                                siblings.removeClass('aino-active');
+                                siblings.find('input[type="radio"]').removeAttr('checked').prop('checked', false);
+                                $(this).closest('[data-aino]').find('.aino-tab-content input[type="radio"]:first').prop('checked', true);
+
+                                $('.customize-shipping-empty').hide();
+                                setHeightToDetailedDelivery();
+                            });
+                        }
+
+                        function _jumpToStep() {
+                            $('[data-aino-tostep]').on('click', function () {
+                                var attr = $(this).attr('data-aino-tostep');
+                                var delivery = $(this).closest('.aino-delivery');
+
+                                delivery.find('> .aino-media-left').hide();
+                                delivery.find('.aino-delivery-step').hide();
+                                delivery.find('.aino-step-' + attr).show();
+                            })
+                        }
+
+                        function _placeholderToSearchField() {
+                            var input = $('.aino-search-point').find('input');
+
+                            input.on('keyup', function () {
+                                if ($(this).val()) {
+                                    $(this).next().hide();
+                                }
+                                else {
+                                    $(this).next().show();
+                                }
+                            })
+                        }
+
+                        function _backButtonEvent() {
+                            $('.aino-backto-shipping').on('click', function () {
+                                $('.aino-loadmore-locations button').removeClass('aino-disable');
+                                $('.aino-active').removeClass('aino-active');
+                                var input = $('.aino-deliver-to li label  input:checked');
+
+                                if (input.length > 0) {
+                                    $(input).closest('li').addClass('aino-active');
+                                    $(input).closest('label').trigger('click');
+                                }
+                            });
+                        }
+
+                        function _setDeliveryPrice() {
+                            $('[data-aino-price]').on('click', function () {
+                                var price = $(this).attr('data-aino-price');
+                                var deliveryPrice = $(this).closest('.aino-collapse').siblings().find('.aino-delivery-price');
+
+                                deliveryPrice.html(price);
+                            });
+                        }
+
+                        function _loadPreSelectedInputs() {
+                            $(_container).find('.aino-delivery-detailed > li > .shipping-method-label').on('click', function () {
+                                var labelOfInput = $(this).siblings().find('label.aino-input');
+                                var parent = labelOfInput.closest('.aino-tabs');
+
+                                for(var x = 0; x < parent.length; x++){
+                                    $($(parent[x]).children()[0]).find('label.aino-input').trigger('click');
+                                }
+                            })
+                        }
+
+                        function setHeightToDetailedDelivery() {
+                            var h = $('.aino-delivery-detailed > li.aino-active > .aino-collapse').outerHeight();
+                            $('.aino-deliver-to').css('min-height', h);
+                        }
+
+                        return {
+                            map: createMapOnClick,
+                            map_pickupinshop: createMapOnClick_pickupinshop,
+                            miniMap: createMiniMap,
+                            loadMoreLocations: loadMoreLocations,
+                            loadMoreLocations_pickupinshop: loadMoreLocations_pickupinshop,
+                            Create: function (widgetData, langData, container) {
+                                _create(widgetData, langData, container);
+                            },
+                            ShowPickupPoints_pickupinshop: function () {
+                                _showPickupPoints_pickupinshop();
+                            },
+                            ShowPickupPoints: function (points) {
+                                _showPickupPoints(points);
+                                if (points) {
+                                    points.sort(function(a,b){
+                                        return a.routeDistance - b.routeDistance;
+                                    });
+
+                                    var monFriOpen = (typeof points[0].openingHours !== 'undefined')
+                                        ? points[0].openingHours[0].from1.insertString(2, 0, ":") : '';
+                                    var monFriClose = (typeof points[0].openingHours !== 'undefined')
+                                        ? points[0].openingHours[0].to1.insertString(2, 0, ":") : '';
+                                    var satOpen = (typeof points[0].openingHours !== 'undefined')
+                                        ? points[0].openingHours[points[0].openingHours.length - 1].from1.insertString(2, 0, ":") : '';
+                                    var satClose = (typeof points[0].openingHours !== 'undefined')
+                                        ? points[0].openingHours[points[0].openingHours.length - 1].to1.insertString(2, 0, ":") : '';
+
+                                    var name = points[0].name;
+                                    var info = points[0].visitingAddress.streetName + ' ' + (points[0].visitingAddress.streetNumber ? points[0].visitingAddress.streetNumber : '') + ' <br> '
+                                        + ((monFriOpen || monFriClose) ? '<?php echo __('Mån-Fre'); ?>: ' + monFriOpen + ' - ' + monFriClose : '') + '<br>'
+                                        + ((satOpen || satClose) ? "<?php echo __('Lör-Sön'); ?>: " + satOpen + ' - ' + satClose : '');
+
+                                    $('.aino-user-choicen-destination .aino-destination-name-mailbox').html(name);
+                                    $('.aino-user-choicen-destination .aino-destination-info-mailbox').html(info);
+                                }
+                            },
+                            GetData: function () {
+                                return _getData();
+                            },
+                            GetDataPickupinshop: function () {
+                                return _getDataPickupinshop();
+                            }
+                        };
+                    }
+
+                    $('[data-aino="customize-shipping"] input, [data-aino="customize-shipping"] select, [data-aino="customize-shipping"] textarea').on('change',function() {
+                        if ($(allinone_find_form_element_id +' input[type=radio]:checked').length != 0 && $(allinone_find_form_element_id + ' input[type=radio]:checked').val().indexOf('vconnectpostnord_') != -1) {
+                            addVconnectPostnordData($(allinone_find_form_element_id + ' input[type=radio]:checked'));
+                        }
+                    });
+
+                    function addVconnectPostnordData(method_object) {
+                        var set_vconnect_postnord_data = false;
+
+                        if (method_object.val().indexOf('_pickupinshop') != -1) {
+                            selectedPoint = aino.GetDataPickupinshop();
+                            if (selectedPoint) {
+                                data = method_object.data('allinone-shipping');
+                                data.data = selectedPoint;
+                                data.description = data.method_title + ': ' + selectedPoint.name + ' - ' + selectedPoint.streetName + (selectedPoint.servicePointId == '' ? '' : ' - Postnord ID: ' + selectedPoint.servicePointId),
+
+                                method_object.data('allinone-shipping', data);
+                            }
+                        } else if (method_object.val().indexOf('_pickup') != -1) {
+                            selectedPoint = aino.GetData();
+                            if (selectedPoint && selectedPoint.servicePointId) {
+                                data = method_object.data('allinone-shipping');
+                                data.data = selectedPoint;
+                                data.description = data.method_title + ': ' + selectedPoint.name + ' - ' + selectedPoint.streetName + ', ' + selectedPoint.streetNumber + ' - ' + selectedPoint.postcode + ' - ID:' + selectedPoint.servicePointId;
+
+                                method_object.data('allinone-shipping', data);
+                            }
+                        } else {
+                            if (method_object.data('allinone-shipping') && $("li[data-code="+method_object.val()+"]").length > 0) {
+                                var new_description = '';
+
+                                vconnect_postnord_data = method_object.data('allinone-shipping');
+
+                                if ($("li[data-code="+method_object.val()+"] .aino-collapse input[name=arrival]:checked").length > 0) {
+                                    vconnect_postnord_data.arrival = encodeURIComponent($("li[data-code="+method_object.val()+"] .aino-collapse input[name=arrival]:checked").val());
+                                    new_description += vconnect_postnord_data.arrival;
+
+                                    arrival_attr = $("li[data-code="+method_object.val()+"] .aino-collapse input[name=arrival]:checked").parent().attr('data-aino-control');
+                                    if (arrival_attr) {
+                                        // if option is additional fee, add more data to object
+                                        if ($("li[data-code="+method_object.val()+"] .aino-collapse input[name=arrival]:checked").parent().attr('data-additional-fee') !== undefined) {
+                                            vconnect_postnord_data.additional_fee_label = $("li[data-code="+method_object.val()+"] .aino-collapse input[name=arrival]:checked").parent().attr('data-additional-label');
+                                            vconnect_postnord_data.additional_fee_amount = $("li[data-code="+method_object.val()+"] .aino-collapse input[name=arrival]:checked").parent().attr('data-additional-fee');
+                                        } else if (vconnect_postnord_data.additional_fee_amount !== 'undefined') {
+                                            delete vconnect_postnord_data.additional_fee_label;
+                                            delete vconnect_postnord_data.additional_fee_amount;
+                                        }
+
+                                        // If only one delivery element exist - check it
+                                        if ($("li[data-code="+method_object.val()+"]").find('[data-aino-target="'+ arrival_attr+ '"] input[name=delivery]').length == 1 && $("li[data-code="+method_object.val()+"]").find('[data-aino-target="'+ arrival_attr+ '"] input[name=delivery]:checked').length == 0) {
+                                            $("li[data-code="+method_object.val()+"]").find('[data-aino-target="'+ arrival_attr+ '"] input[name=delivery]').prop('checked', true);
+                                        }
+
+                                        if ($("li[data-code="+method_object.val()+"]").find('[data-aino-target="'+ arrival_attr+ '"] input[name=delivery]:checked').length > 0) {
+                                            vconnect_postnord_data.delivery = encodeURIComponent($("li[data-code="+method_object.val()+"]").find('[data-aino-target="'+ arrival_attr+ '"] input[name=delivery]:checked').val());
+                                            new_description += ' / ' + vconnect_postnord_data.delivery;
+                                        }
+
+                                        if ($("li[data-code="+method_object.val()+"]").find('[data-aino-target="'+ arrival_attr+ '"] input[name=other]').length > 0) {
+                                            aio_send_other_value = false;
+
+                                           /*
+                                            send other any of conditions bellow is true:
+                                            - if sender country_id == se
+                                            - if sender country_id == dk && other == Other place
+                                            */
+                                            if ('<?php echo $dataHelper->getStoreConfig('shipping/origin/country_id'); ?>' == 'SE') {
+                                                aio_send_other_value = true;
+                                            } else if ('<?php echo $dataHelper->getStoreConfig('shipping/origin/country_id'); ?>' == 'DK' && $("li[data-code="+method_object.val()+"] input[name=delivery]:checked").length > 0 && $("li[data-code="+method_object.val()+"] input[name=delivery]:checked").val() == '<?php echo __('Other place'); ?>') {
+                                                aio_send_other_value = true;
+                                            }
+
+                                            if (aio_send_other_value) {
+                                                $("li[data-code="+method_object.val()+"] .aio_other_field").show();
+
+                                                vconnect_postnord_data.other = encodeURIComponent($("li[data-code="+method_object.val()+"]").find('[data-aino-target="'+ arrival_attr+ '"] input[name=other]').val());
+
+                                                if (vconnect_postnord_data.other != '') {
+                                                    new_description += ' - ' + vconnect_postnord_data.other;
+                                                }
+                                            } else {
+                                                $("li[data-code="+method_object.val()+"] .aio_other_field").hide();
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (new_description) {
+                                    vconnect_postnord_data.description = vconnect_postnord_data.method_title + ': ' + new_description;
+                                }
+
+                                method_object.data('allinone-shipping', vconnect_postnord_data)
+                            }
+                        }
+
+                        if (method_object.data('allinone-shipping')) {
+                            set_vconnect_postnord_data = true;
+                        }
+
+                        if (set_vconnect_postnord_data) {
+                            $('#vconnect_allinone_html #vconnect_postnord_data').val(JSON.stringify(method_object.data('allinone-shipping')));
+                            $('#vconnect_allinone_html #vconnect_postnord_data').trigger('change');
+                        }
+                    }
+
+                    // AJAX to save vconnect postnord data 
+                    var xhr_vconnect_postnord_save; // abort request if new ajax request is started
+                    $('#vconnect_allinone_html #vconnect_postnord_data').on('change', function () {
+                        if ($(this).val()) {
+                            if (xhr_vconnect_postnord_save && xhr_vconnect_postnord_save.readyState != 4) {
+                                xhr_vconnect_postnord_save.abort();
+                            }
+                            xhr_vconnect_postnord_save = $.ajax({
+                                url     : savePostnordData,
+                                type    : 'POST',
+                                global  : false,
+                                showLoader : true,
+                                data    : 'vconnect_postnord_data=' + encodeURIComponent($(this).val())
+                            }).done(function (data) {
+                                console.log('vconnect_postnord_data saved');
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+    <?php echo $this->getChildrenHtml('body_scripts') ?>
+</div>
+<?php endif; ?>

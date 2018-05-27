@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Add Plugins -->
+    <type name="Magento\Quote\Model\Quote\Address\Rate">
+        <plugin name="aroundImportShippingRate-vconnect-allinone" type="Vconnect\Allinone\Model\Plugin\Quote\Address\Rate" sortOrder="10"/>
+    </type>
+
+    <!-- Rewrite Models -->
+    <preference for="Magento\Shipping\Model\Rate\Result" type="Vconnect\Allinone\Model\Shipping\Rate\Result" />
+
+    <!-- Rewrite Blocks -->
+    <preference for="Magento\Sales\Block\Adminhtml\Order\Create\Shipping\Method\Form" type="Vconnect\Allinone\Block\Adminhtml\Order\Create\Shipping\Method\Form" />
+
+    <preference for="Vconnect\Allinone\Api\RateRepositoryInterface" type="Vconnect\Allinone\Model\RateRepository" />
+    <preference for="Vconnect\Allinone\Api\Data\RateInterface" type="Vconnect\Allinone\Model\Rate" />
+    <preference for="Vconnect\Allinone\Api\Data\RateSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+</config>

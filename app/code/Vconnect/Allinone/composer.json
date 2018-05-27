@@ -1,0 +1,24 @@
+{
+  "name": "vconnect/module-allinone",
+  "description": "Magento 2 All In One shipping module integration",
+  "type": "magento2-module",
+  "version": "2.0.1",
+  "license": "OSL-3.0",
+  "authors": [
+    {
+      "email": "kontakt@vconnect.dk",
+      "name": "vConnect.dk"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Vconnect\\Allinone\\": ""
+    }
+  }
+}

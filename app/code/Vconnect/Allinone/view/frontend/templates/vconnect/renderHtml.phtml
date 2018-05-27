@@ -1,0 +1,85 @@
+<script>
+var allinone_find_form_element_id = '<?php echo $this->getData('form_element_id'); ?>';
+
+require([
+    'jquery',
+    'Magento_Checkout/js/model/quote'
+], function(
+    jQuery,
+    quote
+) {
+    jQuery(document).ready(function ($) {
+        if ($( "input[value^=vconnectpostnord_]" ).length > 0) {
+            updateShippingVconnectModuleHtml();
+        }
+
+        $(document).on('DOMNodeInserted', function(e) {
+            if ($(e.target).is(allinone_find_form_element_id)) {
+                setTimeout(function(){
+                    if ($( "input[value^=vconnectpostnord_]" ).length > 0) {
+                        updateShippingVconnectModuleHtml();
+                    }
+
+                    $(allinone_find_form_element_id).on("DOMSubtreeModified", function() {
+                        if ($( "input[value^=vconnectpostnord_]" ).length > 0) {
+                            updateShippingVconnectModuleHtml();
+                        }
+                    });
+                }, 1000);
+            }
+        });
+
+        var last_aio_vconnect_postnord_elements_string = '';
+
+        function updateShippingVconnectModuleHtml() {
+            var aio_vconnect_postnord_elements_string = $( "input[value^=vconnectpostnord_]" )
+                     .map(function() {
+                       return $(this).val();
+                     })
+                     .get()
+                     .join();
+
+            if (last_aio_vconnect_postnord_elements_string !== aio_vconnect_postnord_elements_string) {
+                last_aio_vconnect_postnord_elements_string = aio_vconnect_postnord_elements_string;
+
+                console.log('started Postnord Html Reload');
+
+                renderVconnectAllinoneHtml();
+            }
+        }
+
+        var xhr_vconnect_allinone_html;
+
+        function renderVconnectAllinoneHtml() {
+            if (xhr_vconnect_allinone_html && xhr_vconnect_allinone_html.readyState != 4) {
+                return;
+            }
+
+            before_ajax_aio_inputs = $(allinone_find_form_element_id + ' input[type=radio][value^="vconnectpostnord_"]');
+            before_ajax_aio_inputs.closest('tr').hide();
+
+            xhr_vconnect_allinone_html = $.ajax({
+                url: "<?php echo $this->getPostnordHtmlUrl() ?>",
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    'countryId' : (typeof quote.shippingAddress().countryId !== 'undefined') ? quote.shippingAddress().countryId : '',
+                    'postcode'  : (typeof quote.shippingAddress().postcode !== 'undefined') ? quote.shippingAddress().postcode : '',
+                    'street'    : (typeof quote.shippingAddress().street !== 'undefined' && typeof quote.shippingAddress().street[0] !== 'undefined') ? quote.shippingAddress().street[0] : ''
+                },
+                global: false,
+                showLoader: true,
+                success: function(html) {
+                    if ($(allinone_find_form_element_id + ' #vconnect_allinone_form').length > 0) {
+                        $('#vconnect_allinone_form').html(html);
+                    } else if ($(allinone_find_form_element_id).length > 0) {
+                        $(allinone_find_form_element_id).append('<div id="vconnect_allinone_form">' + html + '</div>');
+                    } else {
+                        $('body').append('<div style="display: none;" id="vconnect_allinone_form">' + html + '</div>');
+                    }
+                }
+            });
+        }
+    });
+});
+</script>

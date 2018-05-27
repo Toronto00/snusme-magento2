@@ -1,0 +1,231 @@
+<?php
+/* 
+ * The MIT License
+ *
+ * Copyright 2016 vConnect.dk
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * @category Magento
+ * @package Vconnect_AllInOne
+ * @author vConnect
+ * @email kontakt@vconnect.dk
+ * @template app/design/frontend/base/default/template/vconnect/aio/base.phtml
+ */
+
+$dataHelper = $this->getDataHelper();
+$rates = $this->getRates();
+$quote = $this->getBlockQuote();
+
+$vconnect_postnord_data = $quote->getVconnectPostnordData();
+if (!empty($vconnect_postnord_data)) {
+    $vconnect_postnord_data = json_decode($vconnect_postnord_data);
+}
+?>
+
+<!--[if IE 8]>
+<link rel="stylesheet" type="text/css" href="<?php echo $this->getViewFileUrl("Vconnect_Allinone/css/aio/blue_ie8.css") ?>" media="all" />
+<![endif]-->
+
+<script>
+    window.pointsEndpoint = "<?php echo $this->getPostnordPointsUrl() ?>";
+    window.transitInformation = "<?php echo $this->getPostnordTransitUrl() ?>";
+    window.savePostnordData = "<?php echo $this->getPostnordDataUrl() ?>";
+</script>
+
+<div id="vconnect_allinone_html">
+    <input type="hidden" name="vconnect_postnord_data" id="vconnect_postnord_data" value="" />
+
+    <?php echo $this->getChildrenHtml('tab_headers'); ?>
+    <?php echo $this->getChildrenHtml('body_scripts'); ?>
+</div>
+
+<script>
+    require([
+        'jquery',
+        'jquery/ui',
+        'prototype'
+    ], function(
+        jQuery
+    ) {
+        (function(d, id){
+            if (d.getElementById(id)) {
+                return;
+            }
+            var css = d.createElement('link');
+            css.id      = id;
+            css.type    ='text/css';
+            css.href    = "https://fonts.googleapis.com/css?family=Roboto:400,700,800";
+            css.rel     = "stylesheet";
+            d.head.appendChild(css);
+
+            var css1    = d.createElement('link');
+            css1.type   = 'text/css';
+            css1.href   = "<?php echo $this->getViewFileUrl("Vconnect_Allinone/css/aio/blue.css") ?>";
+            css1.rel    = "stylesheet";
+            d.head.appendChild(css1);
+        }(document, 'vconnect_postnord_scripts'));
+
+        jQuery(function($){
+            $('select[name*="_delivery"]').on('change',function(){
+                var txtArea = $(this).parent().find('textarea');
+                if($(this).val() === '<?php echo __('Other place'); ?>' || $(this).val() == 'Utan kvittens (paketet ställs utanför dörren)'){
+                    txtArea.show();
+                }else{
+                    txtArea.hide();
+                }
+            });
+            $('select[name*="_delivery"]').trigger('change');
+
+            <?php
+            if ($rates) {
+                foreach ($rates as $rate) {
+                    if (empty($rate['code']) || empty($rate['vc_method_data'])) {
+                        continue;
+                    }
+
+                    $method_code = $rate['code'];
+                    $method_data = json_decode($rate['vc_method_data']);
+
+                    if ($method_data) {
+                    ?>
+                        // ADD DEFAULT VALUES FOR SAVING DATA TO VCONNECT SHIPPING METHODS && Add Transit Time text before method price
+                        $('input[name="order[shipping_method]"]').each(function() {
+                            if($(this).val() == '<?php echo $method_code; ?>') {
+                                html_for_this_method = '';
+
+                                method_data = {
+                                    code         : '<?php echo $rate['code']; ?>',
+                                    arrival      : false,
+                                    delivery     : false,
+                                    other        : false,
+                                    flexdelivery : false,
+                                    data         : false,
+                                    carrier      : '<?php echo $rate['carrier_title'] ?>',
+                                    method_title : '<?php echo $rate['method_title'] ?>',
+                                    description  : '<?php echo $rate['method_title'] ?>',
+                                    pointinfo    : html_for_this_method,
+                                };
+
+                                $(this).data('allinone-shipping', method_data);
+
+                                <?php if (!empty($method_data->delivery_time)): ?>
+                                    $(this).parent().find('span.price').before('<span class="transit_time"> <?php echo $method_data->delivery_time; ?> </span>');
+                                <?php endif; ?>
+                            }
+                        });
+                    <?php
+                    }
+                }
+            }
+            ?>
+
+            $('input[name="order[shipping_method]"]').each(function() {
+                // update info for shipping method if it's already saved
+                <?php if ($vconnect_postnord_data && isset($vconnect_postnord_data->code)): ?>
+                if ($(this).val() == '<?php echo $vconnect_postnord_data->code; ?>') {
+                    $(this).data('allinone-shipping', <?php echo json_encode($vconnect_postnord_data); ?>);
+                }
+                <?php endif; ?>
+            });
+
+            $('input[name="order[shipping_method]"]').on('change',function() {
+                $('.aio-options').removeClass('active');
+                if ($(this).val().indexOf('vconnectpostnord_') != -1) {
+                    $('.aio-options[data-code='+$(this).val()+']').addClass('active');
+
+                    addVconnectPostnordData($(this));
+                }
+            });
+            $('input[name="order[shipping_method]"]:checked').trigger('change');
+
+            $('.aio-options input, .aio-options select, .aio-options textarea').on('change',function() {
+                if ($('input[name="order[shipping_method]"]:checked').length != 0 && $('input[name="order[shipping_method]"]:checked').val() == $(this).parent().data('code')) {
+                    addVconnectPostnordData($('input[name="order[shipping_method]"]:checked'));
+                }
+            });
+
+            function addVconnectPostnordData(method_object) {
+                var set_vconnect_postnord_data = false;
+
+                if (method_object.val().indexOf('_pickup') != -1 && method_object.val().indexOf('_pickupinshop') == -1) {
+                    // to post office (pickup) method
+                } else {
+                    if (method_object.data('allinone-shipping') && $('.aio-options[data-code='+method_object.val()+']').length > 0) {
+                        var new_description = '';
+                        
+                        vconnect_postnord_data = method_object.data('allinone-shipping');
+                        if ($('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"]').length) {
+                            vconnect_postnord_data.arrival = encodeURIComponent($('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"]').val());
+                            new_description += vconnect_postnord_data.arrival;
+
+                            // if option is additional fee, add more data to object
+                            if ($('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"] option[value="'+$('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"]').val()+'"]').length > 0
+                                    && $('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"] option[value="'+$('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"]').val()+'"]').attr('id') == method_object.val()+'_additional_fee_element') {
+                                vconnect_postnord_data.additional_fee_label = $('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"] option[value="'+$('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"]').val()+'"]').data('additionalfee-label');
+                                vconnect_postnord_data.additional_fee_amount = $('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"] option[value="'+$('.aio-options[data-code='+method_object.val()+'] select[name*="_arrival"]').val()+'"]').data('additionalfee-pricebase');
+                            }
+                        }
+
+                        if ($('.aio-options[data-code='+method_object.val()+'] select[name*="_delivery"]').length) {
+                            vconnect_postnord_data.delivery = encodeURIComponent($('.aio-options[data-code='+method_object.val()+'] select[name*="_delivery"]').val());
+                            new_description += ' / ' + vconnect_postnord_data.delivery;
+                        }
+
+                        if ($('.aio-options[data-code='+method_object.val()+'] textarea[name*="_other"]').length) {
+                            vconnect_postnord_data.other = encodeURIComponent($('.aio-options[data-code='+method_object.val()+'] [name*="_other"]').val());
+                            new_description += ' - ' + vconnect_postnord_data.other;
+                        }
+
+                        if (new_description) {
+                            vconnect_postnord_data.description = vconnect_postnord_data.method_title + ': ' + new_description;
+                        }
+
+                        method_object.data('allinone-shipping', vconnect_postnord_data)
+                    }
+                }
+
+                if (method_object.data('allinone-shipping')) {
+                    set_vconnect_postnord_data = true;
+                }
+
+                if (set_vconnect_postnord_data) {
+                    $('#vconnect_allinone_html #vconnect_postnord_data').val(JSON.stringify(method_object.data('allinone-shipping')));
+                    $('#vconnect_allinone_html #vconnect_postnord_data').trigger('change');
+                }
+            }
+
+            // AJAX to save vconnect postnord data 
+            var xhr_vconnect_postnord_save; // abort request if new ajax request is started
+            $('#vconnect_allinone_html #vconnect_postnord_data').on('change', function () {
+                if ($(this).val()) {
+                    if (xhr_vconnect_postnord_save && xhr_vconnect_postnord_save.readyState != 4) {
+                        xhr_vconnect_postnord_save.abort();
+                    }
+                    xhr_vconnect_postnord_save = $.ajax({
+                        url     : savePostnordData,
+                        type    : 'POST',
+                        data    : 'vconnect_postnord_data=' + encodeURIComponent($(this).val())
+                    }).done(function (data) {
+                        console.log('vconnect_postnord_data saved');
+                    });
+                }
+            });
+        });
+    });
+</script>

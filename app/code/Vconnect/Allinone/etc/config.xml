@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <vconnectpostnord>
+                <active>0</active>
+                <model>Vconnect\Allinone\Model\Carrier\Postnord</model>
+                <title>PostNord</title>
+                <button_label>Choose a method</button_label>
+                <button_label_active>Choose another delivery method</button_label_active>
+                <popup>embedded</popup>
+            </vconnectpostnord>
+            <vconnect_postnord_pickup>
+                <active>0</active>
+                <name>To post office</name>
+            </vconnect_postnord_pickup>
+            <vconnect_postnord_business>
+                <active>0</active>
+                <name>To your business</name>
+                <arrival_option_text>08:00 - 16:00</arrival_option_text>
+            </vconnect_postnord_business>
+            <vconnect_postnord_home>
+                <active>0</active>
+                <name>To your address</name>
+                <arrival_option_text>08:00-17:00</arrival_option_text>
+                <flex_delivery_active>1</flex_delivery_active>
+            </vconnect_postnord_home>
+            <vconnect_postnord_intl>
+                <active>0</active>
+                <name>International</name>
+            </vconnect_postnord_intl>
+            <vconnect_postnord_pickupinshop>
+                <active>0</active>
+                <name>Pickup in shop</name>
+            </vconnect_postnord_pickupinshop>
+            <vconnect_postnord_mailbox>
+                <active>0</active>
+                <name>To my mailbox</name>
+                <arrival_option_text>2-3 dagar</arrival_option_text>
+            </vconnect_postnord_mailbox>
+        </carriers>
+    </default>
+</config>
