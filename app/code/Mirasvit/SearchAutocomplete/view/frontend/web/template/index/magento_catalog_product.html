@@ -1,0 +1,43 @@
+<!-- ko if: optimize -->
+<a class="title" data-bind="html: name, attr: {href: url}, highlight"></a>
+
+<!-- ko if: price > 0 -->
+<div data-bind="text: price, price" class="price"></div>
+<!-- /ko -->
+<!-- /ko -->
+
+<!-- ko if: !optimize -->
+<!-- ko if: image -->
+<img data-bind="attr: {src: image}"/>
+<!-- /ko -->
+
+<a class="title" data-bind="html: name, attr: {href: url}, highlight"></a>
+
+<!-- ko if: sku -->
+<div class="sku" data-bind="text: sku, highlight"></div>
+<!-- /ko -->
+
+<!-- ko if: description -->
+<div class="description" data-bind="text: description, highlight"></div>
+<!-- /ko -->
+
+<!-- ko if: price > 0 -->
+<div data-bind="text: price, price" class="price"></div>
+<!-- /ko -->
+
+<!-- ko if: rating -->
+<div data-bind="html: rating"></div>
+<!-- /ko -->
+
+<div class="clearfix"></div>
+
+<form data-role="tocart-form" class="to-cart"
+      data-bind="visible: cart.visible, attr:{action: cart.params.action}, afterRender: afterRender" method="post">
+    <input type="hidden" name="product" data-bind="value: cart.params.data.product">
+    <input type="hidden" name="uenc" data-bind="value: cart.params.data.uenc">
+    <input type="hidden" name="form_key" data-bind="value: formKey()"/>
+    <button type="submit" class="action tocart primary">
+        <span data-bind="html: cart.label"></span>
+    </button>
+</form>
+<!-- /ko -->

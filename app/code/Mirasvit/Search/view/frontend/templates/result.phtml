@@ -1,0 +1,48 @@
+<?php
+//@codingStandardsIgnoreFile
+/** @var \Mirasvit\Search\Block\Result $block */
+
+$indices = $block->getIndices();
+$currentContent = $block->getCurrentContent();
+$tabsCnt = 0;
+$totalCnt = 0;
+?>
+
+<ul class="search__result-tabs">
+    <?php foreach ($indices as $index): ?>
+        <?php $collection = $block->getSearchCollection($index); ?>
+        <?php $totalCnt += $collection->getSize() ?>
+
+        <?php if ($collection->getSize() || $index->getIdentifier() == 'catalogsearch_fulltext'): ?>
+            <?php if ($index->getIdentifier() == $block->getCurrentIndex()->getIdentifier()
+                && $index->getStoreId() == $block->getCurrentIndex()->getStoreId()
+            ): ?>
+                <li>
+                    <a class="active" href="#">
+                        <?= __($index->getTitle()) ?>
+                    </a>
+                </li>
+            <?php else: ?>
+                <li>
+                    <a href="<?= $block->getIndexUrl($index) ?>">
+                        <?= __($index->getTitle()) ?> (<?= $collection->getSize() ?>)
+                    </a>
+                </li>
+                <?php $tabsCnt++ ?>
+            <?php endif ?>
+        <?php endif ?>
+    <?php endforeach ?>
+</ul>
+
+<?= $block->getChildHtml("suggestion") ?>
+<?= $currentContent ?>
+
+<?php if ($totalCnt == 0): ?>
+    <?= $block->getChildHtml("search.no_results") ?>
+<?php endif ?>
+
+<?php if ($block->getCurrentIndexSize() == 0 && $tabsCnt > 1): ?>
+    <div class="message notice">
+        <div><?=__('Please select other tab to see more results') ?></div>
+    </div>
+<?php endif ?>
