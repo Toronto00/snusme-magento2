@@ -1,0 +1,31 @@
+.page.messages {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 100;
+
+    .message {
+        background-color: #008fd5;
+        color: white;
+        display: flex;
+        box-sizing: border-box;
+        padding: 14px;
+        padding-left: 38px;
+
+        .message-text {
+            flex-grow: 1;
+        }
+
+        .close-message {
+            cursor: pointer;
+        }
+
+        & > *:first-child:before {
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            margin: 0;
+        }
+    }
+}

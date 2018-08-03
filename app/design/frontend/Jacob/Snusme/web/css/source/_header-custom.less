@@ -3,6 +3,8 @@ header.page-header {
     height: 80px;
     margin-bottom: 50px;
     background: @color-brown;
+    z-index: 10;
+    border-bottom: 0;
 
     &.no-spacing {
         margin-bottom: 0;
@@ -51,13 +53,18 @@ header.page-header {
 
         & > .action {
             &.showcart:before {
-                font-size: 32px;
-                color: @color-blue1;
+                content: ""
+            }
+
+            svg {
+                fill: @color-white;
+                width: 30px;
             }
 
             .counter.qty {
                 background: @color-blue1;
                 border-radius: 50%;
+                margin-left: 8px;
 
                 .counter-number {
                     text-shadow: none;
@@ -102,6 +109,13 @@ header.page-header {
                     opacity: 1;
                     pointer-events: all;
                 }
+            }
+
+            .label:before {
+                font-size: 45px;
+                line-height: 1;
+                margin: 0;
+                color: @color-white;
             }
 
             .control {
@@ -151,11 +165,12 @@ header.page-header {
             align-items: flex-end !important;
 
             .block-minicart {
-                right: -18px;
+                right: -3px;
             }
 
             & > .action {
                 padding-bottom: 18px;
+                padding-right: 16px;
             }
         }
     }

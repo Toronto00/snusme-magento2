@@ -42,26 +42,26 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                     <div class="item-details">
                         <div class="product-name">
                             <a href="<?= $_product->getProductUrl() ?>">
-                                <h3>
-                                    <?= 
-                                        $_helper->productAttribute(
-                                            $_product, 
-                                            $_product->getName(), 
-                                            'name') 
-                                    ?>
-                                </h3>
-                                <h4>
-                                    <?php if ($_product->getSubHeading()): ?>
+                                <?php if ($_product->getBrand()): ?>
+                                    <h3>
+                                        <?=
+                                            $_product->getResource()
+                                                ->getAttribute('brand')
+                                                ->getFrontend()
+                                                ->getValue($_product);
+                                        ?>
+                                    </h3>
+                                <?php endif ?>
+                                <?php if ($_product->getName()): ?>
+                                    <h4>
                                         <?= 
                                             $_helper->productAttribute(
                                                 $_product, 
-                                                $_product->getSubHeading(), 
-                                                'sub_heading') 
+                                                $_product->getName(), 
+                                                'name') 
                                         ?>
-                                    <?php else: ?>
-                                        &nbsp;
-                                    <?php endif ?>
-                                </h4>
+                                    </h4>
+                                <?php endif ?>
                             </a>
                         </div>
 

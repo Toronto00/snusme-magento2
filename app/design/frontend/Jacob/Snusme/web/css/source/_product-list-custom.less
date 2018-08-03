@@ -1,14 +1,14 @@
 .product-grid {
     display: flex;
     flex-flow: row wrap;
-    margin-left: -8px;
-    margin-right: -8px;
+    margin-left: -4px;
+    margin-right: -4px;
     margin-top: 0;
 
     .item {
         box-sizing: border-box;
-        padding-left: 8px;
-        padding-right: 8px;
+        padding-left: 4px;
+        padding-right: 4px;
         position: relative;
         margin-bottom: 16px;
 
@@ -66,13 +66,8 @@
         }
 
         .item-inner {
-            box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, .25);
             transition: all .2s ease-out;
             height: 100%;
-
-            &:hover {
-                box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, .5);
-            }
         }
 
         .item-details {
@@ -81,7 +76,8 @@
             right: 8px;
             bottom: 0px;
             padding: 8px;
-            background: rgba(255, 255, 255, .5);
+            align-items: center;
+            display: flex;
 
             h3, h4 {
                 font-family: 'Oswald', sans-serif;
@@ -106,11 +102,10 @@
             }
 
             .product-name {
-                float: left;
+                flex-grow: 1;
             }
 
             .product-actions {
-                float: right;
                 display: flex;
                 align-items: center;
 

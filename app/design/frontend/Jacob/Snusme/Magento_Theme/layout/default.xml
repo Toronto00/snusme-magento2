@@ -17,6 +17,7 @@
     <referenceBlock name="view.addto.compare" remove="true" />
     <referenceBlock name="footer" remove="true" />
     <referenceBlock name="copyright" remove="true" />
+    <referenceBlock name="messages" remove="true" />
 
     <!-- Added static block to main menu -->
     <referenceBlock name="catalog.topnav">
