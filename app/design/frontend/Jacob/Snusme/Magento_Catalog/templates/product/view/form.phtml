@@ -32,6 +32,10 @@
             <?php endif;?>
         <?php endif; ?>
 
+        <a href="#" data-post='<?= $this->helper('Magento\Wishlist\Helper\Data')->getAddParams($_product) ?>' class="action towishlist" data-action="add-to-wishlist">
+            <span><?= __('Add to Wish List') ?></span>
+        </a>
+
         <?php if ($_product->isSaleable() && $block->hasOptions() && $block->getOptionsContainer() == 'container2'):?>
             <?= $block->getChildChildHtml('options_container') ?>
         <?php endif;?>

@@ -1,0 +1,18 @@
+
+
+<li class="level0 nav-1 first last level-top parent ui-menu-item" role="presentation">
+    <a href="<?= $block->getUrl('customer/account') ?>" class="level-top ui-corner-all" aria-haspopup="true" id="ui-id-3" tabindex="-1" role="menuitem">
+        <span class="ui-menu-icon ui-icon ui-icon-carat-1-e"></span>
+        <span>Account</span>
+    </a>
+
+    <ul class="level0 submenu ui-menu ui-widget ui-widget-content ui-corner-all" role="menu" aria-expanded="false" aria-hidden="true">
+        <?php foreach ($this->getLinks() as $link): ?>
+            <li class="level1 nav-1-1 first ui-menu-item" role="presentation">
+                <a href="<?= $block->getUrl($link->getPath()) ?>" id="ui-id-4" class="ui-corner-all" tabindex="-1" role="menuitem">
+                    <span><?= $link->getLabel() ?></span>
+                </a>
+            </li>
+        <?php endforeach ?>
+    </ul>
+</li>

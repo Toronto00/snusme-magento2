@@ -1,0 +1,31 @@
+.minicart-items {
+    .product-item-name {
+        display: inline-block;
+    }
+
+    .product.options.list {
+        font-size: 12px;
+
+        .values span {
+            &:before {
+                content: "(";
+            }
+
+            &:after {
+                content: ")";
+            }
+        }
+    }
+
+    .item-qty {
+        margin: 0;
+        vertical-align: middle;
+    }
+
+    .qty-increment {
+        font-size: 18px;
+        background: #f1f1f1;
+        padding: 4px 12px;
+        vertical-align: middle;
+    }
+}

@@ -14,7 +14,7 @@
 <?php $_geoIpHelper = $this->helper('Jacob\Catalog\Helper\Data'); $_geoIpHelper->getIpLocation(); ?>
 <?php if ($_product->isSaleable()): ?>
 <div class="box-tocart">
-    <div class="fieldset">
+    <div class="qty-wrapper">
         <?php if ($block->shouldRenderQuantity()): ?>
         <div class="field qty">
             <label class="label" for="qty"><span><?= /* @escapeNotVerified */ __('Qty') ?></span></label>
@@ -68,6 +68,14 @@
                 <?php endforeach ?>
             <?php endforeach ?>
         </div>
+    <?php else: ?>
+        <?php $buttonTitle = __('Buy') . ' (' . $_checkoutHelper->formatPrice($_product->getFinalPrice()) . ')'; ?>
+        <button type="submit"
+                title="Add to Cart"
+                class="action primary tocart"
+                id="product-addtocart-button">
+            <span><?= /* @escapeNotVerified */ $buttonTitle ?></span>
+        </button>
     <?php endif ?>
 </div>
 <?php endif; ?>

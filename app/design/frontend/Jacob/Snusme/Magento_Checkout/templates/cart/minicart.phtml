@@ -78,6 +78,88 @@
         }
     }
     </script>
+    <script type="text/javascript">
+        var updateQtyTimeout;
+
+        function increase(target) {
+            var qtyInput = target.parentElement.querySelector('.cart-item-qty');
+
+            if (qtyInput) {
+                if (qtyInput.disabled) {
+                    console.log('disable');
+                    return;
+                }
+
+                var itemId = qtyInput.dataset.cartItem;
+                var newQty = parseInt(qtyInput.value) + 1;
+
+                qtyInput.value = newQty;
+
+                sendUpdatedQty(itemId, newQty, qtyInput);
+            }
+        }
+
+        function decrease(target) {
+            var qtyInput = target.parentElement.querySelector('.cart-item-qty');
+
+            if (qtyInput) {
+                if (qtyInput.disabled) {
+                    return;
+                }
+
+                var itemId = qtyInput.dataset.cartItem;
+                var newQty = parseInt(qtyInput.value) - 1;
+
+                qtyInput.value = newQty;
+
+                sendUpdatedQty(itemId, newQty, qtyInput);
+            }
+        }
+
+        function sendUpdatedQty(item, qty, input) {
+            var url = window.checkout.updateItemQtyUrl;
+            var formKey = document.querySelector('input[name="form_key"]').value;
+
+            var data = {
+                'form_key': formKey,
+                'item_id': item,
+                'item_qty': qty
+            };
+
+            clearTimeout(updateQtyTimeout);
+            updateQtyTimeout = setTimeout(function() {
+                jQuery.ajax({
+                    url: url,
+                    data: data,
+                    type: 'post',
+                    dataType: 'json',
+                    context: this,
+                    beforeSend: function () {
+                        input.disabled = true;
+                    },
+                    complete: function () {
+                        input.disabled = false;
+                    }
+                });
+            }, 1000);
+            
+        }
+
+        function debounce(func, wait, immediate) {
+            var timeout;
+            return function() {
+                var context = this, args = arguments;
+                var later = function() {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                };
+                var callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(context, args);
+            };
+        };
+    </script>
 </div>
 
 
