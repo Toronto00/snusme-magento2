@@ -4,21 +4,7 @@
     </div>
     <div class="footer-information">
         <ul class="footer-links">
-            <li>
-                <a href="#">Link 1</a>
-            </li>
-            <li>
-                <a href="#">Link 1</a>
-            </li>
-            <li>
-                <a href="#">Link 1</a>
-            </li>
-            <li>
-                <a href="#">Link 1</a>
-            </li>
-            <li>
-                <a href="#">Link 1</a>
-            </li>
+            <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_links')->toHtml() ?>
         </ul>
         <div class="footer-info">
             <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_info')->toHtml() ?>
