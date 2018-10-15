@@ -7,7 +7,12 @@
             <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_links')->toHtml() ?>
         </ul>
         <div class="footer-info">
-            <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_info')->toHtml() ?>
+            <div class="footer-info-left">
+                <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_info')->toHtml() ?>
+            </div>
+            <div class="footer-info-right">
+                <img src="<?php echo $this->getViewFileUrl('images/partnerlogos.png') ?>" />
+            </div>
         </div>
         <div class="footer-social">
             <span class="footer-social-label">Get Social!</span>

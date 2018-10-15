@@ -19,7 +19,7 @@
 
     .footer-logo {
         position: relative;
-        height: 270px;
+        height: 300px;
         width: 300px;
         float: left;
         overflow: hidden;
@@ -52,7 +52,8 @@
     }
 
     .footer-links,
-    .footer-info,
+    .footer-info-left,
+    .footer-info-right,
     .footer-social {
         width: 100%;
     }
@@ -87,6 +88,9 @@
         min-width: 300px;
         width: 100%;
         margin: auto 0;
+        display: flex;
+        align-items: center;
+        flex-flow: column;
 
         h1, h2, h3, h4, h5, h6 {
             margin-top: 0;
@@ -97,6 +101,11 @@
         p {
             font-weight: 200;
             font-size: 15px;
+            line-height: 2.2;
+
+            a {
+                color: #fff !important;
+            }
         }
     }
 
@@ -137,8 +146,24 @@
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
     .page-footer {
         .footer-information {
-            .footer-info {
+            .footer-info-left {
                 width: 70%;
+                float: left;
+            }
+
+            .footer-info-right {
+                width: 30%;
+                float: left;
+            }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .page-footer {
+        .footer-information {
+            .footer-info {
+                flex-flow: row;
             }
         }
     }
