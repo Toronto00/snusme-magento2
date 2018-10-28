@@ -95,3 +95,26 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    function openTab(elem, target) {
+        var target  = document.querySelector('[data-tab="' + target + '"]');
+        var labels  = document.querySelectorAll('.frontpage-tab-labels li');
+        var tabs    = document.querySelectorAll('.frontpage-tab-bodies li');
+
+        if (!target) {
+            return;
+        }
+
+        for (var i = 0; i < labels.length; i++) {
+            labels[i].classList.remove('active');
+        }
+
+        for (var i = 0; i < tabs.length; i++) {
+            tabs[i].classList.remove('active');
+        }
+
+        elem.classList.add('active');
+        target.classList.add('active');
+    }
+</script>

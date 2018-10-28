@@ -32,7 +32,6 @@
         margin-top: 0;
         font-weight: 300;
         font-family: 'Oswald', sans-serif;
-        font-size: 26px;
     }
 
     .product-info-price {
@@ -138,8 +137,26 @@
     }
 }
 
+@media all and (min-width: 500px) {
+    .product-info-main {
+        .product.attribute.overview {
+            font-size: 26px;
+        }
+    }
+}
+
 @media all and (max-width: 500px) {
     .product-info-main {
+        .page-title-wrapper {
+            .page-title {
+                font-size: 42px;
+            }
+        }
+
+        .product.attribute.overview {
+            font-size: 20px;
+        }
+
         .box-tocart {
             flex-wrap: wrap;
 
