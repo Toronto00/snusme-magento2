@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f271484365f08dcc3f3e06893fe166d",
+    "content-hash": "0cfe8bea678d95ec0603364db80d45ce",
     "packages": [
         {
             "name": "braintree/braintree_php",
@@ -9444,6 +9444,39 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "dibs/module-payment-flexwin",
+            "version": "2.3.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DIBS-Payment-Services/magento2-dibs-flexwin.git",
+                "reference": "a2e4fd0eccb66d55f6cb94061e678b4d3d23018f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DIBS-Payment-Services/magento2-dibs-flexwin/zipball/a2e4fd0eccb66d55f6cb94061e678b4d3d23018f",
+                "reference": "a2e4fd0eccb66d55f6cb94061e678b4d3d23018f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~5.5.0|~5.6.0|7.*"
+            },
+            "type": "magento2-module",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "Dibs\\Flexwin\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
+            "description": "Integration with DIBS payment gateway for D2 merchants",
+            "time": "2018-05-04T16:22:52+00:00"
+        },
         {
             "name": "doctrine/annotations",
             "version": "v1.6.0",
