@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0cfe8bea678d95ec0603364db80d45ce",
+    "content-hash": "da238618c2c1d71bc69c4e5b9ab85d96",
     "packages": [
         {
             "name": "braintree/braintree_php",
@@ -9445,6 +9445,42 @@
     ],
     "packages-dev": [
         {
+            "name": "chuvisco88/magento2-language-pack-de-ch",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Chuvisco88/magento2-language-pack-de-ch.git",
+                "reference": "0924dae741e768dd813a50fe05c6166ce3f0f4b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Chuvisco88/magento2-language-pack-de-ch/zipball/0924dae741e768dd813a50fe05c6166ce3f0f4b2",
+                "reference": "0924dae741e768dd813a50fe05c6166ce3f0f4b2",
+                "shasum": ""
+            },
+            "require": {
+                "splendidinternet/mage2-locale-de-de": "1.39.5"
+            },
+            "type": "magento2-language",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Fabian Schweizer",
+                    "email": "fa.schweizer@gmail.com"
+                }
+            ],
+            "description": "A german (switzerland) language pack for Magento 2 based on splendidinternet/mage2-locale-de-de",
+            "time": "2018-04-13T18:03:39+00:00"
+        },
+        {
             "name": "dibs/module-payment-flexwin",
             "version": "2.3.8",
             "source": {
@@ -11356,6 +11392,36 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2016-10-03T07:35:21+00:00"
+        },
+        {
+            "name": "splendidinternet/mage2-locale-de-de",
+            "version": "1.39.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/splendidinternet/Magento2_German_LocalePack_de_DE.git",
+                "reference": "c9a24362e7292e06b9bd9ed77e70f470a1f7eff8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/splendidinternet/Magento2_German_LocalePack_de_DE/zipball/c9a24362e7292e06b9bd9ed77e70f470a1f7eff8",
+                "reference": "c9a24362e7292e06b9bd9ed77e70f470a1f7eff8",
+                "shasum": ""
+            },
+            "require": {
+                "magento/framework": "^100.0.0 || ^101.0.0"
+            },
+            "type": "magento2-language",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
+            "description": "German (Germany) language",
+            "time": "2018-04-04T10:38:02+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",

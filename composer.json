@@ -20,7 +20,8 @@
         "friendsofphp/php-cs-fixer": "~2.2.0",
         "lusitanian/oauth": "~0.8.10",
         "sebastian/phpcpd": "2.0.4",
-        "dibs/module-payment-flexwin": "^2.3.0"
+        "dibs/module-payment-flexwin": "^2.3.0",
+        "chuvisco88/magento2-language-pack-de-ch": "^1.0.0"
     },
     "autoload": {
         "psr-4": {
