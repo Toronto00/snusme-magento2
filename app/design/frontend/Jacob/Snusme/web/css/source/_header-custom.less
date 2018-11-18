@@ -45,6 +45,69 @@ header.page-header {
         }
     }
 
+    .language-switcher-desktop {
+        color: white;
+        display: none;
+        float: right;
+        height: 100%;
+        align-items: flex-end;
+        padding-bottom: 24px;
+        padding-right: 8px;
+        box-sizing: border-box;
+
+        .switcher {
+            margin-left: 16px;
+            margin-right: 0;
+
+            .options {
+                .action.toggle {
+                    font-family: 'Oswald', sans-serif;
+                    font-weight: 200;
+                    font-size: 19px;
+
+                    .flag {
+                        color: black;
+                        width: 24px;
+                        height: 16px;
+                        display: block;
+                        position: relative;
+                        background-position: center;
+                        background-size: cover;
+                    }
+
+                    &:after {
+                        font-size: 48px;
+                        position: absolute;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        bottom: -16px;
+                    }
+                }
+            }
+
+            .dropdown {
+                margin-top: 32px;
+                transform: translateX(-4px);
+                font-family: 'Oswald', sans-serif;
+                font-weight: 200;
+
+                .dropdown-flag {
+                    height: 20px;
+                    float: left;
+                    margin-right: 8px;
+
+                    img {
+                        height: 20px;
+                    }
+                }
+
+                .dropdown-label {
+
+                }
+            }
+        }
+    }
+
     .nav-toggle:before {
         color: #fff;
     }
@@ -91,7 +154,7 @@ header.page-header {
     .nav-toggle:after {
         background: transparent;
     }
-} 
+}
 
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
     .logo {
@@ -148,12 +211,18 @@ header.page-header {
             }
         }
     }
+
+    .switcher-language {
+        .action.toggle:after {
+            display: none !important;
+        }
+    }
 }
 
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
     header.page-header {
         .block-search {
-            margin-right: 40px;
+            margin-right: 24px;
             align-items: flex-end !important;
 
             & > .block {
@@ -178,13 +247,9 @@ header.page-header {
                 padding-right: 16px;
             }
         }
-    }
-}
 
-.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
-    header.page-header {
-        .block-search {
-            margin-right: 100px;
+        .language-switcher-desktop {
+            display: flex !important;
         }
     }
 }

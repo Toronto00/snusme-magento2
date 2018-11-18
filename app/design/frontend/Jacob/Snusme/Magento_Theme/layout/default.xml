@@ -46,7 +46,8 @@
 
     <!-- Move menu into inside header -->
     <referenceContainer name="header-wrapper">
-        <block class="Magento\Framework\View\Element\Template" name="country" after="search" template="Magento_Theme::html/header/country.phtml" />
+        <referenceBlock name="compare-link-wrapper" remove="true" />
+        <block class="Magento\Store\Block\Switcher" name="country" before="topSearch" template="Magento_Store::switch/languages_desktop.phtml"/>
 
         <block class="Magento\Framework\View\Element\Template" name="navigation" after="logo" template="Magento_Theme::html/sections.phtml">
             <arguments>
@@ -58,7 +59,6 @@
                     <argument name="title" translate="true" xsi:type="string">Menu</argument>
                 </arguments>
                 <block class="Magento\Theme\Block\Html\Topmenu" name="catalog.topnav" template="Magento_Theme::html/topmenu.phtml" ttl="3600" before="-">
-                    <block class="Magento\Store\Block\Switcher" name="store_language" as="store_language" template="Magento_Store::switch/languages.phtml"/>
                     <block class="Magento\Customer\Block\Account\Navigation" name="customer_account_navigation" before="-" template="Magento_Theme::html/account.phtml">
                         <arguments>
                             <argument name="css_class" xsi:type="string">nav items</argument>
