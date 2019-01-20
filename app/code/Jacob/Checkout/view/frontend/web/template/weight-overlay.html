@@ -1,0 +1,19 @@
+<div data-bind="if: getOverlayParam('display_overlay')">
+    <div class="weight-overlay__container">
+        <div class="weight-overlay__inner">
+            <h3 translate="'Shipping limit reached'" />
+            <p translate="'You have reached the shipping limit of the given shipping country. These limits are implemented as local laws prevent us from shipping in higher volumes of nicotine. If you are shipping somewhere else, change your destination below.'" />
+            <div class="weight-overlay__shipping-country">
+                <div class="weight-overlay__shipping-country--inner">
+                    <select data-bind="options: getCountries(), optionsText: 'label', optionsValue: 'value', value: getOverlayParam('selected_country'), event: { change: updateCountry }" />
+                    <button class="action primary" translate="'Change country'" data-bind="click: changeCountry" />
+                </div>
+            </div>
+
+            <div class="weight-overlay__actions">
+                <button class="action primary" translate="'Proceed to checkout'" data-bind="click: proceedToCheckout" />
+                <button class="action secondary" translate="'I understand'" data-bind="click: hideOverlay" />
+            </div>
+        </div>
+    </div>
+</div>

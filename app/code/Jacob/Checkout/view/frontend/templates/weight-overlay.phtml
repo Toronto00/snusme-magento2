@@ -1,0 +1,20 @@
+<div data-bind="scope: 'weightoverlay'">
+<!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+<script>
+    window.weightoverlay = <?= $block->getSerializedConfig() ?>;
+</script>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "weightoverlay": {
+                        "component": "Jacob_Checkout/js/weight-overlay",
+                        "template" : "Jacob_Checkout/weight-overlay"
+                    }
+                }
+            }
+        }
+    }
+</script>

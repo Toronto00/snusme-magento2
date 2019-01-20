@@ -97,7 +97,7 @@ class Switcher extends \Magento\Store\Block\Switcher
             'languages'     => $languages,
             'current'       => [
                 'currency' => $currentCurrency,
-                'language' => $currentLanguage,
+                'language' => $this->_labelMap[$currentLanguage],
                 'flag'     => $this->getViewFileUrl("images/{$currentLanguage}.png")
             ]
         ];

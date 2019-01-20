@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="controller_action_predispatch_checkout_cart_add">
+        <observer name="onAddToCart" instance="Jacob\Checkout\Observer\OnAddToCart" />
+    </event>
+    <event name="checkout_cart_update_items_before">
+        <observer name="onUpdateCart" instance="Jacob\Checkout\Observer\OnUpdateCart" />
+    </event>
+    <event name="sales_quote_item_set_product">
+    	<observer name="injectRollWeight" instance="Jacob\Checkout\Observer\InjectRollWeight" />
+    </event>
+</config>

@@ -8,7 +8,6 @@
 
 /** @var \Magento\Store\Block\Switcher $block */
 $matrix = $block->getStoreMatrix();
-
 ?>
 <?php if (count($block->getStores())>1): ?>
 <?php $id = $block->getIdModifier() ? '-' . $block->getIdModifier() : '' ?>
@@ -31,7 +30,7 @@ $matrix = $block->getStoreMatrix();
                 <?php if ($lang['lang'] != $matrix['current']['language']): ?>
                     <li class="view-<?= $block->escapeHtml($lang['code']) ?> switcher-option">
                         <a href="#" data-post='<?= $block->getTargetStorePostData($lang['store']) ?>'>
-                            <?= $lang['lang'] ?>
+                            <?= $lang['label'] ?>
                         </a>
                     </li>
                 <?php endif; ?>
@@ -49,7 +48,7 @@ $matrix = $block->getStoreMatrix();
              data-toggle="dropdown"
              data-trigger-keypress-button="true">
             <strong class="view-<?= $block->escapeHtml($block->getCurrentStoreCode()) ?>">
-                <span><?= $matrix['current']['currency'] ?></span>
+                <span><?= mb_strtoupper($matrix['current']['currency']) ?></span>
             </strong>
         </div>
         <ul class="dropdown switcher-dropdown"
@@ -59,7 +58,7 @@ $matrix = $block->getStoreMatrix();
                 <?php if ($currency['currency'] != $matrix['current']['currency']): ?>
                     <li class="view-<?= $block->escapeHtml($currency['code']) ?> switcher-option">
                         <a href="#" data-post='<?= $block->getTargetStorePostData($currency['store']) ?>'>
-                            <?= $currency['currency'] ?>
+                            <?= mb_strtoupper($currency['currency']) ?>
                         </a>
                     </li>
                 <?php endif; ?>

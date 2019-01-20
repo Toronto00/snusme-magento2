@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd"
+>
+    <system>
+        <tab id="snusme" translate="label" sortOrder="200">
+            <label>Snus Me</label>
+        </tab>
+        <section id="snusme_checkout" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Checkout</label>
+            <tab>snusme</tab>
+            <resource>Magento_Config::config</resource>
+
+            <group id="shipping" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Shipping</label>
+
+                <field id="max_nicotine_weight" translate="Max Nicotine Weight" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Max Nicotine Weight</label>
+                    <config_path>snusme/checkout/max_nicotine_weight</config_path>
+                    <comment>Maximum weight in grams that can be shipped in given country.</comment>
+                    <frontend_model>Jacob\Checkout\Block\Adminhtml\System\Config\Field\CountryMaxNicotine</frontend_model>
+                    <backend_model>Jacob\Checkout\Model\Config\Backend\CountryMaxNicotine</backend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

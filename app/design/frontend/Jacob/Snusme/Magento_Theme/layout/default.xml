@@ -111,4 +111,8 @@
             </block>
         </block>
     </referenceContainer>
+
+    <referenceContainer name="after.body.start">
+        <block class="Jacob\Checkout\Block\Weightoverlay" before="-" name="weight_overlay" template="Jacob_Checkout::weight-overlay.phtml" />
+    </referenceContainer>
 </page>

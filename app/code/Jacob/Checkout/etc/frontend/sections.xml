@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
+    <action name="checkout/cart/add">
+        <section name="weightOverlay"/>
+    </action>
+    <action name="checkout/cart/updatePost">
+        <section name="weightOverlay"/>
+    </action>
+    <action name="checkout/sidebar/removeItem">
+        <section name="weightOverlay"/>
+    </action>
+    <action name="checkout/sidebar/updateItemQty">
+        <section name="weightOverlay"/>
+    </action>
+    <action name="smc/delivery/set">
+        <section name="weightOverlay"/>
+    </action>
+</config>

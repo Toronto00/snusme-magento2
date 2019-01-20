@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * The MIT License
  *
  * Copyright 2016 vConnect.dk
@@ -331,14 +331,14 @@ class Postnord extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
         }else{
             $ratePath = sprintf('carriers/%s/%s',$code, $config->getPriceCode());
         }
-        
+
         $result = $this->_dataHelper->getStoreConfig($ratePath);
         if(!$result){
             $this->_logger->debug("no rate for code $code and path $ratePath" );
-            
+
             return FALSE;
         }
-        $pickupShippingRates = $this->_dataHelper->unserialize($result); 
+        $pickupShippingRates = $this->_dataHelper->unserialize($result);
         if (is_array($pickupShippingRates) && !empty($pickupShippingRates)) {
             foreach ($pickupShippingRates as $pickupShippingRate) {
                 if( (float)$pickupShippingRate['orderminprice'] <= (float)$orderPrice
@@ -360,8 +360,8 @@ class Postnord extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
      * @param Varien_Object $config method configuration
      * @return float
      */
-    public function getRateForMethodEupickup($orderPrice, $orderWeight, \Magento\Framework\DataObject $config) 
-    { 
+    public function getRateForMethodEupickup($orderPrice, $orderWeight, \Magento\Framework\DataObject $config)
+    {
         $code = $config->getSystemPath();
 
         if($config->getMultiprices()){
@@ -377,7 +377,7 @@ class Postnord extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
             return FALSE;
         }
 
-        $pickupShippingRates = $this->_dataHelper->unserialize($result); 
+        $pickupShippingRates = $this->_dataHelper->unserialize($result);
         if (is_array($pickupShippingRates) && !empty($pickupShippingRates)) {
             foreach ($pickupShippingRates as $pickupShippingRate) {
                 $countries = strtoupper(str_replace(" ", "",$pickupShippingRate['countries']));
@@ -397,7 +397,7 @@ class Postnord extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
     }
 
     /**
-     * 
+     *
      * @param Mage_Shipping_Model_Rate_Request $request
      * @param string $code
      * @param float $freeQty
@@ -515,7 +515,7 @@ class Postnord extends \Magento\Shipping\Model\Carrier\AbstractCarrier implement
         }
 
         $method->setPrice($shippingPrice)->setCost($rate['price']);
-        
+
         return $method;
     }
 }
