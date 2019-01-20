@@ -95,7 +95,32 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 continue;
             }
 
-            $this->_totalWeight += $item->getProduct()->getData(self::WEIGHT_ATTRIBUTE) * $item->getQty();
+            $modifier = 1;
+
+            if ($item->getBuyRequest() && $options = $item->getBuyRequest()->getOptions()) {
+                foreach ($item->getProduct()->getOptions() as $productOption) {
+                    if (!$this->isSizeOptionName($productOption->getTitle())) {
+                        continue;
+                    }
+
+                    $optionKey  = $productOption->getId();
+
+                    if (!isset($options[$optionKey])) {
+                        continue;
+                    }
+
+                    $optionId       = $options[$optionKey];
+                    $optionValue    = $productOption->getValueById($optionId);
+
+                    if (!$this->isRollOption($optionValue->getDefaultTitle())) {
+                        continue;
+                    }
+
+                    $modifier = 10;
+                }
+            }
+
+            $this->_totalWeight += ($item->getProduct()->getData(self::WEIGHT_ATTRIBUTE) * $modifier) * $item->getQty();
         }
 
         return $this->_totalWeight;
@@ -120,14 +145,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 continue;
             }
 
-            $product    = $requestItem['product'];
-            $qty        = $requestItem['qty'];
+            $product        = $requestItem['product'];
+            $qty            = $requestItem['qty'];
+            $isRoll         = $requestItem['isRoll'] ?? false;
+            $weightModifier = $isRoll ? 10 : 1;
 
             if (!$product->getData(self::WEIGHT_ATTRIBUTE)) {
                 continue;
             }
 
-            $weight += $product->getData(self::WEIGHT_ATTRIBUTE) * $qty;
+            $weight += ($product->getData(self::WEIGHT_ATTRIBUTE) * $weightModifier) * $qty;
         }
 
         return $weight;
