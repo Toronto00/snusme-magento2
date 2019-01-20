@@ -162,6 +162,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $lowerName = mb_strtolower($name);
-        return in_array($lowerName, ['stock', 'roll']);
+        return in_array($lowerName, ['stock', 'roll', '1 stock', '1 roll']);
     }
 }
