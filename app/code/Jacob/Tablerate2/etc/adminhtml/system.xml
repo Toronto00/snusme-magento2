@@ -30,7 +30,7 @@
                     <label>Include Virtual Products in Price Calculation</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="export" translate="label" type="Magento\OfflineShipping\Block\Adminhtml\Form\Field\Export" sortOrder="5" showInDefault="0" showInWebsite="1" showInStore="0">
+                <field id="export" translate="label" type="Jacob\Tablerate2\Block\Adminhtml\Form\Field\Export" sortOrder="5" showInDefault="0" showInWebsite="1" showInStore="0">
                     <label>Export</label>
                 </field>
                 <field id="import" translate="label" type="Magento\OfflineShipping\Block\Adminhtml\Form\Field\Import" sortOrder="6" showInDefault="0" showInWebsite="1" showInStore="0">

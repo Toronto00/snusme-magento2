@@ -64,7 +64,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
     protected function _construct()
     {
         parent::_construct();
-        $this->setId('shippingTablerateGrid');
+        $this->setId('shippingTablerate2Grid');
         $this->_exportPageSize = 10000;
     }
 

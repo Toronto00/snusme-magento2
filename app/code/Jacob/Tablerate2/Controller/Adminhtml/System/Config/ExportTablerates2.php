@@ -10,7 +10,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Config\Controller\Adminhtml\System\ConfigSectionChecker;
 use Magento\Framework\App\Filesystem\DirectoryList;
 
-class ExportTablerates extends \Magento\Config\Controller\Adminhtml\System\AbstractConfig
+class ExportTablerates2 extends \Magento\Config\Controller\Adminhtml\System\AbstractConfig
 {
     /**
      * @var \Magento\Framework\App\Response\Http\FileFactory
@@ -51,13 +51,13 @@ class ExportTablerates extends \Magento\Config\Controller\Adminhtml\System\Abstr
         $fileName = 'tablerates.csv';
         /** @var $gridBlock \Magento\OfflineShipping\Block\Adminhtml\Carrier\Tablerate\Grid */
         $gridBlock = $this->_view->getLayout()->createBlock(
-            \Magento\OfflineShipping\Block\Adminhtml\Carrier\Tablerate\Grid::class
+            \Jacob\Tablerate2\Block\Adminhtml\Carrier\Tablerate\Grid::class
         );
         $website = $this->_storeManager->getWebsite($this->getRequest()->getParam('website'));
         if ($this->getRequest()->getParam('conditionName')) {
             $conditionName = $this->getRequest()->getParam('conditionName');
         } else {
-            $conditionName = $website->getConfig('carriers/tablerate/condition_name');
+            $conditionName = $website->getConfig('carriers/tablerate2/condition_name');
         }
         $gridBlock->setWebsiteId($website->getId())->setConditionName($conditionName);
         $content = $gridBlock->getCsvFile();

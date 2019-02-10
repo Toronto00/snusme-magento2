@@ -35,8 +35,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-            \Magento\OfflineShipping\Model\Carrier\Tablerate::class,
-            \Magento\OfflineShipping\Model\ResourceModel\Carrier\Tablerate::class
+            \Jacob\Tablerate2\Model\Carrier\Tablerate::class,
+            \Jacob\Tablerate2\Model\ResourceModel\Carrier\Tablerate::class
         );
         $this->_countryTable = $this->getTable('directory_country');
         $this->_regionTable = $this->getTable('directory_country_region');
