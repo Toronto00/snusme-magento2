@@ -58,9 +58,17 @@ class Switcher extends \Magento\Store\Block\Switcher
         $currentWebsite = $this->_storeManager->getWebsite();
 
         list($currentCurrency, $currentLanguage) = explode('_', $currentStore->getCode());
+        $activeWebsites = [
+            'usd',
+            'chf'
+        ];
 
         // Websites are separated by currency
         foreach ($websites as $website) {
+            if (!in_array($website->getCode(), $activeWebsites)) {
+                continue;
+            }
+
             $websiteStores = $website->getStores();
             $targetStore = null;
 
