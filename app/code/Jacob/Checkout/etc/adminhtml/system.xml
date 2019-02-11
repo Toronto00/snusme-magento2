@@ -15,12 +15,20 @@
             <group id="shipping" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Shipping</label>
 
-                <field id="max_nicotine_weight" translate="Max Nicotine Weight" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="max_nicotine_weight" translate="Max Nicotine Weight" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Max Nicotine Weight</label>
                     <config_path>snusme/checkout/max_nicotine_weight</config_path>
                     <comment>Maximum weight in grams that can be shipped in given country.</comment>
                     <frontend_model>Jacob\Checkout\Block\Adminhtml\System\Config\Field\CountryMaxNicotine</frontend_model>
                     <backend_model>Jacob\Checkout\Model\Config\Backend\CountryMaxNicotine</backend_model>
+                </field>
+
+                <field id="country_info" translate="Checkout Country Information" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Checkout Country Information</label>
+                    <config_path>snusme/checkout/country_info</config_path>
+                    <comment>Shows in checkout as given country is chosen as shipping destination.</comment>
+                    <frontend_model>Jacob\Checkout\Block\Adminhtml\System\Config\Field\CountryInfo</frontend_model>
+                    <backend_model>Jacob\Checkout\Model\Config\Backend\CountryInfo</backend_model>
                 </field>
             </group>
         </section>

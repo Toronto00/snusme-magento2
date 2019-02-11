@@ -38,6 +38,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
+     * Gives country info configuration
+     *
+     * @return string
+     */
+    public function getCountryInfoStructure()
+    {
+        $countryInfoStructure = $this->_scopeConfig->getValue(
+            'snusme/checkout/country_info',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        if (!$countryInfoStructure) {
+            return [];
+        }
+
+        return unserialize($countryInfoStructure);
+    }
+
+    /**
      * Checks current cart weight and sees if a given buy request (product + qty)
      * can be added on top of it
      *

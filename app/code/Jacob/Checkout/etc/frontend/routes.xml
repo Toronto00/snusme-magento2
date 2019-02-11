@@ -7,5 +7,9 @@
            <!--Module name-->
            <module name="Jacob_Checkout" />
        </route>
+
+       <route id="checkout" frontName="checkout">
+            <module name="Jacob_Checkout" before="Amasty_Checkout" />
+        </route>
    </router>
 </config>
