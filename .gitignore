@@ -54,6 +54,7 @@ atlassian*
 /pub/media/Productattachments/*
 /pub/static/*
 !/pub/static/.htaccess
+/pub/media/upload/*
 
 /var/*
 !/var/.htaccess
