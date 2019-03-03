@@ -54,11 +54,11 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                                 <?php endif ?>
                                 <?php if ($_product->getName()): ?>
                                     <h4>
-                                        <?= 
+                                        <?=
                                             $_helper->productAttribute(
-                                                $_product, 
-                                                $_product->getName(), 
-                                                'name') 
+                                                $_product,
+                                                $_product->getName(),
+                                                'name')
                                         ?>
                                     </h4>
                                 <?php endif ?>
@@ -94,7 +94,7 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                                                         <div class="option-value">
                                                             <?php $optionValue->setOption($option); ?>
                                                             <?php $buttonTitle = __('Buy') . ' ' . $optionValue->getTitle() . ' (' . $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) . ')'; ?>
-                                                            <button 
+                                                            <button
                                                                 type="submit"
                                                                 title="<?= $block->escapeHtml(__('Buy')) ?>"
                                                                 class="action tocart options"
@@ -152,7 +152,7 @@ $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         require([
             'jquery',
         ], function ($) {
-            $(function () { 
+            $(function () {
                 $('.product-buy-options button').click(function(e) {
                     var button = $(e.currentTarget),
                         optionValue = button.attr('data-option-value'),

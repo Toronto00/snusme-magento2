@@ -33,8 +33,61 @@ class Value extends \Magento\Catalog\Model\Product\Option\Value implements \Mage
      */
     public function getFinalPrice()
     {
-        $basePrice = $this->getOption()->getProduct()->getFinalPrice();
+        return $this->getPrice(true) + $this->getBaseProductFinalPrice();
+    }
 
-        return $this->getPrice(true) + $basePrice;
+    /**
+     * Return price. If $flag is true and price is percent
+     *  return converted percent to price
+     *
+     * @param bool $flag
+     * @return float|int
+     */
+    public function getPrice($flag = false)
+    {
+        if ($flag && $this->getPriceType() == self::TYPE_PERCENT) {
+            $basePrice = $this->getBaseProductFinalPrice();
+            $price = $basePrice * ($this->_getData(self::KEY_PRICE) / 100);
+            return $price;
+        }
+        return $this->_getData(self::KEY_PRICE);
+    }
+
+    public function getBaseProductFinalPrice()
+    {
+        $priceInfo  = $this->getProduct()->getPriceInfo();
+        $finalPrice = $priceInfo->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)
+            ->getAmount()
+            ->getValue();
+
+        return $finalPrice;
+    }
+
+    public function getBaseProductRegularPrice()
+    {
+        $priceInfo  = $this->getProduct()->getPriceInfo();
+        $price      = $priceInfo->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE)
+            ->getAmount()
+            ->getValue();
+
+        return $price;
+    }
+
+    public function hasSpecialPrice()
+    {
+        $finalPrice     = $this->getBaseProductFinalPrice();
+        $regularPrice   = $this->getBaseProductRegularPrice();
+
+        return $finalPrice !== $regularPrice;
+    }
+
+    public function getOriginalPrice($flag = false)
+    {
+        if ($flag && $this->getPriceType() == self::TYPE_PERCENT) {
+            $basePrice = $this->getBaseProductRegularPrice();
+            $price = $basePrice + ($basePrice * ($this->_getData(self::KEY_PRICE) / 100));
+            return $price;
+        }
+        return $this->_getData(self::KEY_PRICE);
     }
 }

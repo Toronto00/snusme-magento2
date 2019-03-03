@@ -38,8 +38,8 @@
         <div class="product-buy-options">
             <?php foreach ($customOptions as $option): ?>
                 <?php $option->setProduct($_product); ?>
-                <input 
-                    type="hidden" 
+                <input
+                    type="hidden"
                     name="options[<?= $option->getId() ?>]"
                     class="product-buy-options-input"
                     value=""
@@ -48,9 +48,14 @@
                 <?php foreach ($option->getValues() as $optionValue): ?>
                     <div class="option-value" id="option-value-<?= $optionValue->getId() ?>">
                         <?php $optionValue->setOption($option); ?>
-                        <?php $buttonTitle = __('Buy') . ' ' . $optionValue->getTitle() . ' (' . $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) . ')'; ?>
 
-                        <button 
+                        <?php if ($optionValue->hasSpecialPrice()): ?>
+                            <?php $buttonTitle = __('Buy') . ' ' . $optionValue->getTitle() . ' (<span class="special-price">' . $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) . '</span> <span class="old-price">' . $_checkoutHelper->formatPrice($optionValue->getOriginalPrice(true)) . '</span>)'; ?>
+                        <?php else: ?>
+                            <?php $buttonTitle = __('Buy') . ' ' . $optionValue->getTitle() . ' (' . $_checkoutHelper->formatPrice($optionValue->getFinalPrice()) . ')'; ?>
+                        <?php endif ?>
+
+                        <button
                             type="submit"
                             title="<?= $block->escapeHtml(__('Buy')) ?>"
                             class="action tocart primary"
@@ -83,7 +88,7 @@
     require([
         'jquery',
     ], function ($) {
-        $(function () { 
+        $(function () {
             $('.product-buy-options button').click(function(e) {
                 var button = $(e.currentTarget),
                     optionValue = button.attr('data-option-value'),
