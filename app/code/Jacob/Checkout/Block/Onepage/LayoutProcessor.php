@@ -146,7 +146,7 @@ class LayoutProcessor implements LayoutProcessorInterface
                 'Amasty_Checkout/js/view/summary';
 
             $jsLayout['components']['checkout']['config']['template'] = 'Amasty_Checkout/onepage/' . $layout;
-            $jsLayout['components']['checkout']['component'] = 'Amasty_Checkout/js/view/onepage';
+            $jsLayout['components']['checkout']['component'] = 'Jacob_Checkout/js/view/onepage';
 
             $shippingAddress = &$jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']['children']['shippingAddress'];
             $shippingAddress['component'] = $this->moduleEnable->isPostNlEnable()
@@ -171,6 +171,28 @@ class LayoutProcessor implements LayoutProcessorInterface
                 'sortOrder' => '91',
                 'skipValidation' => true,
                 'provider' => 'checkoutProvider'
+            ];
+
+            $now = new \DateTime();
+
+            $shippingAddress['children']['shipping-address-fieldset']['children']['dob'] = [
+                'component' => 'Magento_Ui/js/form/element/date',
+                'sortOrder' => '45',
+                'config'    => [
+                    'customScope' => 'shippingAddress',
+                    'template'    => 'ui/form/field',
+                    'elementTmpl' => 'ui/form/element/date',
+                    'options'     => ['dateFormat' => 'y-MM-dd']
+                ],
+                'dataScope' => 'dob',
+                'label' => __('Date of birth'),
+                'validation' => [
+                    'required-entry' => true,
+                    'above-eighteen' => $now->modify('-18 year')->getTimestamp()
+                ],
+                'visible' => true,
+                'provider' => 'checkoutProvider',
+                'additionalClasses' => 'dob'
             ];
 
             $shippingAddressFields = &$shippingAddress['children']['shipping-address-fieldset']['children'];

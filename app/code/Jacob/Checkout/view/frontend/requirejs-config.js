@@ -6,5 +6,12 @@ var config = {
             'Magento_Checkout/template/minicart/content.html':
                 'Jacob_Checkout/template/minicart/content.html',
         }
+    },
+    config: {
+    	mixins: {
+    		'Magento_Checkout/js/model/place-order': {
+                'Jacob_Checkout/js/model/place-order-mixin': true
+            },
+    	}
     }
 };

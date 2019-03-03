@@ -84,6 +84,13 @@
                                 <argument name="sortOrder" xsi:type="number">180</argument>
                             </arguments>
                         </block>
+                        <block class="Magento\Customer\Block\Account\SortLinkInterface" name="customer-account-navigation-account-signout-link">
+                            <arguments>
+                                <argument name="label" xsi:type="string" translate="true">Sign out</argument>
+                                <argument name="path" xsi:type="string">customer/account/logout</argument>
+                                <argument name="sortOrder" xsi:type="number">10</argument>
+                            </arguments>
+                        </block>
                     </block>
                 </block>
             </block>

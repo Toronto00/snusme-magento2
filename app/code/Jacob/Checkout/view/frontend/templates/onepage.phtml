@@ -30,6 +30,9 @@ $helper = $block->getData('amcheckout_helper');
         {
             "#checkout": {
                 "Magento_Ui/js/core/app": <?php /* @escapeNotVerified */ echo $block->getJsLayout();?>
+            },
+            "*": {
+                "aboveEighteen": {}
             }
         }
     </script>

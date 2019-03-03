@@ -8,6 +8,9 @@
 
     <ul class="level0 submenu ui-menu ui-widget ui-widget-content ui-corner-all" role="menu" aria-expanded="false" aria-hidden="true">
         <?php foreach ($this->getLinks() as $link): ?>
+            <?php if ($link->getLabel() == 'Sign out'): ?>
+                <?php continue ?>
+            <?php endif ?>
             <li class="level1 nav-1-1 first ui-menu-item" role="presentation">
                 <a href="<?= $block->getUrl($link->getPath()) ?>" id="ui-id-4" class="ui-corner-all" tabindex="-1" role="menuitem">
                     <span><?= $link->getLabel() ?></span>
