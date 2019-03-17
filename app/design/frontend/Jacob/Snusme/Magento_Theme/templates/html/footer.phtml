@@ -98,7 +98,12 @@
 
 <script type="text/javascript">
     function openTab(elem, target) {
-        var target  = document.querySelector('[data-tab="' + target + '"]');
+        if (target) {
+            var target  = document.querySelector('[data-tab="' + target + '"]');
+        } else {
+            var target  = document.querySelector('[data-tab="' + elem.value + '"]');
+        }
+
         var labels  = document.querySelectorAll('.frontpage-tab-labels li');
         var tabs    = document.querySelectorAll('.frontpage-tab-bodies li');
 

@@ -8,7 +8,9 @@
 
         .full,
         .half,
-        .third {
+        .third,
+        .twothirds,
+        .abstract {
             padding-left: 4px;
             padding-right: 4px;
         }
@@ -16,8 +18,11 @@
 
     .full,
     .half,
-    .third {
+    .third,
+    .twothirds,
+    .abstract {
         box-sizing: border-box;
+        display: flex;
 
         img {
             display: block;
@@ -53,5 +58,32 @@
     .third {
         flex-basis: 33.3333%;
         width: 33.3333%;
+    }
+
+    .twothirds {
+        flex-basis: 66.6666%;
+        width: 66.6666%;
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .row  {
+        .full,
+        .half,
+        .third,
+        .twothirds,
+        .abstract {
+            flex-basis: 100%;
+            width: 100%;
+            justify-content: center;
+
+            &.gutter-left {
+                padding-left: 0;
+            }
+
+            &.gutter-right {
+                padding-right: 0;
+            }
+        }
     }
 }

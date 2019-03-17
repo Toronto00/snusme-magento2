@@ -1,6 +1,20 @@
 @border-color: #e8e8e8;
 
 .frontpage-tabs {
+    select {
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 1px #e8e8e8 solid;
+        font-family: 'Oswald', sans-serif;
+        text-transform: uppercase;
+        font-size: 22px;
+        font-weight: bold;
+        letter-spacing: -1px;
+        color: #462120;
+        height: 44px;
+    }
+
     .frontpage-tab-labels,
     .frontpage-tab-bodies {
         list-style: none;
@@ -14,7 +28,6 @@
     }
 
     .frontpage-tab-labels {
-        display: flex;
         justify-content: center;
         margin-bottom: 8px;
         border-bottom: 1px @border-color solid;
@@ -51,6 +64,26 @@
             &.active {
                 display: block;
             }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .frontpage-tabs {
+        select {
+            display: none;
+        }
+
+        .frontpage-tab-labels {
+            display: flex;
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .frontpage-tabs {
+        .frontpage-tab-labels {
+            display: none;
         }
     }
 }
