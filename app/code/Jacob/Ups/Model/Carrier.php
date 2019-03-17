@@ -134,7 +134,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             // UPS Print Return Label
             $returnPart->addChild('Code', '9');
         }
-        $shipmentPart->addChild('Description', substr(implode(' ', $itemsDesc), 0, 35));
+        $shipmentPart->addChild('Description', 'Swedish Snus for personal use');
         //empirical
 
         $shipperPart = $shipmentPart->addChild('Shipper');
@@ -229,7 +229,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         $servicePart = $shipmentPart->addChild('Service');
         $servicePart->addChild('Code', $request->getShippingMethod());
         $packagePart = $shipmentPart->addChild('Package');
-        $packagePart->addChild('Description', substr(implode(' ', $itemsDesc), 0, 35));
+        $packagePart->addChild('Description', 'Swedish Snus for personal use');
         //empirical
         $packagePart->addChild('PackagingType')->addChild('Code', $request->getPackagingType());
         $packageWeight = $packagePart->addChild('PackageWeight');
@@ -286,15 +286,14 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         $internationalForms->addChild('InvoiceNumber', $request->getOrderShipment()->getOrder()->getIncrementId());
         $internationalForms->addChild('InvoiceDate', $invoiceDate);
         $internationalForms->addChild('PurchaseOrderNumber', $request->getOrderShipment()->getOrder()->getIncrementId());
-        $internationalForms->addChild('ReasonForExport', 'SALE');
+        $internationalForms->addChild('ReasonForExport', 'OTHER');
         $internationalForms->addChild('CurrencyCode', $request->getBaseCurrencyCode());
         $internationalForms->addChild('DeclarationStatement', "I hereby certify that the information on this invoice is true and correct and the contents and value of this shipment is as stated above. The exporter of the products covered by this document declares that except where otherwise clearly indicated these products are of EEA preferential origin.");
 
         $totalItemCost = 0;
 
         if ($request->getRecipientAddressCountryCode() == 'US') {
-            // Temporarily disable ddp again
-            //$internationalForms->addChild('TermsOfShipment', 'DDP');
+            $internationalForms->addChild('TermsOfShipment', 'DDP');
         }
 
         foreach ($request->getPackageItems() as $item) {
