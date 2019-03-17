@@ -34,6 +34,10 @@
         </block>
     </referenceBlock>
 
+    <referenceContainer name="page.top">
+       <referenceBlock name="store.links" remove="true" />
+    </referenceContainer>
+
     <referenceContainer name="footer-container">
         <block class="Magento\Framework\View\Element\Template" name="static.footer" template="Magento_Theme::html/footer.phtml" />
 
