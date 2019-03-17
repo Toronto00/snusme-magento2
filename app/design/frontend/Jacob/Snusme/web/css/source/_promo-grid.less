@@ -44,25 +44,29 @@
             padding-right: 8px;
         }
     }
+}
 
-    .full {
-        flex-basis: 100%;
-        width: 100%;
-    }
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .row  {
+        .full {
+            flex-basis: 100%;
+            width: 100%;
+        }
 
-    .half {
-        flex-basis: 50%;
-        width: 50%;
-    }
+        .half {
+            flex-basis: 50%;
+            width: 50%;
+        }
 
-    .third {
-        flex-basis: 33.3333%;
-        width: 33.3333%;
-    }
+        .third {
+            flex-basis: 33.3333%;
+            width: 33.3333%;
+        }
 
-    .twothirds {
-        flex-basis: 66.6666%;
-        width: 66.6666%;
+        .twothirds {
+            flex-basis: 66.6666%;
+            width: 66.6666%;
+        }
     }
 }
 
