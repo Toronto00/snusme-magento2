@@ -280,7 +280,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         }
 
         $shippingAmount = (float)$request->getOrderShipment()->getOrder()->getShippingAmount();
-        $discountAmount = (float)$request->getOrderShipment()->getOrder()->getDiscountAmount();
+        $discountAmount = abs((float)$request->getOrderShipment()->getOrder()->getDiscountAmount());
 
         $internationalForms->addChild('FormType', '01');
         $internationalForms->addChild('InvoiceNumber', $request->getOrderShipment()->getOrder()->getIncrementId());
@@ -323,7 +323,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         if ($diff > 0) {
             $otherCharges = $internationalForms->addChild('OtherCharges');
 
-            $otherCharges->addChild('MonetaryValue', $shippingAmount);
+            $otherCharges->addChild('MonetaryValue', $diff);
             $otherCharges->addChild('Description', 'Other');
         }
 
