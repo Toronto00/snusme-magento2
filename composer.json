@@ -13,7 +13,8 @@
         "magefan/module-geoip": "^2.0",
         "mailchimp/mc-magento2": "*",
         "ebizmarts/magento2-mandrill": "*",
-        "mageplaza/magento-2-russian-language-pack": "dev-master"
+        "mageplaza/magento-2-russian-language-pack": "dev-master",
+        "livechat/module-magento-livechat": "^2.3"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.2.0",
