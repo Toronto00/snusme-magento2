@@ -293,7 +293,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         $totalItemCost = 0;
 
         if ($request->getRecipientAddressCountryCode() == 'US') {
-            $internationalForms->addChild('TermsOfShipment', 'DDP');
+            //$internationalForms->addChild('TermsOfShipment', 'DDP');
         }
 
         foreach ($request->getPackageItems() as $item) {
