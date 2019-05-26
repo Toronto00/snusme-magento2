@@ -182,10 +182,10 @@ class LayoutProcessor implements LayoutProcessorInterface
                     'customScope' => 'shippingAddress',
                     'template'    => 'ui/form/field',
                     'elementTmpl' => 'ui/form/element/date',
-                    'options'     => ['dateFormat' => 'y-MM-dd']
+                    'options'     => ['dateFormat' => 'yy/MM/dd']
                 ],
                 'dataScope' => 'dob',
-                'label' => __('Date of birth'),
+                'label' => __('Date of birth (YYYY/MM/DD)'),
                 'validation' => [
                     'required-entry' => true,
                     'above-eighteen' => $now->modify('-18 year')->getTimestamp()
