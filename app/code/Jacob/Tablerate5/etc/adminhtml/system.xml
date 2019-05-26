@@ -8,8 +8,8 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="carriers" translate="label" type="text" sortOrder="320" showInDefault="1" showInWebsite="1" showInStore="1">
-            <group id="tablerate2" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Table Rates 2</label>
+            <group id="tablerate5" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Table Rates 5</label>
                 <field id="handling_type" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Calculate Handling Fee</label>
                     <source_model>Magento\Shipping\Model\Source\HandlingType</source_model>
@@ -30,12 +30,12 @@
                     <label>Include Virtual Products in Price Calculation</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="export" translate="label" type="Jacob\Tablerate2\Block\Adminhtml\Form\Field\Export" sortOrder="5" showInDefault="0" showInWebsite="1" showInStore="0">
+                <field id="export" translate="label" type="Jacob\Tablerate5\Block\Adminhtml\Form\Field\Export" sortOrder="5" showInDefault="0" showInWebsite="1" showInStore="0">
                     <label>Export</label>
                 </field>
                 <field id="import" translate="label" type="Magento\OfflineShipping\Block\Adminhtml\Form\Field\Import" sortOrder="6" showInDefault="0" showInWebsite="1" showInStore="0">
                     <label>Import</label>
-                    <backend_model>Jacob\Tablerate2\Model\Config\Backend\Tablerate</backend_model>
+                    <backend_model>Jacob\Tablerate5\Model\Config\Backend\Tablerate</backend_model>
                 </field>
                 <field id="name" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Method Name</label>
