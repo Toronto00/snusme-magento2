@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e4539b75ae93b6f4f1c2e09da30275ee",
+    "content-hash": "69fc0b5c2681ca775a2aee6436233ef3",
     "packages": [
         {
             "name": "braintree/braintree_php",
@@ -6206,12 +6206,87 @@
             "time": "2017-06-21T14:56:23+00:00"
         },
         {
-            "name": "mailchimp/mc-magento2",
-            "version": "1.0.32",
+            "name": "mageplaza/magento-2-russian-language-pack",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mageplaza/magento-2-russian-language-pack.git",
+                "reference": "b23735450c105f09ed8e5ab0a7f31d166c1a662a"
+            },
             "dist": {
                 "type": "zip",
-                "url": "https://repo.magento.com/archives/mailchimp/mc-magento2/mailchimp-mc-magento2-1.0.32.0.zip",
+                "url": "https://api.github.com/repos/mageplaza/magento-2-russian-language-pack/zipball/b23735450c105f09ed8e5ab0a7f31d166c1a662a",
+                "reference": "b23735450c105f09ed8e5ab0a7f31d166c1a662a",
+                "shasum": ""
+            },
+            "require": {
+                "mageplaza/module-core": "^1.3.13"
+            },
+            "type": "magento2-language",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mageplaza team",
+                    "email": "hi@mageplaza.com",
+                    "homepage": "https://www.mageplaza.com",
+                    "role": "Leader"
+                }
+            ],
+            "description": "Russian language package for Magento 2",
+            "homepage": "https://www.mageplaza.com",
+            "time": "2019-05-23T05:08:12+00:00"
+        },
+        {
+            "name": "mageplaza/module-core",
+            "version": "1.4.3",
+            "dist": {
+                "type": "zip",
+                "url": "https://repo.magento.com/archives/mageplaza/module-core/mageplaza-module-core-1.4.3.0.zip",
                 "reference": null,
+                "shasum": "ace1e7c14d25b4d5df2b58f1af6dc7974a284d36"
+            },
+            "type": "magento2-module",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "Mageplaza\\Core\\": ""
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Mageplaza",
+                    "email": "support@mageplaza.com",
+                    "homepage": "https://www.mageplaza.com",
+                    "role": "Technical Support"
+                }
+            ],
+            "description": "Mageplaza Core for Magento 2"
+        },
+        {
+            "name": "mailchimp/mc-magento2",
+            "version": "1.0.32",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mailchimp/mc-magento2.git",
+                "reference": "0b9ec20c94c51e447c359bbe0045e57fc6498321"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mailchimp/mc-magento2/zipball/0b9ec20c94c51e447c359bbe0045e57fc6498321",
+                "reference": "0b9ec20c94c51e447c359bbe0045e57fc6498321",
                 "shasum": "b446fc192d19b077caceb49a89532ee58d1718a1"
             },
             "require": {
@@ -12236,6 +12311,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "composer/composer": 15,
+        "mageplaza/magento-2-russian-language-pack": 20,
         "phpmd/phpmd": 0
     },
     "prefer-stable": false,

@@ -27,7 +27,8 @@ class Switcher extends \Magento\Store\Block\Switcher
 
     protected $_labelMap = [
         'en' => 'English',
-        'de' => 'Swiss'
+        'de' => 'Swiss',
+        'ru' => 'Russian'
     ];
 
     /**
