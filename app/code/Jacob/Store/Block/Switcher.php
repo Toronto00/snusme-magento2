@@ -112,4 +112,9 @@ class Switcher extends \Magento\Store\Block\Switcher
 
         return $this->_matrix;
     }
+
+    public function isEuStore()
+    {
+        return $this->_storeManager->getWebsite()->getCode() == 'eur';
+    }
 }
