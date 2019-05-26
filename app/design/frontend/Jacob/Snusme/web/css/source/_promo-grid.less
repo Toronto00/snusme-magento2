@@ -68,6 +68,14 @@
             width: 66.6666%;
         }
     }
+
+    img.small {
+        display: none !important;
+    }
+
+    img.large {
+        display: block !important;
+    }
 }
 
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
@@ -100,5 +108,13 @@
                 padding-bottom: 4px;
             }
         }
+    }
+
+    img.small {
+        display: block !important;
+    }
+
+    img.large {
+        display: none !important;
     }
 }
