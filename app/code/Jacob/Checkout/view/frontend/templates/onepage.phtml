@@ -11,7 +11,13 @@
 /** @var \Amasty\Checkout\Helper\Onepage $helper */
 $helper = $block->getData('amcheckout_helper');
 ?>
-
+<script>
+    window.checkoutConfig = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getCheckoutConfig()); ?>;
+    window.countryInfo = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getData('country_info')); ?>;
+    // Create aliases for customer.js model from customer module
+    window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+    window.customerData = window.checkoutConfig.customerData;
+</script>
 <div id="checkout" data-bind="scope:'checkout'" class="checkout-container am-checkout">
     <div class="checkout-header">
         <h1 class="title"><?= $block->escapeHtml($helper->getTitle()) ?></h1>
@@ -35,13 +41,6 @@ $helper = $block->getData('amcheckout_helper');
                 "aboveEighteen": {}
             }
         }
-    </script>
-    <script>
-        window.checkoutConfig = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getCheckoutConfig()); ?>;
-        window.countryInfo = <?php /* @escapeNotVerified */ echo \Zend_Json::encode($block->getData('country_info')); ?>;
-        // Create aliases for customer.js model from customer module
-        window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
-        window.customerData = window.checkoutConfig.customerData;
     </script>
     <script>
         require([
