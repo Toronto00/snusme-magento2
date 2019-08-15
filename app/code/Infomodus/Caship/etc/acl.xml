@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Sales::sales">
+                    <resource id="Infomodus_Caship::caship_acl" title="Infomodus Shipping Methods" sortOrder="31">
+                        <resource id="Infomodus_Caship::items" title="View methods" sortOrder="5">
+                            <resource id="Infomodus_Caship::create" title="Create method" sortOrder="5"/>
+                            <resource id="Infomodus_Caship::delete" title="Delete method" sortOrder="10"/>
+                            <resource id="Infomodus_Caship::export" title="Export methods" sortOrder="15"/>
+                        </resource>
+                    </resource>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="Magento_Shipping::carriers">
+                                <resource id="Infomodus_Caship::caship" title="Infomodus Shipping Methods" sortOrder="5"/>
+                            </resource>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Infomodus. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Backend/etc/menu.xsd">
+    <menu>
+        <add id="infomodus::base" title="Infomodus" module="Infomodus_Caship" sortOrder="90" parent="Magento_Sales::sales" resource="Infomodus_Caship::sample"/>
+        <add id="infomodus_caship::caship" title="Shipping Methods" module="Infomodus_Caship" sortOrder="10" parent="infomodus::base" action="infomodus_caship/items/" resource="Infomodus_Caship::items"/>
+    </menu>
+</config>

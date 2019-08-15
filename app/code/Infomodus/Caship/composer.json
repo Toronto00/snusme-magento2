@@ -1,0 +1,22 @@
+{
+  "name": "infomodus/caship",
+  "description": "infomodus caship",
+  "require": {
+    "php": "~5.6.5|7.0.2|7.0.4|~7.0.6|~7.1.0|~7.2.0",
+    "magento/framework": "100.1.*|100.2.*|100.3.*|101.0.*|^102.0.0",
+    "magento/module-sales": "100.1.*|101.0.*|102.0.*",
+    "magento/module-shipping": "100.1.*|100.2.*|100.3.*",
+    "dvdoug/boxpacker": "2.4.*"
+  },
+  "type": "magento2-module",
+  "version": "1.5.1",
+  "license": [
+    "proprietary"
+  ],
+  "autoload": {
+    "files": [ "registration.php" ],
+    "psr-4": {
+      "Infomodus\\Caship\\": ""
+    }
+  }
+}

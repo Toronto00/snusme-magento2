@@ -1,0 +1,57 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="carriers">
+            <group id="caship" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Infomodus Shipping Methods</label>
+                <field id="active" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="button_method" translate="label" type="button" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Shipping Methods</label>
+                    <frontend_model>Infomodus\Caship\Model\Config\ShippingSettingsLink</frontend_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="title" translate="label comment" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                    <comment>Required field</comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="price_format" translate="label" type="select" sortOrder="350" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Price format</label>
+                    <source_model>Infomodus\Caship\Model\Config\PriceFormat</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="csv_import" translate="label" type="file" sortOrder="500" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Import</label>
+                    <backend_model>Infomodus\Caship\Model\Config\Import</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="0">caship_import</upload_dir>
+                    <base_url type="media" scope_info="0">caship_import</base_url>
+                    <comment>Allowed file type: csv.</comment>
+                </field>
+                <field id="csv_export" translate="label" type="button" sortOrder="600" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Export</label>
+                    <frontend_model>Infomodus\Caship\Model\Config\ExportLink</frontend_model>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="2000" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
