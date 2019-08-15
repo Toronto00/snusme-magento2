@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+    }
+</style>
+<script type="text/javascript">
+    window.onload = function () {
+        var el = document.querySelector("iframe");
+        el.style.width = window.innerWidth + 'px';
+        el.style.height = window.innerHeight + 'px';
+    }
+</script>
+<?php $url = str_replace('&', '&amp;', str_replace('&amp;', '&', $_SERVER['QUERY_STRING'])); ?>
+<iframe src="//www.ups.com/lsw/invoke?<?php echo $url; ?>" frameborder="0" width="1080px" height="750px"
+        name="dialog_upsap_access_points2"></iframe>
+</body>
+</html>

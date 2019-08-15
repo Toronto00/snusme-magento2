@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Infomodus. All rights reserved.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Infomodus\Upsap\Block\Adminhtml\Points" name="adminhtml.block.upsap.points.grid.container">
+                <block class="Magento\Backend\Block\Widget\Grid" name="adminhtml.block.upsap.points.grid" as="grid">
+                    <arguments>
+                        <argument name="id" xsi:type="string">infomodus_upsap_points_grid</argument>
+                        <argument name="dataSource" xsi:type="object">Infomodus\Upsap\Model\ResourceModel\Points\Collection</argument>
+                        <argument name="default_sort" xsi:type="string">ap_id</argument>
+                        <argument name="default_dir" xsi:type="string">DESC</argument>
+                        <argument name="save_parameters_in_session" xsi:type="string">1</argument>
+                    </arguments>
+                    <block class="Magento\Backend\Block\Widget\Grid\ColumnSet" as="grid.columnSet" name="adminhtml.upsap.points.grid.columnSet">
+                        <arguments>
+                            <argument name="rowUrl" xsi:type="array">
+                                <item name="path" xsi:type="string">infomodus_upsap/*/edit</item>
+                                <item name="extraParamsTemplate" xsi:type="array">
+                                    <item name="id" xsi:type="string">getId</item>
+                                </item>
+                            </argument>
+                        </arguments>
+                        <block class="Magento\Backend\Block\Widget\Grid\Column" as="ap_id">
+                            <arguments>
+                                <argument name="header" xsi:type="string" translate="true">#</argument>
+                                <argument name="index" xsi:type="string">ap_id</argument>
+                            </arguments>
+                        </block>
+                        <block class="Magento\Backend\Block\Widget\Grid\Column" as="order_increment_id">
+                            <arguments>
+                                <argument name="header" xsi:type="string" translate="true">Order #</argument>
+                                <argument name="index" xsi:type="string">order_increment_id</argument>
+                                <argument name="renderer" xsi:type="string">Infomodus\Upsap\Block\Adminhtml\Widget\Points\Grid\Column\Renderer\OrderId</argument>
+                            </arguments>
+                        </block>
+                        <block class="Magento\Backend\Block\Widget\Grid\Column" as="appu_id">
+                            <arguments>
+                                <argument name="header" xsi:type="string" translate="true">Access Point Id</argument>
+                                <argument name="index" xsi:type="string">appu_id</argument>
+                            </arguments>
+                        </block>
+                        <block class="Magento\Backend\Block\Widget\Grid\Column" as="address">
+                            <arguments>
+                                <argument name="header" xsi:type="string" translate="true">Address</argument>
+                                <argument name="index" xsi:type="string">address</argument>
+                                <argument name="renderer" xsi:type="string">Infomodus\Upsap\Block\Adminhtml\Widget\Points\Grid\Column\Renderer\Address</argument>
+                            </arguments>
+                        </block>
+                    </block>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

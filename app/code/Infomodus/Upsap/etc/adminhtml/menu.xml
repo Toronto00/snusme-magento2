@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Infomodus_Upsap::base" title="Infomodus" module="Infomodus_Upsap" sortOrder="30" dependsOnModule="Infomodus_Upsap" parent="Magento_Sales::sales" resource="Infomodus_Upsap::upsap_acl"/>
+        <add id="Infomodus_Upsap::upsap_items" title="UPS AP Shipping Methods" module="Infomodus_Upsap" sortOrder="10" action="infomodus_upsap/items/" parent="Infomodus_Upsap::base" resource="Infomodus_Upsap::items"/>
+        <add id="Infomodus_Upsap::upsap_points" title="UPS AP Shipments" module="Infomodus_Upsap" sortOrder="10" action="infomodus_upsap/points/" parent="Infomodus_Upsap::base" resource="Infomodus_Upsap::points"/>
+   </menu>
+</config>

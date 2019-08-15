@@ -1,0 +1,91 @@
+Methods,Methods
+"Add New Method","Add New Method"
+"Save and Continue Edit","Save and Continue Edit"
+"Edit Method '%1'","Edit Method '%1'"
+"New Method","New Method"
+"Method Information","Method Information"
+Title,Title
+"It appears only in admin interface","It appears only in admin interface"
+"Method name","Method name"
+"UPS Shipping method","UPS Shipping method"
+"Price Source","Price Source"
+Price,Price
+"Add extra price type","Add extra price type"
+"Add extra value","Add extra value"
+"Negotiated rates","Negotiated rates"
+"Order amount from for Negotiated rates","Order amount from for Negotiated rates"
+"Time in transit","Time in transit"
+"Add day","Add day"
+"Minimum Order Amount","Minimum Order Amount"
+"Maximum Order Amount","Maximum Order Amount"
+"If 0 then infinity","If 0 then infinity"
+"Minimum Order Weight","Minimum Order Weight"
+"Maximum Order Weight","Maximum Order Weight"
+"Minimum Product Quantity","Minimum Product Quantity"
+"Maximum Product Quantity","Maximum Product Quantity"
+"Minimum ZIP/Postal code","Minimum ZIP/Postal code"
+"Maximum ZIP/Postal code","Maximum ZIP/Postal code"
+"Duty and Tax","Duty and Tax"
+"Allowed Countries","Allowed Countries"
+"User groups","User groups"
+"Apply to Store","Apply to Store"
+"Allowed Stores","Allowed Stores"
+"Free Shipping","Free Shipping"
+Enabled,Enabled
+Method,Method
+"Access Points","Access Points"
+"View Point","View Point"
+"Access Point Information","Access Point Information"
+"Order #","Order #"
+"Access Point Id","Access Point Id"
+Address,Address
+Point,Point
+All,All
+"You deleted the item.","You deleted the item."
+"We can't delete item right now. Please review the log and try again.","We can't delete item right now. Please review the log and try again."
+"We can't find a item to delete.","We can't find a item to delete."
+"This item no longer exists.","This item no longer exists."
+"UPS Access Point Shipping Methods","UPS Access Point Shipping Methods"
+Infomodus,Infomodus
+Items,Items
+"Please select one or more methods.","Please select one or more methods."
+"Total of %1 record(s) were deleted.","Total of %1 record(s) were deleted."
+"The wrong item is specified.","The wrong item is specified."
+"You saved the item.","You saved the item."
+"Something went wrong while saving the item data. Please review the error log.","Something went wrong while saving the item data. Please review the error log."
+"UPS Access Points","UPS Access Points"
+"All Stores","All Stores"
+" (%1 day(s))"," (%1 day(s))"
+"Hold for Pickup at UPS Access Point","Hold for Pickup at UPS Access Point"
+"UPS Access Point Delivery","UPS Access Point Delivery"
+Export,Export
+"Manage UPS Access Point shipping methods","Manage UPS Access Point shipping methods"
+Specific,Specific
+Disabled,Disabled
+"UPS Access Point","UPS Access Point"
+"Shipping Methods for UPS Access Point","Shipping Methods for UPS Access Point"
+"Required field","Required field"
+Type,Type
+"Select Used Module","Select Used Module"
+CSS,CSS
+"path to file","path to file"
+"Enable search in popup","Enable search in popup"
+"Price format","Price format"
+"Sort Order","Sort Order"
+"Import Shipping Methods (CSV)","Import Shipping Methods (CSV)"
+"Export Existing Shipping Methods (CSV)","Export Existing Shipping Methods (CSV)"
+Debug,Debug
+Delete,Delete
+"Are you sure?","Are you sure?"
+ID,ID
+Name,Name
+"UPS Shipping Method","UPS Shipping Method"
+"Min Order Amount","Min Order Amount"
+"Max Order Amount","Max Order Amount"
+"Min Weight","Min Weight"
+"Max Weight","Max Weight"
+"Min Qty","Min Qty"
+"Max Qty","Max Qty"
+Store,Store
+Status,Status
+#,#

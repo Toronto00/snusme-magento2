@@ -1,0 +1,136 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="carriers">
+            <group id="upsap" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>UPS Access Point</label>
+                <field id="active" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="button_method" translate="label" type="button" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Shipping Methods for UPS Access Point</label>
+                    <frontend_model>Infomodus\Upsap\Model\Config\ShippingSettingsLink</frontend_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="accesslicensenumber" translate="label comment" type="password" sortOrder="155"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Access License Number</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="userid" translate="label comment" type="password" sortOrder="160" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>User Id</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="password" translate="label comment" type="password" sortOrder="165" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Password</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="shippernumber" translate="label comment" type="text" sortOrder="170" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Shipper Number</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="title" translate="label comment" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                    <comment>Required field</comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="type" translate="label" type="select" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Type</label>
+                    <source_model>Infomodus\Upsap\Model\Config\AccesspointType</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="dest_type" translate="label" type="select" sortOrder="350" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Destination type</label>
+                    <source_model>Infomodus\Upsap\Model\Config\DestinationType</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="packagingtypecode" translate="label comment" type="select" sortOrder="360" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Packaging Type</label>
+                    <source_model>Infomodus\Upsap\Model\Config\Upspackagecode</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="additionalhandling" translate="label" type="select" sortOrder="370" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Additional Handling</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="unit_of_measure" translate="label" type="select" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Weight Unit</label>
+                    <source_model>Infomodus\Upsap\Model\Config\Weight</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="css" translate="label comment" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>CSS</label>
+                    <comment>path to file</comment>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="search_ui" translate="label" type="select" sortOrder="520" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable search in popup</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="price_format" translate="label" type="select" sortOrder="550" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Price format</label>
+                    <source_model>Infomodus\Upsap\Model\Config\PriceFormat</source_model>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="csv_import" translate="label" type="file" sortOrder="700" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Import Shipping Methods (CSV)</label>
+                    <backend_model>Infomodus\Upsap\Model\Config\Import</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="0">upsap_import</upload_dir>
+                    <base_url type="media" scope_info="0">upsap_import</base_url>
+                    <comment>Allowed file type: csv.</comment>
+                </field>
+                <field id="csv_export" translate="label" type="button" sortOrder="800" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Export Existing Shipping Methods (CSV)</label>
+                    <frontend_model>Infomodus\Upsap\Model\Config\ExportLink</frontend_model>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="2000" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
