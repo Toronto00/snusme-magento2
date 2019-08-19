@@ -358,8 +358,10 @@ class Fedex extends \Magento\Fedex\Model\Carrier
         $response = $client->getRates($request);
         //print_r($client->__getLastRequest());
         //print_r($client->__getLastResponse());
-        $this->_conf->log($client->__getLastRequest());
-        $this->_conf->log($client->__getLastResponse());
+        if ($this->_handy->_conf->getStoreConfig('carriers/caship/debug') == 1) {
+            $this->_conf->log($client->__getLastRequest());
+            $this->_conf->log($client->__getLastResponse());
+        }
         /*$this->_conf->log($this->xml2array($response));*/
         /*print_r($response);*/
         if (is_soap_fault($response)) {
@@ -394,7 +396,7 @@ class Fedex extends \Magento\Fedex\Model\Carrier
 
                     if (isset($response->RatedShipmentDetails) && is_array($response->RatedShipmentDetails)) {
                         foreach ($response->RatedShipmentDetails as $replyPrice) {
-                            $valueToDb[$replyPrice->ServiceType] = ['time' => $time,
+                            $valueToDb[$response->ServiceType] = ['time' => $time,
                                 'currency' => $replyPrice->ShipmentRateDetail->TotalNetChargeWithDutiesAndTaxes->Currency,
                                 'price' => number_format($replyPrice->ShipmentRateDetail
                                     ->TotalNetChargeWithDutiesAndTaxes->Amount, 2, ".", ",")];

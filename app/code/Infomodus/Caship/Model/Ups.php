@@ -277,8 +277,6 @@ class Ups
 
             return $rates;
         } else {
-            $this->_handy->_conf->log($data);
-            $this->_handy->_conf->log($result);
             $errorDescription = [];
             if (is_array($xml['Response']['Error']) && isset($xml['Response']['Error'][0])) {
                 foreach ($xml['Response']['Error'] as $item) {

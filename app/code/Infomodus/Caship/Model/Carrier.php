@@ -222,17 +222,17 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
 
     protected function _doShipmentRequest(DataObject $request)
     {
-        return true;
+        return new \Magento\Framework\DataObject();
     }
 
     public function processAdditionalValidation(DataObject $request)
     {
-        return true;
+        return $this;
     }
 
     public function proccessAdditionalValidation(DataObject $request)
     {
-        return true;
+        return $this;
     }
 
     /**
@@ -415,7 +415,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
                                 $ratePrice = (float)$ratecode2[$nameOfPriceType]['price'];
                                 $rateCurrency = (string)$ratecode2[$nameOfPriceType]['currency'];
 
-                                if($method->getRural() == 0){
+                                if ($method->getRural() == 0 && !empty($ratecode2['rural']['price'])) {
                                     $ratePrice -= ((float)$ratecode2['rural']['price']);
                                 }
                             } else {
@@ -471,7 +471,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
                         $testing = ('https://xmlpi-ea.dhl.com/XMLShippingServlet' == $this->_conf->getStoreConfig('carriers/dhl/gateway_url', $storeId) ? 0 : 1);
                     }
 
-                    if (count($this->ratesDHL) > 0) {
+                    if (!empty($this->ratesDHL) > 0) {
                         if (is_array($this->ratesDHL[0]) && count($this->ratesDHL[0]) > 0) {
                             foreach ($this->ratesDHL[0] as $k => $price) {
                                 if ($price->getProductGlobalCode() == $method->getDhlmethodId() && ($price->getTotalAmount() > 0 || $testing == 1)) {
@@ -482,7 +482,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
                             }
                         }
 
-                        if (count($this->ratesDHL[1]) > 0) {
+                        if (is_array($this->ratesDHL[1]) && count($this->ratesDHL[1]) > 0) {
                             foreach ($this->ratesDHL[1] as $k => $price) {
                                 if ($price->getProductGlobalCode() == $method->getDhlmethodId() && ($price->getTotalAmount() > 0 || $testing == 1)) {
                                     $ratePrice = $price->getTotalAmount();
@@ -522,7 +522,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
                     }
                 }
 
-                if ($method->getAddedValue() != 0 && $method->getAddedValue() != "") {
+                if ($ratePrice !== false && $method->getAddedValue() != 0 && $method->getAddedValue() != "") {
                     $coefficient = 1;
 
                     if ($method->getAddedValueAppliedFor() == 'package' && !empty($this->countPackages)) {
@@ -667,17 +667,21 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
         }
 
         $arrMethods = [];
-        $model = $this->methodItems->addFieldToFilter(['is_store_all', 'store_id'], [['eq' => 0], [
-                [
-                    ['like' => '%,' . $storeId . ',%'],
-                    ['like' => '%,' . $storeId],
-                    ['like' => $storeId . ',%'],
-                    ['like' => $storeId],
+        $model = $this->methodItems;
+        if($storeId > 1) {
+            $model->addFieldToFilter(['is_store_all', 'store_id'], [['eq' => 0], [
+                    [
+                        ['like' => '%,' . $storeId . ',%'],
+                        ['like' => '%,' . $storeId],
+                        ['like' => $storeId . ',%'],
+                        ['like' => $storeId],
+                    ]
                 ]
-            ]
-            ]
-        )
-            ->addFieldToFilter('status', 1);
+                ]
+            );
+        }
+
+        $model->addFieldToFilter('status', 1);
         foreach ($model as $method) {
             $arrMethods[$method->getId()] = $method->getTitle();
         }

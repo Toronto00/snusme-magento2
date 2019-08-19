@@ -124,19 +124,21 @@ class Ups extends AbstractHelper
             $lbl->insured = $this->_conf->getStoreConfig('upslabel/ratepayment/insured_automaticaly', $this->storeId);
 
             $params['shipper_no'] = $this->_conf->getStoreConfig('upslabel/shipping/defaultshipper', $this->storeId);
-            \dahbug::dump($this->_conf->getStoreConfig('upslabel/shipping/defaultshipper', $this->storeId));
-            $lbl->shipperCity = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/city', $this->storeId));
-            $lbl->shipperStateProvinceCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/stateprovincecode', $this->storeId));
-            $lbl->shipperPostalCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/postalcode', $this->storeId));
-            $lbl->shipperCountryCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/countrycode', $this->storeId));
+            $address = ObjectManager::getInstance()->get(\Infomodus\Upslabel\Model\Config\Defaultaddress::class)->getAddressesById($params['shipper_no']);
+
+            $lbl->shipperCity = $this->_conf->escapeXML($address->getCity());
+            $lbl->shipperStateProvinceCode = $this->_conf->escapeXML($address->getProvinceCode());
+            $lbl->shipperPostalCode = $this->_conf->escapeXML($address->getPostalCode());
+            $lbl->shipperCountryCode = $this->_conf->escapeXML($address->getCountry());
 
             $params['shipfrom_no'] = $this->_conf->getStoreConfig('upslabel/shipping/defaultshipfrom', $this->storeId);
-            $lbl->shipfromStateProvinceCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/stateprovincecode', $this->storeId));
-            $lbl->shipfromCity = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/city', $this->storeId));
-            $lbl->shipfromPostalCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/postalcode', $this->storeId));
-            $lbl->shipfromCountryCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/countrycode', $this->storeId));
-            $lbl->shipfromAddressLine = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/addressline1', $this->storeId));
-            \dahbug::dump($params['shipfrom_no']);
+            $address = ObjectManager::getInstance()->get(\Infomodus\Upslabel\Model\Config\Defaultaddress::class)->getAddressesById($params['shipfrom_no']);
+
+            $lbl->shipfromCity = $this->_conf->escapeXML($address->getCity());
+            $lbl->shipfromStateProvinceCode = $this->_conf->escapeXML($address->getProvinceCode());
+            $lbl->shipfromPostalCode = $this->_conf->escapeXML($address->getPostalCode());
+            $lbl->shipfromCountryCode = $this->_conf->escapeXML($address->getCountry());
+            $lbl->shipfromAddressLine = $this->_conf->escapeXML($address->getStreetOne());
 
             $lbl->weightUnits = $this->_conf->getStoreConfig('upslabel/weightdimension/weightunits', $this->storeId);
             $lbl->testing = $this->_conf->getStoreConfig('upslabel/testmode/testing', $this->storeId);
@@ -152,7 +154,7 @@ class Ups extends AbstractHelper
             $packages[0]['additionalhandling'] = $this->_conf->getStoreConfig('upslabel/ratepayment/additionalhandling', $this->storeId) == 1 ? '<AdditionalHandling />' : '';
 
             /* Multi package */
-            $dimensionSets = ObjectManager::getInstance()->get(\Infomodus\Upslabel\Model\Config\Defaultdimensionsset::class)->toOptionArray($this->storeId);
+            $dimensionSets = ObjectManager::getInstance()->get(\Infomodus\Upslabel\Model\Config\Defaultdimensionsset::class)->toOptionObjects();
             if (count($dimensionSets) > 0 || $this->_conf->getStoreConfig('upslabel/packaging/frontend_multipackes_enable', $this->storeId) == 1) {
                 $attributeCodeWidth = $this->_conf->getStoreConfig('upslabel/weightdimension/multipackes_attribute_width', $this->storeId) ?
                     $this->_conf->getStoreConfig('upslabel/weightdimension/multipackes_attribute_width', $this->storeId) : 'width';
@@ -245,19 +247,18 @@ class Ups extends AbstractHelper
 
                     if ($countProductInBox > 0) {
                         foreach ($dimensionSets as $v) {
-                            if ($v['value'] !== 0) {
+                            if (!empty($v)) {
                                 $packer->addBox(new MyBox(
-                                        $v['value'],
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_width', $this->storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_length', $this->storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_height', $this->storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/emptyWeight', $this->storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/width', $this->storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/length', $this->storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/height', $this->storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/maxWeight', $this->storeId)
-                                    )
-                                );
+                                    $v->getId(),
+                                    $v->getOuterWidth(),
+                                    $v->getOuterLengths(),
+                                    $v->getOuterHeight(),
+                                    $v->getEmptyWeight(),
+                                    $v->getWidth(),
+                                    $v->getLengths(),
+                                    $v->getHeight(),
+                                    $v->getMaxWeight()
+                                ));
                             }
                         }
 
@@ -387,7 +388,6 @@ class Ups extends AbstractHelper
         }
 
         $lbl->pickupDate = $dateFormat->format("Ymd");
-        \dahbug::dump($lbl);
 
         return $lbl;
     }
