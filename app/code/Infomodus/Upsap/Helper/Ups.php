@@ -6,6 +6,8 @@
  */
 namespace Infomodus\Upsap\Helper;
 
+use Magento\Framework\App\ObjectManager;
+
 class Ups extends \Magento\Framework\App\Helper\AbstractHelper
 {
     public $_context;
@@ -59,6 +61,13 @@ class Ups extends \Magento\Framework\App\Helper\AbstractHelper
             $lbl->shiptoStateProvinceCode = '';
         }
 
+        if ($lbl->shiptoCountryCode == 'ES') {
+            if (in_array(substr($lbl->shiptoPostalCode, 0, 2), ['35', '38'])) {
+                $lbl->shiptoCountryCode = 'CI';
+                $lbl->shiptoStateProvinceCode = '';
+            }
+        }
+
         $lbl->AccessLicenseNumber = $this->_conf->getStoreConfig('carriers/upsap/accesslicensenumber', $this->storeId);
         $lbl->UserID = $this->_conf->getStoreConfig('carriers/upsap/userid', $this->storeId);
         $lbl->Password = $this->_conf->getStoreConfig('carriers/upsap/password', $this->storeId);
@@ -76,21 +85,28 @@ class Ups extends \Magento\Framework\App\Helper\AbstractHelper
 
         $lbl->weightUnits = $this->_conf->getStoreConfig('carriers/upsap/unit_of_measure', $this->storeId);
 
-        if($this->_conf->isModuleOutputEnabled("Infomodus_Upslabel")) {
+        $lbl->insured = 0;
 
+        if($this->_conf->isModuleOutputEnabled("Infomodus_Upslabel")) {
             $params['shipper_no'] = $this->_conf->getStoreConfig('upslabel/shipping/defaultshipper', $this->storeId);
-            $lbl->shipperCity = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/city', $this->storeId));
-            $lbl->shipperStateProvinceCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/stateprovincecode', $this->storeId));
-            $lbl->shipperPostalCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/postalcode', $this->storeId));
-            $lbl->shipperCountryCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/countrycode', $this->storeId));
+            $address = ObjectManager::getInstance()->get(\Infomodus\Upslabel\Model\Config\Defaultaddress::class)->getAddressesById($params['shipper_no']);
+
+            $lbl->shipperCity = $this->_conf->escapeXML($address->getCity());
+            $lbl->shipperStateProvinceCode = $this->_conf->escapeXML($address->getProvinceCode());
+            $lbl->shipperPostalCode = $this->_conf->escapeXML($address->getPostalCode());
+            $lbl->shipperCountryCode = $this->_conf->escapeXML($address->getCountry());
 
             $params['shipfrom_no'] = $this->_conf->getStoreConfig('upslabel/shipping/defaultshipfrom', $this->storeId);
-            $lbl->shipfromStateProvinceCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/stateprovincecode', $this->storeId));
-            $lbl->shipfromCity = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/city', $this->storeId));
-            $lbl->shipfromPostalCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/postalcode', $this->storeId));
-            $lbl->shipfromCountryCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/countrycode', $this->storeId));
+            $address = ObjectManager::getInstance()->get(\Infomodus\Upslabel\Model\Config\Defaultaddress::class)->getAddressesById($params['shipfrom_no']);
+
+            $lbl->shipfromCity = $this->_conf->escapeXML($address->getCity());
+            $lbl->shipfromStateProvinceCode = $this->_conf->escapeXML($address->getProvinceCode());
+            $lbl->shipfromPostalCode = $this->_conf->escapeXML($address->getPostalCode());
+            $lbl->shipfromCountryCode = $this->_conf->escapeXML($address->getCountry());
 
             $lbl->unitOfMeasurement = $this->_conf->getStoreConfig('upslabel/weightdimension/unitofmeasurement', $this->storeId);
+
+            $lbl->insured = $this->_conf->getStoreConfig('upslabel/ratepayment/insured_automaticaly', $this->storeId);
 
             if ($this->_conf->getStoreConfig('upslabel/quantum/adult', $this->storeId) != 1
                     ||
@@ -137,9 +153,23 @@ class Ups extends \Magento\Framework\App\Helper\AbstractHelper
             $lbl->shipperStateProvinceCode = '';
         }
 
+        if ($lbl->shipperCountryCode == 'ES') {
+            if (in_array(substr($lbl->shipperPostalCode, 0, 2), ['35', '38'])) {
+                $lbl->shipperCountryCode = 'CI';
+                $lbl->shipperStateProvinceCode = '';
+            }
+        }
+
         if($lbl->shipfromCountryCode == 'US' && $lbl->shipfromStateProvinceCode == 'PR'){
             $lbl->shipfromCountryCode = 'PR';
             $lbl->shipfromStateProvinceCode = '';
+        }
+
+        if ($lbl->shipfromCountryCode == 'ES') {
+            if (in_array(substr($lbl->shipfromPostalCode, 0, 2), ['35', '38'])) {
+                $lbl->shipfromCountryCode = 'CI';
+                $lbl->shipfromStateProvinceCode = '';
+            }
         }
 
         return $lbl;

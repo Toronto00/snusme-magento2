@@ -123,6 +123,18 @@ class Import extends \Magento\Config\Model\Config\Backend\File
                                 $model->setTimeInTransit($colData);
                                 $items->addFieldToFilter('time_in_transit', $colData);
                                 break;
+                            case 'tit_show_format':
+                                $model->setTitShowFormat($colData);
+                                $items->addFieldToFilter('tit_show_format', $colData);
+                                break;
+                            case 'tit_show_format':
+                                $model->setTitShowFormat($colData);
+                                $items->addFieldToFilter('tit_show_format', $colData);
+                                break;
+                            case 'tit_close_hour':
+                                $model->setTitCloseHour($colData);
+                                $items->addFieldToFilter('tit_close_hour', $colData);
+                                break;
                             case 'add_day':
                                 $model->setAddDay($colData);
                                 $items->addFieldToFilter('add_day', $colData);

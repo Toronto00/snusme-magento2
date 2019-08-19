@@ -8,6 +8,8 @@
 
 namespace Infomodus\Upsap\Model;
 
+use DateTime;
+use Magento\Framework\App\ObjectManager;
 use Magento\Quote\Model\Quote\Address\RateResult\Error;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Carrier\AbstractCarrierOnline;
@@ -62,6 +64,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
     protected $_prms = null;
     protected $allowedCurrencies;
     private $_coreRegistry = null;
+    private $timezone;
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -110,6 +113,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
         \Magento\Framework\App\State $appState,
         \Magento\Backend\Model\Session\Quote $adminSession,
         \Magento\Framework\Registry $registry,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         array $data = []
     )
     {
@@ -126,6 +130,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
         $this->_coreRegistry = $registry;
         $this->_countryFactory = $countryFactory;
         $this->_currencyFactory = $currencyFactory;
+        $this->timezone = $timezone;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $xmlSecurity, $xmlElFactory, $rateResultFactory, $rateMethodFactory, $trackFactory,
             $trackErrorFactory, $trackStatusFactory, $regionFactory, $countryFactory, $currencyFactory, $directoryData, $stockRegistry, $data);
     }
@@ -203,7 +208,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
             $packages[0]['packweight'] = round($this->_conf->getStoreConfig('upslabel/weightdimension/packweight', $storeId), 1) > 0 ? round($this->_conf->getStoreConfig('upslabel/weightdimension/packweight', $storeId), 1) : '0';
 
             /* Multi package */
-            $dimensionSets = $this->_conf->_objectManager->get("Infomodus\Upslabel\Model\Config\Defaultdimensionsset")->toOptionArray($storeId);
+            $dimensionSets = ObjectManager::getInstance()->get(\Infomodus\Upslabel\Model\Config\Defaultdimensionsset::class)->toOptionObjects();
             if (count($dimensionSets) > 0 || $this->_conf->getStoreConfig('upslabel/packaging/frontend_multipackes_enable', $storeId) == 1) {
                 $attributeCodeWidth = $this->_conf->getStoreConfig('upslabel/weightdimension/multipackes_attribute_width', $storeId) ?
                     $this->_conf->getStoreConfig('upslabel/weightdimension/multipackes_attribute_width', $storeId) : 'width';
@@ -296,19 +301,18 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
 
                     if ($countProductInBox > 0) {
                         foreach ($dimensionSets as $v) {
-                            if ($v['value'] !== 0) {
+                            if (!empty($v)) {
                                 $packer->addBox(new \Infomodus\Upsap\Model\Packer\TestBox(
-                                        $v['value'],
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_width', $storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_length', $storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_height', $storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/emptyWeight', $storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/width', $storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/length', $storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/height', $storeId),
-                                        $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/maxWeight', $storeId)
-                                    )
-                                );
+                                    $v->getId(),
+                                    $v->getOuterWidth(),
+                                    $v->getOuterLengths(),
+                                    $v->getOuterHeight(),
+                                    $v->getEmptyWeight(),
+                                    $v->getWidth(),
+                                    $v->getLengths(),
+                                    $v->getHeight(),
+                                    $v->getMaxWeight()
+                                ));
                             }
                         }
 
@@ -372,11 +376,15 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
         $model->getSelect()->group('upsmethod_id');
 
         foreach ($model as $method) {
-            if (($request->getDestCountryId() && $request->getDestPostcode())) {
+            if ($request->getDestCountryId() && ($request->getDestPostcode() || ($request->getDestRegionCode() && $request->getDestCity()))) {
                 if ($method->getCountryIds() != '') {
                     $methodEnd = $this->_getStandardShippingRate($request, $method);
                     if ($methodEnd !== false) {
-                        $result->append($methodEnd);
+                        if($methodEnd->getMethod()) {
+                            $result->append($methodEnd);
+                        } else {
+                            return $methodEnd;
+                        }
                     }
                 }
             }
@@ -415,11 +423,33 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
 
         $mTitle = __($method->getName());
         $rate->setMethod($method->getId());
+        $ratePrice = false;
 
         if ($request->getFreeShipping() == true && $method->getFreeShipping() == 1) {
             $ratePrice = 0;
         } else {
             if ($method->getDinamicPrice() == 1) {
+                $timezone = new \DateTimeZone($this->_conf->getStoreConfig('general/locale/timezone', $storeId));
+                $dateFormat = new \DateTime('now', $timezone);
+
+                if ($method->getTitCloseHour() < $this->timezone->date($dateFormat)->format('H:i')) {
+                    $dateFormat->setTimestamp($dateFormat->getTimestamp() + 60 * 60 * 24);
+                }
+
+                $weekend = $this->_conf->getStoreConfig('general/locale/weekend', $storeId);
+                if (!empty($weekend)) {
+                    if (!is_array($weekend)) {
+                        $weekend = explode(",", $weekend);
+                    }
+
+                    foreach ($weekend as $item) {
+                        if (in_array($dateFormat->format("w"), $weekend)) {
+                            $dateFormat->setTimestamp($dateFormat->getTimestamp() + 60 * 60 * 24);
+                        }
+                    }
+                }
+
+                $this->_lbl->pickupDate = $dateFormat->format("Ymd");
 
                 if ($this->ratesUpsWithNR === null && $method->getNegotiated() == 1) {
                     $this->ratesUpsWithNR = $this->_handy->getShipRate($this->_lbl, 1);
@@ -482,9 +512,16 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
                         if ($method->getTimeInTransit() == 1 && isset($ratecode2['day'])) {
                             if ($method->getTitShowFormat() === 'days') {
                                 $mTitle .= ' (' . ($ratecode2['day']['days'] + $method->getAddDay()) . __(' day(s)') . ')';
-                            } else if ($method->getTitShowFormat() === 'datetime') {
-                                $dateFormat = new \Datetime($ratecode2['day']['datetime']['date']);
-                                $mTitle .= ' (' . $dateFormat->format('d') . ' ' . __($dateFormat->format('F')) . ' ' . $dateFormat->format('Y') . ' ' . substr($ratecode2['day']['datetime']['time'], 0, -3) . ')';
+                            } else {
+                                $timezone = new \DateTimeZone($this->_conf->getStoreConfig('general/locale/timezone', $storeId));
+                                $dateFormat = new DateTime($ratecode2['day']['datetime']['date'], $timezone);
+                                if ($method->getTitShowFormat() === 'datetime') {
+                                    $mTitle .= ' (' . $dateFormat->format('d') . ' ' . __($dateFormat->format('F')) . ' ' . $dateFormat->format('Y') . ' ' . substr($ratecode2['day']['datetime']['time'], 0, -3) . ')';
+                                } else if ($method->getTitShowFormat() === 'full') {
+                                    /*$locale = $request->getDestCountryId();*/
+                                    $locale = $this->_conf->getStoreConfig('general/locale/code', $storeId);
+                                    $mTitle .= ' '. $this->timezone->formatDate($this->timezone->date($dateFormat->getTimestamp(), $locale, true, false), \IntlDateFormatter::FULL);
+                                }
                             }
                         }
                     } else {
@@ -500,7 +537,7 @@ class Carrier extends AbstractCarrierOnline implements CarrierInterface
                     return false;
                 }
 
-                if ($method->getAddedValue() != 0 && $method->getAddedValue() != "") {
+                if ($ratePrice !== false && $method->getAddedValue() != 0 && $method->getAddedValue() != "") {
                     if ($method->getAddedValueType() == 'static') {
                         $ratePrice += (float)str_replace(",", ".", $method->getAddedValue());
                     } else {

@@ -59,7 +59,28 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addIsProdAllow($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.3.9', '<')) {
+            $this->addTitCloseHour($setup);
+        }
+
         $setup->endSetup();
+    }
+
+    protected function addTitCloseHour(SchemaSetupInterface $setup)
+    {
+        $tableName = $setup->getTable('upsapshippingmethod');
+        if ($setup->getConnection()->isTableExists($tableName) == true) {
+            $setup->getConnection()->addColumn($tableName,
+                'tit_close_hour',
+                [
+                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                    'nullable' => false,
+                    'length' => '20',
+                    'default' => '24:00',
+                    'comment' => 'tit close hour'
+                ]
+            );
+        }
     }
 
     protected function addColumnTimeInTransit(SchemaSetupInterface $setup)

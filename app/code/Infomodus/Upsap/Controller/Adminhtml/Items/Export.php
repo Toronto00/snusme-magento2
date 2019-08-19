@@ -53,6 +53,8 @@ class Export extends \Infomodus\Upsap\Controller\Adminhtml\Items
             'tax',
             'store_id',
             'time_in_transit',
+            'tit_show_format',
+            'tit_close_hour',
             'add_day',
             'free_shipping',
             'user_group_ids',
@@ -87,6 +89,8 @@ class Export extends \Infomodus\Upsap\Controller\Adminhtml\Items
                 $row[] = $itemData['store_id'];
             }
             $row[] = $itemData['time_in_transit'];
+            $row[] = $itemData['tit_show_format'];
+            $row[] = $itemData['tit_close_hour'];
             $row[] = $itemData['add_day'];
             $row[] = $itemData['free_shipping'];
             $row[] = trim($itemData['user_group_ids'], ',');

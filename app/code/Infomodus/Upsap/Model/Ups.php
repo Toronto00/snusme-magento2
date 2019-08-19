@@ -46,6 +46,8 @@ class Ups
     public $residentialAddress = 0;
     public $invoiceLineTotal = 0;
     public $currency = "";
+    public $insured;
+    public $pickupDate;
 
     function getShipRate($nr = 0)
     {
@@ -115,7 +117,8 @@ class Ups
 </AlternateDeliveryAddress>";
         $data .= "<ShipmentIndicationType><Code>". $this->shipmentIndicationType ."</Code></ShipmentIndicationType>";
         $weightSum = 0;
-        foreach ($this->packages AS $pv) {
+
+        foreach ($this->packages as $key => $pv) {
             $data .= "<Package>
       <PackagingType>
         <Code>" . $pv["packagingtypecode"] . "</Code>
@@ -153,11 +156,20 @@ class Ups
             }
 
             $data .= "</PackageWeight>";
-            if ($this->isAdult('P')) {
-                $data .= "<PackageServiceOptions>";
-                $data .= "<DeliveryConfirmation><DCISType>" . $this->adult . "</DCISType></DeliveryConfirmation>";
-                $data .= "</PackageServiceOptions>";
+
+            $data .= "<PackageServiceOptions>";
+            if ($this->insured == 1 && $key == 0) {
+                $data .= "<InsuredValue>
+                <CurrencyCode>" . $this->currency . "</CurrencyCode>
+                <MonetaryValue>" . $this->invoiceLineTotal . "</MonetaryValue>
+                </InsuredValue>";
             }
+
+            if ($this->isAdult('P')) {
+                $data .= "<DeliveryConfirmation><DCISType>" . $this->adult . "</DCISType></DeliveryConfirmation>";
+            }
+
+            $data .= "</PackageServiceOptions>";
 
             $data .= "</Package>";
         }
@@ -352,7 +364,7 @@ class Ups
 </UnitOfMeasurement>
 <Weight>" . $weightSum . "</Weight>
 </ShipmentWeight>
-<PickupDate>" . date('Ymd') . "</PickupDate>
+<PickupDate>" . (!empty($this->pickupDate)?($this->pickupDate):date('Ymd')) . "</PickupDate>
 <DocumentsOnlyIndicator />";
         if ($this->shiptoCountryCode != $this->shipfromCountryCode) {
             $data .= "<InvoiceLineTotal><MonetaryValue>" . $this->invoiceLineTotal . "</MonetaryValue><CurrencyCode>" . $this->currency . "</CurrencyCode></InvoiceLineTotal>";

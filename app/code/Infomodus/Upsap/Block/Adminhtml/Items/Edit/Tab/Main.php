@@ -154,7 +154,17 @@ class Main extends Generic implements TabInterface
             'name' => 'tit_show_format',
             'label' => __('Time in transit format'),
             'title' => __('Time in transit format'),
-            'options' => ['days' => '1 day(s)', 'datetime' => '09 July 2016 10:30']
+            'options' => ['days' => '1 day(s)', 'datetime' => '09 July 2016 10:30', 'full' => 'Friday, February 22, 2019']
+        ]);
+
+        $fieldset->addField('tit_close_hour', 'select', [
+            'name' => 'tit_close_hour',
+            'label' => __('Close Hour'),
+            'title' => __('Close Hour'),
+            'options' => array('23:00' => 23, '22:00' => 22, '21:00' => 21, '20:00' => 20, '19:00' => 19,
+                '18:00' => 18, '17:00' => 17, '16:00' => 16, '15:00' => 15, '14:00' => 14, '13:00' => 13,
+                '12:00' => 12, '11:00' => 11, '10:00' => 10, '09:00' => 9, '08:00' => 8, '07:00' => 7,
+                '06:00' => 6, '05:00' => 5, '04:00' => 4, '03:00' => 3, '02:00' => 2, '01:00' => 1, '24:00' => __('Always ready')),
         ]);
 
         $fieldset->addField('add_day', 'text', [
@@ -292,6 +302,9 @@ class Main extends Generic implements TabInterface
                 "{$htmlIdPrefix}tit_show_format",
                 'tit_show_format'
             )->addFieldMap(
+                "{$htmlIdPrefix}tit_close_hour",
+                'tit_close_hour'
+            )->addFieldMap(
                 "{$htmlIdPrefix}add_day",
                 'add_day'
             )->addFieldMap(
@@ -335,11 +348,19 @@ class Main extends Generic implements TabInterface
                 'time_in_transit',
                 '1'
             )->addFieldDependence(
+                'tit_close_hour',
+                'time_in_transit',
+                '1'
+            )->addFieldDependence(
                 'tit_show_format',
                 'time_in_transit',
                 '1'
             )->addFieldDependence(
                 'add_day',
+                'dinamic_price',
+                '1'
+            )->addFieldDependence(
+                'tit_close_hour',
                 'dinamic_price',
                 '1'
             )->addFieldDependence(
