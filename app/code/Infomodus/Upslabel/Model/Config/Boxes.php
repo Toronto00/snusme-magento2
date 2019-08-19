@@ -1,22 +1,42 @@
 <?php
 namespace Infomodus\Upslabel\Model\Config;
 
-use Infomodus\Upslabel\Helper\Config;
+use Infomodus\Upslabel\Model\ResourceModel\Boxes\Collection;
 use Magento\Framework\Data\OptionSourceInterface;
 
-class Boxes extends Config implements OptionSourceInterface
+class Boxes implements OptionSourceInterface
 {
+    /**
+     * @var Collection
+     */
+    private $collection;
+
+    /**
+     * Defaultdimensionsset constructor.
+     * @param Collection $collection
+     */
+    public function __construct(
+        Collection $collection
+    )
+    {
+        $this->collection = $collection;
+    }
+
     public function toOptionArray()
     {
         $storeId = null;
+        $collection = $this->collection->load();
         $c = [['label' => __('--PLEASE SELECT--'), 'value' => '']];
-        for ($i = 1; $i <= 15; $i++) {
-            if ($this->getStoreConfig('upslabel/dimansion_' . $i . '/enable', $storeId) == 1) {
-                $c[] = ['label' => $this->getStoreConfig('upslabel/dimansion_' . $i . '/dimansionname', $storeId),
-                    'value' => $this->getStoreConfig('upslabel/dimansion_' . $i . '/outer_width', $storeId) . 'x'
-                    .$this->getStoreConfig('upslabel/dimansion_' . $i . '/outer_height', $storeId) . 'x'
-                    .$this->getStoreConfig('upslabel/dimansion_' . $i . '/outer_length', $storeId)
-                ];
+
+        if($collection->getSize() > 0) {
+            foreach ($collection as $item) {
+                if ($item->getEnable() == 1) {
+                    $c[] = ['label' => $item->getName(),
+                        'value' => $item->getOuterWidth() . 'x'
+                            . $item->getOuterHeight() . 'x'
+                            . $item->getOuterLengths()
+                    ];
+                }
             }
         }
 

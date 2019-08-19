@@ -46,7 +46,10 @@ class International extends Generic implements TabInterface
     {
         $model = $this->_coreRegistry->registry('current_infomodus_upslabel_items');
         $confParams = $model['handy']->defConfParams;
-        if($confParams['shiptocountrycode'] == $model['handy']->_conf->getStoreConfig('upslabel/address_' . $confParams['shipfrom_no'] . '/countrycode'/*multistore*/, $model['handy']->storeId/*multistore*/) || $model['handy']->type == 'refund'){
+        $address = $model['handy']->objectManager->get('Infomodus\Upslabel\Model\Config\Defaultaddress')->getAddressesById($confParams['shipfrom_no']);
+        if(!empty($address) && ($confParams['shiptocountrycode'] == $address->getCountry()
+            || $model['handy']->type == 'refund')
+        ){
             return true;
         }
         return false;
@@ -68,8 +71,9 @@ class International extends Generic implements TabInterface
         $form->setHtmlIdPrefix($htmlIdPrefix);
         $confParams = $model['handy']->defConfParams;
         $fieldset = $form->addFieldset('international_fieldset', ['legend' => __('Configuration')]);
-        if ($confParams['shiptocountrycode'] == $model['handy']->_conf->getStoreConfig('upslabel/address_' . $confParams['shipfrom_no'] . '/countrycode'/*multistore*/, $model['handy']->storeId/*multistore*/)
-            || $model['handy']->type == 'refund'
+        $address = $model['handy']->objectManager->get('Infomodus\Upslabel\Model\Config\Defaultaddress')->getAddressesById($confParams['shipfrom_no']);
+        if (!empty($address) && ($confParams['shiptocountrycode'] == $address->getCountry()
+            || $model['handy']->type == 'refund')
         ) {
             $confParams['international_invoice'] = 0;
         }

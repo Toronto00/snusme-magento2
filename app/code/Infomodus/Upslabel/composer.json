@@ -7,7 +7,7 @@
     "dvdoug/boxpacker": "2.4.*"
   },
   "type": "magento2-module",
-  "version": "8.7.3",
+  "version": "8.8.0",
   "license": [
     "proprietary"
   ],

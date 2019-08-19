@@ -8,6 +8,7 @@
 namespace Infomodus\Upslabel\Helper;
 
 use DVDoug\BoxPacker\ItemTooLargeException;
+use Infomodus\Upslabel\Model\Config\Defaultdimensionsset;
 use Magento\Framework\App\Helper\AbstractHelper;
 use DVDoug\BoxPacker\Packer;
 use Infomodus\Upslabel\Model\Packer\TestBox as PackerBox;
@@ -61,6 +62,10 @@ class Handy extends AbstractHelper
     protected $upsFactory;
     protected $convertOrder;
     protected $upsAccount;
+    /**
+     * @var \Infomodus\Upslabel\Model\Config\Defaultaddress
+     */
+    private $addresses;
 
     /**
      * Handy constructor.
@@ -77,6 +82,7 @@ class Handy extends AbstractHelper
      * @param \Infomodus\Upslabel\Model\Config\Upsmethod $upsMethod
      * @param \Infomodus\Upslabel\Model\ResourceModel\Account\Collection $accountCollection
      * @param \Infomodus\Upslabel\Model\Config\Defaultdimensionsset $defaultdimensionsset
+     * @param \Infomodus\Upslabel\Model\Config\Defaultaddress $addresses
      * @param \Infomodus\Upslabel\Model\Items $labelsModel
      * @param \Infomodus\Upslabel\Model\ItemsFactory $labelFactory
      * @param \Infomodus\Upslabel\Model\Pickup $pickupModel
@@ -100,6 +106,7 @@ class Handy extends AbstractHelper
         \Infomodus\Upslabel\Model\Config\Upsmethod $upsMethod,
         \Infomodus\Upslabel\Model\ResourceModel\Account\Collection $accountCollection,
         \Infomodus\Upslabel\Model\Config\Defaultdimensionsset $defaultdimensionsset,
+        \Infomodus\Upslabel\Model\Config\Defaultaddress $addresses,
         \Infomodus\Upslabel\Model\Items $labelsModel,
         \Infomodus\Upslabel\Model\ItemsFactory $labelFactory,
         \Infomodus\Upslabel\Model\Pickup $pickupModel,
@@ -132,6 +139,7 @@ class Handy extends AbstractHelper
         $this->upsFactory = $upsFactory;
         $this->convertOrder = $convertOrder;
         $this->upsAccount = $upsAccount;
+        $this->addresses = $addresses;
     }
 
     public function intermediate($order, $type, $shipmentId = null)
@@ -433,7 +441,7 @@ class Handy extends AbstractHelper
                 $this->defConfParams['accesspoint_provincecode'] = $modelAccessPoint['state'];
                 $this->defConfParams['accesspoint_postal'] = $modelAccessPoint['postal'];
                 $this->defConfParams['accesspoint_country'] = $modelAccessPoint['country'];
-
+                $address = $this->addresses->getAddressesById($this->defConfParams['shipfrom_no']);
                 if (
                     $this->defConfParams['accesspoint_type'] !== '01'
                     || strpos(
@@ -442,7 +450,7 @@ class Handy extends AbstractHelper
                     ) === false
                     || strpos(
                         $this->_conf->getStoreConfig('general/country/eu_countries', $this->storeId),
-                        $this->_conf->getStoreConfig('upslabel/address_' . $this->defConfParams['shipfrom_no'] . '/countrycode', $this->storeId)
+                        (!empty($address) ? $address->getCountry() : '')
                     ) === false
                 ) {
                     $this->defConfParams['cod'] = 0;
@@ -458,7 +466,7 @@ class Handy extends AbstractHelper
             $this->_conf->getStoreConfig('upslabel/weightdimension/multipackes_attribute_length', $this->storeId) : 'length';
 
         /* Multi package */
-        $dimensionSets = $this->defaultdimensionsset->toOptionArray($this->storeId);
+        $dimensionSets = $this->defaultdimensionsset->toOptionObjects();
 
         if (
             $this->type == 'shipment'
@@ -566,11 +574,13 @@ class Handy extends AbstractHelper
                                     }
                                 } else {
                                     $defaultBox = $this->_conf->getStoreConfig('upslabel/weightdimension/default_dimensions_box', $this->storeId);
-                                    if (!empty($defaultBox)) {
+
+                                    if (!empty($defaultBox) && !empty($dimensionSets[$defaultBox])) {
+                                        $v = $dimensionSets[$defaultBox];
                                         $itemDataTwo = array();
-                                        $itemDataTwo['width'] = $this->_conf->getStoreConfig('upslabel/dimansion_' . $defaultBox . '/outer_width', $this->storeId);
-                                        $itemDataTwo['length'] = $this->_conf->getStoreConfig('upslabel/dimansion_' . $defaultBox . '/outer_length', $this->storeId);
-                                        $itemDataTwo['height'] = $this->_conf->getStoreConfig('upslabel/dimansion_' . $defaultBox . '/outer_height', $this->storeId);
+                                        $itemDataTwo['width'] = $v->getOuterWidth();
+                                        $itemDataTwo['length'] = $v->getOuterLengths();
+                                        $itemDataTwo['height'] = $v->getOuterHeight();
                                         $defParArr_1[$i] = $this->setPackageDefParams($itemDataTwo);
                                         $i++;
                                     }
@@ -671,17 +681,17 @@ class Handy extends AbstractHelper
 
                                 if ($countProductInBox > 0) {
                                     foreach ($dimensionSets as $v) {
-                                        if ($v['value'] !== 0) {
+                                        if (!empty($v)) {
                                             $packer->addBox(new PackerBox(
-                                                $v['value'],
-                                                $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_width', $this->storeId),
-                                                $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_length', $this->storeId),
-                                                $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/outer_height', $this->storeId),
-                                                $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/emptyWeight', $this->storeId),
-                                                $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/width', $this->storeId),
-                                                $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/length', $this->storeId),
-                                                $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/height', $this->storeId),
-                                                $this->_conf->getStoreConfig('upslabel/dimansion_' . $v['value'] . '/maxWeight', $this->storeId)
+                                                $v->getId(),
+                                                $v->getOuterWidth(),
+                                                $v->getOuterLengths(),
+                                                $v->getOuterHeight(),
+                                                $v->getEmptyWeight(),
+                                                $v->getWidth(),
+                                                $v->getLengths(),
+                                                $v->getHeight(),
+                                                $v->getMaxWeight()
                                             ));
                                         }
                                     }
@@ -710,11 +720,12 @@ class Handy extends AbstractHelper
                                 }
                             } else {
                                 $defaultBox = $this->_conf->getStoreConfig('upslabel/weightdimension/default_dimensions_box', $this->storeId);
-                                if (!empty($defaultBox)) {
+                                if (!empty($defaultBox) && !empty($dimensionSets[$defaultBox])) {
+                                    $v = $dimensionSets[$defaultBox];
                                     $itemData = array();
-                                    $itemData['width'] = $this->_conf->getStoreConfig('upslabel/dimansion_' . $defaultBox . '/outer_width', $this->storeId);
-                                    $itemData['length'] = $this->_conf->getStoreConfig('upslabel/dimansion_' . $defaultBox . '/outer_length', $this->storeId);
-                                    $itemData['height'] = $this->_conf->getStoreConfig('upslabel/dimansion_' . $defaultBox . '/outer_height', $this->storeId);
+                                    $itemData['width'] = $v->getOuterWidth();
+                                    $itemData['length'] = $v->getOuterLengths();
+                                    $itemData['height'] = $v->getOuterHeight();
                                     $this->defPackageParams[$i] = $this->setPackageDefParams($itemData);
                                     $i++;
                                     $countProductInBox = 1;
@@ -812,6 +823,7 @@ class Handy extends AbstractHelper
         $defParArr_1['codfundscode'] = 0;
         $defParArr_1['codmonetaryvalue'] = ($itemData !== null && isset($itemData['price'])) ? $itemData['price'] : $this->shipmentTotalPrice;
         $defParArr_1['insuredmonetaryvalue'] = $this->_conf->getStoreConfig('upslabel/ratepayment/insured_automaticaly', $this->storeId) == 1 ? (($itemData !== null && isset($itemData['price'])) ? $itemData['price'] : $this->shipmentTotalPrice) : 0;
+        $address = $this->addresses->getAddressesById($this->defConfParams['shipfrom_no']);
         if ($this->defConfParams['accesspoint'] == 1
             && ($this->defConfParams['accesspoint_type'] !== '01'
                 || strpos(
@@ -820,7 +832,7 @@ class Handy extends AbstractHelper
                 ) === false
                 || strpos(
                     $this->_conf->getStoreConfig('general/country/eu_countries', $this->storeId),
-                    $this->_conf->getStoreConfig('upslabel/address_' . $this->defConfParams['shipfrom_no'] . '/countrycode', $this->storeId)
+                    (!empty($address) ? $address->getCountry() : '')
                 ) === false)
         ) {
             $defParArr_1['cod'] = 0;
@@ -918,15 +930,21 @@ class Handy extends AbstractHelper
         $lbl->packages = $packages;
         $lbl->storeId = $this->storeId;
 
+        $address = $this->addresses->getAddressesById($params['shipper_no']);
+
+        if (empty($address)) {
+            return $lbl;
+        }
+
         $lbl->shipmentDescription = isset($params['shipmentdescription']) ? $this->_conf->escapeXML($params['shipmentdescription']) : '';
-        $lbl->shipperName = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/companyname', $this->storeId));
-        $lbl->shipperAttentionName = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/attentionname', $this->storeId));
-        $lbl->shipperPhoneNumber = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/phonenumber', $this->storeId));
-        $lbl->shipperAddressLine1 = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/addressline1', $this->storeId));
-        $lbl->shipperCity = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/city', $this->storeId));
-        $lbl->shipperStateProvinceCode = $this->_conf->escapeXML($configOptions->getProvinceCode($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/stateprovincecode', $this->storeId), $this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/countrycode', $this->storeId)));
-        $lbl->shipperPostalCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/postalcode', $this->storeId));
-        $lbl->shipperCountryCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipper_no'] . '/countrycode', $this->storeId));
+        $lbl->shipperName = $this->_conf->escapeXML($address->getCompany());
+        $lbl->shipperAttentionName = $this->_conf->escapeXML($address->getAttention());
+        $lbl->shipperPhoneNumber = $this->_conf->escapeXML($address->getPhone());
+        $lbl->shipperAddressLine1 = $this->_conf->escapeXML($address->getStreetOne());
+        $lbl->shipperCity = $this->_conf->escapeXML($address->getCity());
+        $lbl->shipperStateProvinceCode = $this->_conf->escapeXML($address->getProvinceCode());
+        $lbl->shipperPostalCode = $this->_conf->escapeXML($address->getPostalCode());
+        $lbl->shipperCountryCode = $this->_conf->escapeXML($address->getCountry());
 
         if ($lbl->shipperCountryCode == 'US' && $lbl->shipperStateProvinceCode == 'PR') {
             $lbl->shipperCountryCode = 'PR';
@@ -963,14 +981,20 @@ class Handy extends AbstractHelper
             }
         }
 
-        $lbl->shipfromCompanyName = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/companyname', $this->storeId));
-        $lbl->shipfromAttentionName = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/attentionname', $this->storeId));
-        $lbl->shipfromPhoneNumber = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/phonenumber', $this->storeId));
-        $lbl->shipfromAddressLine1 = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/addressline1', $this->storeId));
-        $lbl->shipfromCity = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/city', $this->storeId));
-        $lbl->shipfromStateProvinceCode = $this->_conf->escapeXML($configOptions->getProvinceCode($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/stateprovincecode', $this->storeId), $this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/countrycode', $this->storeId)));
-        $lbl->shipfromPostalCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/postalcode', $this->storeId));
-        $lbl->shipfromCountryCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $params['shipfrom_no'] . '/countrycode', $this->storeId));
+        $address = $this->addresses->getAddressesById($params['shipfrom_no']);
+
+        if (empty($address)) {
+            return $lbl;
+        }
+
+        $lbl->shipfromCompanyName = $this->_conf->escapeXML($address->getCompany());
+        $lbl->shipfromAttentionName = $this->_conf->escapeXML($address->getAttention());
+        $lbl->shipfromPhoneNumber = $this->_conf->escapeXML($address->getPhone());
+        $lbl->shipfromAddressLine1 = $this->_conf->escapeXML($address->getStreetOne());
+        $lbl->shipfromCity = $this->_conf->escapeXML($address->getCity());
+        $lbl->shipfromStateProvinceCode = $this->_conf->escapeXML($address->getProvinceCode());
+        $lbl->shipfromPostalCode = $this->_conf->escapeXML($address->getPostalCode());
+        $lbl->shipfromCountryCode = $this->_conf->escapeXML($address->getCountry());
 
         if ($lbl->shipfromCountryCode == 'US' && $lbl->shipfromStateProvinceCode == 'PR') {
             $lbl->shipfromCountryCode = 'PR';
@@ -1429,9 +1453,11 @@ class Handy extends AbstractHelper
         $this->pickup->password = $this->_conf->getStoreConfig('upslabel/credentials/password', $this->storeId);
         $this->pickup->shipperNumber = $this->_conf->getStoreConfig('upslabel/credentials/shippernumber', $this->storeId);
 
+        $address = $this->addresses->getAddressesById($this->_conf->getStoreConfig('upslabel/shipping/defaultshipper', $this->storeId));
+
         $this->pickup->ratePickupIndicator = "N"/*$data['RatePickupIndicator']*/
         ;
-        $this->pickup->shipperCountryCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $this->_conf->getStoreConfig('upslabel/shipping/defaultshipper', $this->storeId) . '/countrycode', $this->storeId));
+        $this->pickup->shipperCountryCode = $address->getCountry();
         $this->pickup->closeTime = $data['CloseTime'];
         $this->pickup->readyTime = $data['ReadyTime'];
         $this->pickup->pickupDateYear = $data['PickupDateYear'];
@@ -1452,19 +1478,20 @@ class Handy extends AbstractHelper
             $this->pickup->pickupPoint = $this->_conf->escapeXML($data['oadress']['pickup_point']);
             $this->pickup->shipfromPhoneNumber = $this->_conf->escapeXML($data['oadress']['phonenumber']);
         } else {
-            $this->pickup->shipfromCompanyName = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/companyname', $this->storeId));
-            $this->pickup->shipfromAttentionName = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/attentionname', $this->storeId));
-            $this->pickup->shipfromAddressLine1 = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/addressline1', $this->storeId));
-            $this->pickup->room = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/room', $this->storeId));
-            $this->pickup->floor = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/floor', $this->storeId));
-            $this->pickup->shipfromCity = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/city', $this->storeId));
-            $this->pickup->shipfromStateProvinceCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/stateprovincecode', $this->storeId));
-            $this->pickup->urbanization = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/urbanization', $this->storeId));
-            $this->pickup->shipfromPostalCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/postalcode', $this->storeId));
-            $this->pickup->shipfromCountryCode = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/countrycode', $this->storeId));
-            $this->pickup->residential = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/residential', $this->storeId));
-            $this->pickup->pickupPoint = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/pickup_point', $this->storeId));
-            $this->pickup->shipfromPhoneNumber = $this->_conf->escapeXML($this->_conf->getStoreConfig('upslabel/address_' . $data['ShipFrom'] . '/phonenumber', $this->storeId));
+            $pickupAddress = $this->addresses->getAddressesById($data['ShipFrom']);
+            $this->pickup->shipfromCompanyName = $this->_conf->escapeXML($pickupAddress->getCompany());
+            $this->pickup->shipfromAttentionName = $this->_conf->escapeXML($pickupAddress->getAttention());
+            $this->pickup->shipfromAddressLine1 = $this->_conf->escapeXML($pickupAddress->getStreetOne());
+            $this->pickup->room = $this->_conf->escapeXML($pickupAddress->getRoom());
+            $this->pickup->floor = $this->_conf->escapeXML($pickupAddress->getFloor());
+            $this->pickup->shipfromCity = $this->_conf->escapeXML($pickupAddress->getCity());
+            $this->pickup->shipfromStateProvinceCode = $this->_conf->escapeXML($pickupAddress->getProvinceCode());
+            $this->pickup->urbanization = $this->_conf->escapeXML($pickupAddress->getUrbanization());
+            $this->pickup->shipfromPostalCode = $this->_conf->escapeXML($pickupAddress->getPostalCode());
+            $this->pickup->shipfromCountryCode = $this->_conf->escapeXML($pickupAddress->getCountry());
+            $this->pickup->residential = $this->_conf->escapeXML($pickupAddress->getResidential());
+            $this->pickup->pickupPoint = $this->_conf->escapeXML($pickupAddress->getPickupPoint());
+            $this->pickup->shipfromPhoneNumber = $this->_conf->escapeXML($pickupAddress->getPhone());
         }
 
         $this->pickup->alternateAddressIndicator = $data['AlternateAddressIndicator'];

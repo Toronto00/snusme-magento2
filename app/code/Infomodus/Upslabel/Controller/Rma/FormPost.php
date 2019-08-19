@@ -43,6 +43,11 @@ class FormPost extends \Infomodus\Upslabel\Controller\Rma
             $this->messageManager->addErrorMessage(__('Label(s) was not created'));
         }
 
-        return $this->resultRedirectFactory->create()->setUrl($this->_buildUrl('sales/order/view', ['order_id' => $orderId]));
+        if(!$order->getCustomerIsGuest()) {
+            return $this->resultRedirectFactory->create()->setUrl($this->_buildUrl('sales/order/view',
+                ['order_id' => $orderId]));
+        } else {
+            return $this->resultRedirectFactory->create()->setRefererUrl();
+        }
     }
 }

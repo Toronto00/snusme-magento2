@@ -15,9 +15,17 @@
                             <resource id="Infomodus_Upslabel::account_create" title="Create account" sortOrder="5"/>
                             <resource id="Infomodus_Upslabel::account_delete" title="Delete account" sortOrder="10"/>
                         </resource>
+                        <resource id="Infomodus_Upslabel::boxes_items" title="View box" sortOrder="10">
+                            <resource id="Infomodus_Upslabel::boxes_create" title="Create box" sortOrder="5"/>
+                            <resource id="Infomodus_Upslabel::boxes_delete" title="Delete box" sortOrder="10"/>
+                        </resource>
                         <resource id="Infomodus_Upslabel::pickup_items" title="View pickups" sortOrder="15">
                             <resource id="Infomodus_Upslabel::pickup_create" title="Create pickup" sortOrder="5"/>
                             <resource id="Infomodus_Upslabel::pickup_delete" title="Delete pickup" sortOrder="10"/>
+                        </resource>
+                        <resource id="Infomodus_Upslabel::address_items" title="View address" sortOrder="15">
+                            <resource id="Infomodus_Upslabel::address_create" title="Create address" sortOrder="5"/>
+                            <resource id="Infomodus_Upslabel::address_delete" title="Delete address" sortOrder="10"/>
                         </resource>
                         <resource id="Infomodus_Upslabel::conformity_items" title="View compliance methods"
                                   sortOrder="20">

@@ -6,31 +6,73 @@
  * Time: 10:55
  * To change this template use File | Settings | File Templates.
  */
+
 namespace Infomodus\Upslabel\Model\Config;
 
+use Infomodus\Upslabel\Model\ResourceModel\Boxes\Collection;
 use Magento\Framework\Data\OptionSourceInterface;
 
-class Defaultdimensionsset extends \Infomodus\Upslabel\Helper\Config implements OptionSourceInterface
+class Defaultdimensionsset implements OptionSourceInterface
 {
+    /**
+     * @var Collection
+     */
+    private $collection;
+
+    /**
+     * Defaultdimensionsset constructor.
+     * @param Collection $collection
+     */
+    public function __construct(
+        Collection $collection
+    )
+    {
+        $this->collection = $collection;
+    }
+
     public function toOptionArray()
     {
+
+        $collection = $this->collection->load();
         $c = [];
-        for ($i=1; $i<=15; $i++) {
-            if ($this->getStoreConfig('upslabel/dimansion_'.$i.'/enable') == 1) {
-                $c[] = ['label' => $this->getStoreConfig('upslabel/dimansion_'.$i.'/dimansionname'), 'value' => $i];
+        if ($collection->getSize() > 0) {
+            foreach ($collection as $item) {
+                if ($item->getEnable() == 1) {
+                    $c[] = ['label' => $item->getName(), 'value' => $item->getId()];
+                }
             }
         }
+
         return $c;
     }
 
     public function getDimensionSets()
     {
+        $collection = $this->collection->load();
         $c = [];
-        for ($i=1; $i<=15; $i++) {
-            if ($this->getStoreConfig('upslabel/dimansion_'.$i.'/enable')==1) {
-                $c[$i] =  $this->getStoreConfig('upslabel/dimansion_'.$i.'/dimansionname');
+        if ($collection->getSize() > 0) {
+            foreach ($collection as $item) {
+                if ($item->getEnable() == 1) {
+                    $c[$item->getId()] = $item->getName();
+                }
             }
         }
+
+        return $c;
+    }
+
+    public function toOptionObjects()
+    {
+        $collection = $this->collection->load();
+        $c = [];
+        if ($collection->getSize() > 0) {
+            foreach ($collection as $item) {
+                if ($item->getEnable() == 1) {
+                    $c[$item->getId()] = $item;
+                }
+            }
+        }
+
         return $c;
     }
 }

@@ -11,5 +11,7 @@
         <add id="Infomodus_Upslabel::upslabel" title="UPS Labels" module="Infomodus_Upslabel" sortOrder="10" action="infomodus_upslabel/items/" parent="Infomodus_Upslabel::base" resource="Infomodus_Upslabel::items"/>
         <add id="Infomodus_Upslabel::account" title="UPS Third party shippers" module="Infomodus_Upslabel" sortOrder="20" action="infomodus_upslabel/account/" parent="Infomodus_Upslabel::base" resource="Infomodus_Upslabel::account_items"/>
         <add id="Infomodus_Upslabel::pickup" title="UPS Pickup Service" module="Infomodus_Upslabel" sortOrder="30" action="infomodus_upslabel/pickup/" parent="Infomodus_Upslabel::base" resource="Infomodus_Upslabel::pickup_items"/>
+        <add id="Infomodus_Upslabel::boxes" title="UPS Boxes" module="Infomodus_Upslabel" sortOrder="40" action="infomodus_upslabel/boxes/" parent="Infomodus_Upslabel::base" resource="Infomodus_Upslabel::boxes_items"/>
+        <add id="Infomodus_Upslabel::address" title="UPS Addresses" module="Infomodus_Upslabel" sortOrder="50" action="infomodus_upslabel/address/" parent="Infomodus_Upslabel::base" resource="Infomodus_Upslabel::address_items"/>
     </menu>
 </config>

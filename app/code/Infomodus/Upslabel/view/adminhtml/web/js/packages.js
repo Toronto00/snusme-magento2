@@ -60,17 +60,22 @@ require(
             });
         });
         function getLabelPrice(href) {
-            var formData = $('#edit_form').serializeArray(), obj = {};
-            formData.forEach(function (item, i, arr) {
+            var formData = $('#edit_form').serialize(), obj = {};
+            /*formData.forEach(function (item, i, arr) {
+                if(obj[item.name]){
+
+                } else {
                 obj[item.name] = item.value;
-            });
+                }
+            });*/
             $.ajax({
                 url: href,
-                data: obj,
+                data: formData,
                 type: 'post',
                 dataType: 'text',
                 showLoader: true,
-                context: $('#edit_form')
+                context: $('#edit_form'),
+                traditional: true
             }).done(function(data){
                 $('<div />').html(data)
                     .modal({
