@@ -33,9 +33,9 @@ class Defaultaddress implements OptionSourceInterface
     public function toOptionArray()
     {
 
-        $collection = $this->collection->load();
+        $collection = $this->collection;
         $c = [];
-        if ($collection->getSize() > 0) {
+        if ($collection->count() > 0) {
             foreach ($collection as $item) {
                 $c[] = ['label' => $item->getName(), 'value' => $item->getId()];
             }
@@ -46,9 +46,9 @@ class Defaultaddress implements OptionSourceInterface
 
     public function getAddresses()
     {
-        $collection = $this->collection->load();
+        $collection = $this->collection;
         $c = [];
-        if ($collection->getSize() > 0) {
+        if ($collection->count() > 0) {
             foreach ($collection as $item) {
                 $c[$item->getId()] = $item->getName();
             }
@@ -64,9 +64,9 @@ class Defaultaddress implements OptionSourceInterface
 
     public function toOptionObjects()
     {
-        $collection = $this->collection->load();
+        $collection = $this->collection;
         $c = [];
-        if ($collection->getSize() > 0) {
+        if ($collection->count() > 0) {
             foreach ($collection as $item) {
                 $c[$item->getId()] = $item;
             }
