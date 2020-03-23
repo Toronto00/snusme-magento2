@@ -60,8 +60,7 @@ class Additionalfee extends \Magento\Quote\Model\Quote\Address\Total\AbstractTot
     )
     {
         parent::collect($quote, $shippingAssignment, $total);
-
-        if (!$quote->getShippingAddress() || !$quote->getShippingAddress()->getQuoteId() || $shippingAssignment->getShipping()->getAddress()->getAddressType() != 'shipping' || !count($shippingAssignment->getItems()) || $this->dataHelper->getAdditionalfeeAmount() === false) {
+        if (!$quote->getShippingAddress() || !$quote->getShippingAddress()->getQuoteId() || $shippingAssignment->getShipping()->getAddress()->getAddressType() != 'shipping' || !count($shippingAssignment->getItems()) || ($quote && $this->dataHelper->getAdditionalfeeAmount() === false)) {
             return $this;
         }
 

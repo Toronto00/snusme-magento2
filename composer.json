@@ -15,7 +15,8 @@
         "ebizmarts/magento2-mandrill": "*",
         "mageplaza/magento-2-russian-language-pack": "dev-master",
         "livechat/module-magento-livechat": "^2.3",
-        "dvdoug/boxpacker": "^2.4"
+        "dvdoug/boxpacker": "^2.4",
+        "magento/magento-cloud-patches": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.2.0",

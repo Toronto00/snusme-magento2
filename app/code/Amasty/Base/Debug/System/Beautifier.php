@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2019 Amasty (https://www.amasty.com)
  * @package Amasty_Base
  */
 
@@ -10,6 +10,10 @@ namespace Amasty\Base\Debug\System;
 
 use Amasty\Base\Debug\VarDump;
 
+/**
+ * @codeCoverageIgnore
+ * @codingStandardsIgnoreFile
+ */
 class Beautifier
 {
     /**
@@ -38,13 +42,17 @@ class Beautifier
                 $result = $this->prepareArrayVar($var);
                 break;
             case 'boolean':
-                $result = sprintf(Template::$var, ($var) ? 'true' : 'false');
+                $result = sprintf(Template::$var, $var ? 'true' : 'false');
                 break;
             case 'null':
                 $result = sprintf(Template::$var, 'null');
                 break;
+            case 'resource':
+            case 'resource (closed)':
+                $result = sprintf(Template::$var, 'resource');
+                break;
             default:
-                $result = sprintf(Template::$varTemplate, htmlspecialchars($var));
+                $result = sprintf(Template::$var, htmlspecialchars($var));
                 break;
         }
 
@@ -58,8 +66,8 @@ class Beautifier
      */
     private function arrayKey($key)
     {
-        if (strtolower(gettype($key)) == 'string') {
-                return sprintf(Template::$arrayKeyString, htmlspecialchars($key));
+        if (strtolower(gettype($key)) === 'string') {
+            return sprintf(Template::$arrayKeyString, htmlspecialchars($key));
         }
 
         return sprintf(Template::$arrayKey, htmlspecialchars($key));
@@ -86,6 +94,10 @@ class Beautifier
             case 'float':
             case 'double':
                 return sprintf(Template::$arraySimpleVar, htmlspecialchars($var));
+                break;
+            case 'resource':
+            case 'resource (closed)':
+                return sprintf(Template::$arraySimpleVar, 'resource');
                 break;
             default:
                 return sprintf(Template::$arraySimpleVar, 'Unknown variable type!');

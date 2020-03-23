@@ -79,6 +79,9 @@ Disallow: / catalog / product_compare /
 Disallow: / catalog / category / view /
 Disallow: / catalog / product / view /
 
+# # Livechat window
+Disallow: / livechat /
+
 # # Server Settings
 
 # # Do not index the general technical directories and files on a server

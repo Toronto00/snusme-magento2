@@ -1,13 +1,17 @@
 <?php
 /**
  * @author Amasty Team
- * @copyright Copyright (c) 2018 Amasty (https://www.amasty.com)
+ * @copyright Copyright (c) 2019 Amasty (https://www.amasty.com)
  * @package Amasty_Base
  */
 
 
 namespace Amasty\Base\Debug\System;
 
+/**
+ * @codeCoverageIgnore
+ * @codingStandardsIgnoreFile
+ */
 class LogBeautifier
 {
     /**
@@ -33,10 +37,14 @@ class LogBeautifier
                 $result = $this->prepareArrayVar($var);
                 break;
             case 'boolean':
-                $result = ($var) ? 'true' : 'false';
+                $result = $var ? 'true' : 'false';
                 break;
             case 'null':
                 $result = 'null';
+                break;
+            case 'resource':
+            case 'resource (closed)':
+                $result = 'resource';
                 break;
             default:
                 $result = $var;
@@ -53,7 +61,7 @@ class LogBeautifier
      */
     private function arrayKey($key)
     {
-        if (strtolower(gettype($key)) === 'string') {
+        if (is_string($key)) {
             return '"' . $key . '"';
         }
 
@@ -61,30 +69,28 @@ class LogBeautifier
     }
 
     /**
-     * @param array $var
+     * @param mixed $var
      *
-     * @return string
+     * @return string|int|float
      */
     private function arraySimpleType($var)
     {
         switch (strtolower(gettype($var))) {
             case 'string':
                 return $var;
-                break;
             case 'boolean':
                 return $var ? 'true' : 'false';
-                break;
             case 'null':
                 return 'null';
-                break;
             case 'integer':
             case 'float':
             case 'double':
                 return $var;
-                break;
+            case 'resource':
+            case 'resource (closed)':
+                return 'resource';
             default:
                 return 'Unknown variable type!';
-                break;
         }
     }
 
@@ -137,7 +143,7 @@ class LogBeautifier
         }
 
         $result .= str_repeat(' ', $depth * 4) . "Properties => "
-            . $this->prepareArrayVar($object->properties, $depth + 1);
+            . $this->prepareArrayVar($object->properties, $depth + 1) . "\n";
         $result .= str_repeat(' ', ($depth - 1) * 4) . '}';
 
         return $result;
@@ -149,7 +155,7 @@ class LogBeautifier
     public static function getInstance()
     {
         if (!self::$instance) {
-            self::$instance = new LogBeautifier();
+            self::$instance = new self();
         }
 
         return self::$instance;
