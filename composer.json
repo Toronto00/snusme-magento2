@@ -16,7 +16,9 @@
         "mageplaza/magento-2-russian-language-pack": "dev-master",
         "livechat/module-magento-livechat": "^2.3",
         "dvdoug/boxpacker": "^2.4",
-        "magento/magento-cloud-patches": "^1.0"
+        "magento/magento-cloud-patches": "^1.0",
+        "dibs/module-payment-flexwin": "^2.3.0",
+        "jalogut/magento2-deployer-plus": "^2.6"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.2.0",
@@ -26,7 +28,6 @@
         "friendsofphp/php-cs-fixer": "~2.2.0",
         "lusitanian/oauth": "~0.8.10",
         "sebastian/phpcpd": "2.0.4",
-        "dibs/module-payment-flexwin": "^2.3.0",
         "chuvisco88/magento2-language-pack-de-ch": "^1.0.0"
     },
     "autoload": {
