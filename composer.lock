@@ -6443,9 +6443,9 @@
             "version": "101.2.34",
             "dist": {
                 "type": "zip",
-                "url": "https://repo.magento.com/archives/mailchimp/mc-magento2/mailchimp-mc-magento2-101.2.34.0.zip",
+                "url": "https://github.com/mailchimp/mc-magento2/archive/101.2.34.zip",
                 "reference": null,
-                "shasum": "48aab5e7feef2cd686175aff0c32bddbca1b51f5"
+                "shasum": "109b872b8cc8ad2679c5cae56cfcb8c0ca8a1537"
             },
             "require": {
                 "ebizmarts/mailchimp-lib": ">=3.0.27",
