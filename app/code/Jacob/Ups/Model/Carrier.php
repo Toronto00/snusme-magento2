@@ -16,6 +16,7 @@ use Magento\Shipping\Model\Rate\Result;
 use Magento\Shipping\Model\Simplexml\Element;
 use Magento\Ups\Helper\Config;
 use Magento\Framework\Xml\Security;
+use Magento\Framework\HTTP\ClientFactory;
 
 /**
  * UPS shipping implementation
@@ -67,6 +68,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
         \Magento\Framework\Locale\FormatInterface $localeFormat,
         Config $configHelper,
+        ClientFactory $httpClientFactory,
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
         array $data = []
@@ -91,6 +93,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $stockRegistry,
             $localeFormat,
             $configHelper,
+            $httpClientFactory,
             $data
         );
     }
