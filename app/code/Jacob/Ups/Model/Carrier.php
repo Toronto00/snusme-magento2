@@ -302,7 +302,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $name = strlen($item['name']) > 35 ? substr($item['name'], 0, 35) : $item['name'];
 
             $product->addChild('Description', $name);
-            $product->addChild('CommodityCode', '24039910');
+            //$product->addChild('CommodityCode', '24039910');
             $product->addChild('PartNumber', $item['product_id']);
             $product->addChild('OriginCountryCode', $request->getShipperAddressCountryCode());
             $productUnit = $product->addChild('Unit');
