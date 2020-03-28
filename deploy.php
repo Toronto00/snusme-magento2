@@ -27,7 +27,8 @@ task(
 );
 
 // OPcache configuration
-task('cache:clear:opcache', 'systemctl reload php7.1-fpm.service');
+task('cache:clear:opcache', 'systemctl reload php7.1-fpm.service')->onStage('prod');
+task('cache:clear:opcache', 'systemctl reload php7.2-fpm.service')->onStage('stage');
 after('cache:clear', 'cache:clear:opcache');
 
 // Build host
