@@ -328,13 +328,15 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $otherCharges->addChild('Description', 'Other');
         }
 
+        $packageServiceOptions = $packagePart->addChild('PackageServiceOptions');
+        $packageServiceOptions->addChild('DeclaredValue')->addChild('MonetaryValue', 0);
 
         if ($deliveryConfirmation && $this->_getDeliveryConfirmationLevel($request->getRecipientAddressCountryCode()) == self::DELIVERY_CONFIRMATION_PACKAGE) {
-            $packagePart
-                ->addChild('PackageServiceOptions')
+            $packageServiceOptions
                 ->addChild('DeliveryConfirmation')
                 ->addChild('DCISType', $packageParams->getDeliveryConfirmation());
         }
+
 
         $shipmentPart->addChild(
             'PaymentInformation'
