@@ -134,7 +134,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             // UPS Print Return Label
             $returnPart->addChild('Code', '9');
         }
-        $shipmentPart->addChild('Description', 'Swedish Snus for personal use');
+        $shipmentPart->addChild('Description', 'Swedish goods');
         //empirical
 
         $shipperPart = $shipmentPart->addChild('Shipper');
