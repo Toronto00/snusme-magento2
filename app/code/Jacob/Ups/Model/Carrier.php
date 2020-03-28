@@ -286,7 +286,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         $internationalForms->addChild('InvoiceNumber', $request->getOrderShipment()->getOrder()->getIncrementId());
         $internationalForms->addChild('InvoiceDate', $invoiceDate);
         $internationalForms->addChild('PurchaseOrderNumber', $request->getOrderShipment()->getOrder()->getIncrementId());
-        $internationalForms->addChild('ReasonForExport', 'OTHER');
+        $internationalForms->addChild('ReasonForExport', 'For personal use');
         $internationalForms->addChild('CurrencyCode', $request->getBaseCurrencyCode());
         $internationalForms->addChild('DeclarationStatement', "I hereby certify that the information on this invoice is true and correct and the contents and value of this shipment is as stated above. The exporter of the products covered by this document declares that except where otherwise clearly indicated these products are of EEA preferential origin.");
 
