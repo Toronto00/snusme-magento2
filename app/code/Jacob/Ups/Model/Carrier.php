@@ -303,7 +303,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
 
             $product->addChild('Description', $name);
             //$product->addChild('CommodityCode', '24039910');
-            $product->addChild('PartNumber', $item['product_id']);
+            //$product->addChild('PartNumber', $item['product_id']);
             $product->addChild('OriginCountryCode', $request->getShipperAddressCountryCode());
             $productUnit = $product->addChild('Unit');
 
@@ -311,6 +311,10 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $productUnit->addChild('Value', $item['customs_value']);
             $productUnit->addChild('UnitOfMeasurement')
                 ->addChild('Code', 'PCS');
+
+            $productWeight = $product->addChild('ProductWeight');
+            $productWeight->addChild('UnitOfMeasurement')->addChild('Code', 'KGS');
+            $productWeight->addChild('Weight', round($product->getWeight(), 1));
         }
 
         $totalCalculated    = $totalItemCost + $shippingAmount - $discountAmount;
