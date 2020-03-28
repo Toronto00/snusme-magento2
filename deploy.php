@@ -39,14 +39,15 @@ localhost('build');
     ->user('<user>')
     ->set('deploy_path', '~')
     ->stage('dev')
-    ->roles('master');
+    ->roles('master');*/
 
 host('stage_master')
-    ->hostname('<hostname>')
-    ->user('<user>')
-    ->set('deploy_path', '~')
+    ->hostname('staging.snusme.com')
+    ->user('root')
+    ->set('deploy_path', '/var/www/staging.snusme.com')
+    ->forwardAgent()
     ->stage('stage')
-    ->roles('master');*/
+    ->roles('master');
 
 host('prod_master')
     ->hostname('snusme.com')
