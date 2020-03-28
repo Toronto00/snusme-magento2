@@ -5,6 +5,13 @@
  */
 namespace Magento\Catalog\Controller;
 
+use Magento\Framework\App\ActionInterface;
+
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Model\Category;
+use Magento\TestFramework\Catalog\Model\CategoryLayoutUpdateManager;
+use Magento\TestFramework\Helper\Bootstrap;
+
 /**
  * Test class for \Magento\Catalog\Controller\Category.
  *
@@ -55,6 +62,7 @@ class CategoryTest extends \Magento\TestFramework\TestCase\AbstractController
     /**
      * @dataProvider getViewActionDataProvider
      * @magentoDataFixture Magento/CatalogUrlRewrite/_files/categories_with_product_ids.php
+     * @magentoDbIsolation disabled
      */
     public function testViewAction($categoryId, array $expectedHandles, array $expectedContent)
     {
@@ -101,5 +109,53 @@ class CategoryTest extends \Magento\TestFramework\TestCase\AbstractController
         $this->dispatch('catalog/category/view/id/8');
 
         $this->assert404NotFound();
+    }
+
+    /**
+     * Test changing Store View on Category page.
+     *
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation disabled
+     * @magentoDataFixture Magento/Catalog/_files/enable_using_store_codes.php
+     * @magentoDataFixture Magento/Store/_files/core_fixturestore.php
+     * @magentoDataFixture Magento/Catalog/_files/category_with_two_stores.php
+     */
+    public function testChangeStoreView()
+    {
+        $this->getRequest()->setMethod('POST');
+        $this->getRequest()->setPostValue([ActionInterface::PARAM_NAME_URL_ENCODED => 1]);
+        $this->dispatch('fixturestore/catalog/category/view/id/555?___from_store=default');
+        $html = $this->getResponse()->getBody();
+        $this->assertContains('<span>Fixture Store</span>', $html);
+    }
+
+    /**
+     * Check that custom layout update files is employed.
+     *
+     * @magentoDataFixture Magento/CatalogUrlRewrite/_files/categories_with_product_ids.php
+     * @return void
+     */
+    public function testViewWithCustomUpdate()
+    {
+        //Setting a fake file for the category.
+        $file = 'test-file';
+        $categoryId = 5;
+        /** @var CategoryLayoutUpdateManager $layoutManager */
+        $layoutManager = Bootstrap::getObjectManager()->get(CategoryLayoutUpdateManager::class);
+        $layoutManager->setCategoryFakeFiles($categoryId, [$file]);
+        /** @var CategoryRepositoryInterface $categoryRepo */
+        $categoryRepo = Bootstrap::getObjectManager()->create(CategoryRepositoryInterface::class);
+        $category = $categoryRepo->get($categoryId);
+        //Updating the custom attribute.
+        $category->setCustomAttribute('custom_layout_update_file', $file);
+        $categoryRepo->save($category);
+
+        //Viewing the category
+        $this->dispatch("catalog/category/view/id/$categoryId");
+        //Layout handles must contain the file.
+        $handles = Bootstrap::getObjectManager()->get(\Magento\Framework\View\LayoutInterface::class)
+            ->getUpdate()
+            ->getHandles();
+        $this->assertContains("catalog_category_view_selectable_{$categoryId}_{$file}", $handles);
     }
 }

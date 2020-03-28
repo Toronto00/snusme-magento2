@@ -5,6 +5,9 @@
  */
 namespace Magento\UrlRewrite\Controller;
 
+/**
+ * Class to test Match corresponding URL Rewrite
+ */
 class UrlRewriteTest extends \Magento\TestFramework\TestCase\AbstractController
 {
     /**
@@ -26,14 +29,26 @@ class UrlRewriteTest extends \Magento\TestFramework\TestCase\AbstractController
         $expectedCode = 301
     ) {
         $this->dispatch($request);
-        $code = $this->getResponse()->getHttpResponseCode();
-        $location = $this->getResponse()->getHeader('Location')->getFieldValue();
-
+        $response = $this->getResponse();
+        $code = $response->getHttpResponseCode();
         $this->assertEquals($expectedCode, $code, 'Invalid response code');
-        $this->assertStringEndsWith($redirect, $location, 'Invalid location header');
+
+        if ($expectedCode !== 200) {
+            $location = $response->getHeader('Location')->getFieldValue();
+            $this->assertStringEndsWith(
+                $redirect,
+                $location,
+                'Invalid location header'
+            );
+        }
     }
 
-    public function requestDataProvider()
+    /**
+     * Data provider for testMatchUrlRewrite
+     *
+     * @return array
+     */
+    public function requestDataProvider(): array
     {
         return [
             'Use Case #1: Rewrite: page-one/ --(301)--> page-a/; Request: page-one/ --(301)--> page-a/' => [
@@ -60,12 +75,11 @@ class UrlRewriteTest extends \Magento\TestFramework\TestCase\AbstractController
                 'request' => '/page-similar/',
                 'redirect' => '/page-b',
             ],
-            'Use Case #7: Rewrite during stores switching' => [
-                'request' => '/page-c-on-2nd-store'
-                    . '?___store=default&___from_store=fixture_second_store',
-                'redirect' => '/page-c-on-1st-store',
-                'expectedCode' => 302
-            ]
+            'Use Case #7: Request with query params' => [
+                'request' => '/enable-cookies/?test-param',
+                'redirect' => '',
+                200,
+            ],
         ];
     }
 }

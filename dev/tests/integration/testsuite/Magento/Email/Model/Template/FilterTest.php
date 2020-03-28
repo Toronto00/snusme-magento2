@@ -130,22 +130,22 @@ class FilterTest extends \PHPUnit\Framework\TestCase
             'area parameter - omitted' => [
                 'adminhtml',
                 'handle="email_template_test_handle"',
-                '<b>Email content for frontend/Magento/default theme</b>',
+                '<strong>Email content for frontend/Magento/default theme</strong>',
             ],
             'area parameter - frontend' => [
                 'adminhtml',
                 'handle="email_template_test_handle" area="frontend"',
-                '<b>Email content for frontend/Magento/default theme</b>',
+                '<strong>Email content for frontend/Magento/default theme</strong>',
             ],
             'area parameter - backend' => [
                 'frontend',
                 'handle="email_template_test_handle" area="adminhtml"',
-                '<b>Email content for adminhtml/Magento/default theme</b>',
+                '<strong>Email content for adminhtml/Magento/default theme</strong>',
             ],
             'custom parameter' => [
                 'frontend',
                 'handle="email_template_test_handle" template="Magento_Email::sample_email_content_custom.phtml"',
-                '<b>Custom Email content for frontend/Magento/default theme</b>',
+                '<strong>Custom Email content for frontend/Magento/default theme</strong>',
             ],
         ];
         return $result;
@@ -155,10 +155,11 @@ class FilterTest extends \PHPUnit\Framework\TestCase
      * @param $directive
      * @param $translations
      * @param $expectedResult
+     * @param array $variables
      * @internal param $translatorData
      * @dataProvider transDirectiveDataProvider
      */
-    public function testTransDirective($directive, $translations, $expectedResult)
+    public function testTransDirective($directive, $translations, $expectedResult, $variables = [])
     {
         $renderer = Phrase::getRenderer();
 
@@ -167,9 +168,12 @@ class FilterTest extends \PHPUnit\Framework\TestCase
             ->setMethods(['getData'])
             ->getMock();
 
-        $translator->expects($this->atLeastOnce())
-            ->method('getData')
-            ->will($this->returnValue($translations));
+        $translator->method('getData')
+            ->willReturn($translations);
+
+        if (!empty($variables)) {
+            $this->model->setVariables($variables);
+        }
 
         $this->objectManager->addSharedInstance($translator, \Magento\Framework\Translate::class);
         $this->objectManager->removeSharedInstance(\Magento\Framework\Phrase\Renderer\Translate::class);
@@ -195,7 +199,65 @@ class FilterTest extends \PHPUnit\Framework\TestCase
                 '{{trans "foobar"}}',
                 ['foobar' => 'barfoo'],
                 'barfoo',
-            ]
+            ],
+            'empty directive' => [
+                '{{trans}}',
+                [],
+                '',
+            ],
+            'empty string' => [
+                '{{trans ""}}',
+                [],
+                '',
+            ],
+            'no padding' => [
+                '{{trans"Hello cruel coder..."}}',
+                [],
+                'Hello cruel coder...',
+            ],
+            'multi-line padding' => [
+                "{{trans \t\n\r'Hello cruel coder...' \t\n\r}}",
+                [],
+                'Hello cruel coder...',
+            ],
+            'capture escaped double-quotes inside text' => [
+                '{{trans "Hello \"tested\" world!"}}',
+                [],
+                'Hello &quot;tested&quot; world!',
+            ],
+            'capture escaped single-quotes inside text' => [
+                "{{trans 'Hello \\'tested\\' world!'|escape}}",
+                [],
+                "Hello &#039;tested&#039; world!",
+            ],
+            'filter with params' => [
+                "{{trans 'Hello \\'tested\\' world!'|escape:html}}",
+                [],
+                "Hello &#039;tested&#039; world!",
+            ],
+            'basic var' => [
+                '{{trans "Hello %adjective world!" adjective="tested"}}',
+                [],
+                'Hello tested world!',
+            ],
+            'auto-escaped output' => [
+                '{{trans "Hello %adjective <strong>world</strong>!" adjective="<em>bad</em>"}}',
+                [],
+                'Hello &lt;em&gt;bad&lt;/em&gt; &lt;strong&gt;world&lt;/strong&gt;!',
+            ],
+            'unescaped modifier' => [
+                '{{trans "Hello %adjective <strong>world</strong>!" adjective="<em>bad</em>"|raw}}',
+                [],
+                'Hello <em>bad</em> <strong>world</strong>!',
+            ],
+            'variable replacement' => [
+                '{{trans "Hello %adjective world!" adjective="$mood"}}',
+                [],
+                'Hello happy world!',
+                [
+                    'mood' => 'happy'
+                ],
+            ],
         ];
     }
 
@@ -267,7 +329,7 @@ class FilterTest extends \PHPUnit\Framework\TestCase
             'Empty or missing file' => [
                 TemplateTypesInterface::TYPE_HTML,
                 'file="css/non-existent-file.css"',
-                '/* Contents of css/non-existent-file.css could not be loaded or is empty */'
+                '/* Contents of the specified CSS file could not be loaded or is empty */'
             ],
             'File with compilation error results in error message' => [
                 TemplateTypesInterface::TYPE_HTML,
@@ -352,9 +414,9 @@ class FilterTest extends \PHPUnit\Framework\TestCase
                 false,
                 true,
             ],
-            'Production mode - File with compilation error results in unmodified markup' => [
+            'Production mode - File with compilation error results in structurally unmodified markup' => [
                 '<html><p></p> {{inlinecss file="css/file-with-error.css"}}</html>',
-                '<html><p></p> </html>',
+                '<p></p>',
                 true,
             ],
             'Developer mode - File with compilation error results in error message' => [

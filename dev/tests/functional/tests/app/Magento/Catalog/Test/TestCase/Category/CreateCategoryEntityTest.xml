@@ -37,7 +37,6 @@
             <data name="category/data/meta_keywords" xsi:type="string">custom meta keywords %isolation%</data>
             <data name="category/data/meta_description" xsi:type="string">Custom meta description %isolation%</data>
             <data name="category/data/layout" xsi:type="string">2 columns with right bar</data>
-            <data name="category/data/layout_update_xml" xsi:type="string">&#60;referenceContainer name=&quot;catalog.leftnav&quot; remove=&quot;true&quot;/&#62;</data>
             <data name="category/data/new_theme" xsi:type="string">Magento Luma</data>
             <data name="category/data/apply_design_to_products" xsi:type="string">Yes</data>
             <data name="category/data/schedule_update_from" xsi:type="string">01/10/2014</data>
@@ -81,7 +80,6 @@
             <data name="category/data/meta_description" xsi:type="string">Custom meta description %isolation%</data>
             <data name="category/data/category_products/dataset" xsi:type="string">catalogProductSimple::default,catalogProductSimple::default</data>
             <data name="category/data/layout" xsi:type="string">2 columns with right bar</data>
-            <data name="category/data/layout_update_xml" xsi:type="string">&#60;referenceContainer name=&quot;content.aside&quot; remove=&quot;true&quot;/&#62;</data>
             <data name="category/data/new_theme" xsi:type="string">Magento Luma</data>
             <data name="category/data/apply_design_to_products" xsi:type="string">Yes</data>
             <data name="category/data/schedule_update_from" xsi:type="string">01/10/2014</data>
@@ -174,6 +172,16 @@
             <data name="category/data/name" xsi:type="string">Subcategory%isolation%</data>
             <constraint name="Magento\Catalog\Test\Constraint\AssertCategorySaveMessage" />
             <constraint name="Magento\Catalog\Test\Constraint\AssertCategoryOnCustomWebsite" />
+        </variation>
+        <variation name="CreateCategoryEntityTestVariation11_ProductsGridFilter" summary="Apply category products grid filter">
+            <data name="addCategory" xsi:type="string">addSubcategory</data>
+            <data name="category/data/parent_id/dataset" xsi:type="string">default_category</data>
+            <data name="category/data/is_active" xsi:type="string">Yes</data>
+            <data name="category/data/include_in_menu" xsi:type="string">Yes</data>
+            <data name="category/data/name" xsi:type="string">Subcategory%isolation%</data>
+            <data name="category/data/category_products/dataset" xsi:type="string">catalogProductSimple::default, catalogProductSimple::not_visible_individually</data>
+            <constraint name="Magento\Catalog\Test\Constraint\AssertCategorySaveMessage" />
+            <constraint name="Magento\Catalog\Test\Constraint\AssertCategoryProductsGridFilter" />
         </variation>
     </testCase>
 </config>

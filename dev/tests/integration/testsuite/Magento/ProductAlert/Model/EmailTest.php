@@ -81,8 +81,8 @@ class EmailTest extends \PHPUnit\Framework\TestCase
             \Magento\TestFramework\Mail\Template\TransportBuilderMock::class
         );
         $this->assertContains(
-            'John Smith,',
-            $transportBuilder->getSentMessage()->getBodyHtml()->getRawContent()
+            'Smith,',
+            $transportBuilder->getSentMessage()->getRawMessage()
         );
     }
 

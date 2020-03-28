@@ -6,15 +6,11 @@
 namespace Magento\Framework\Error;
 
 use Magento\Framework\Serialize\Serializer\Json;
-use Magento\Framework\Escaper;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\App\Response\Http;
 
 /**
  * Error processor
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Processor
 {
@@ -22,7 +18,6 @@ class Processor
     const MAGE_ERRORS_DESIGN_XML = 'design.xml';
     const DEFAULT_SKIN = 'default';
     const ERROR_DIR = 'pub/errors';
-    const NUMBER_SYMBOLS_IN_SUBDIR_NAME = 2;
 
     /**
      * Page title
@@ -69,7 +64,7 @@ class Processor
     /**
      * Report ID
      *
-     * @var string
+     * @var int
      */
     public $reportId;
 
@@ -130,7 +125,7 @@ class Processor
     /**
      * Http response
      *
-     * @var Http
+     * @var \Magento\Framework\App\Response\Http
      */
     protected $_response;
 
@@ -142,25 +137,15 @@ class Processor
     private $serializer;
 
     /**
-     * @var Escaper
-     */
-    private $escaper;
-
-    /**
-     * @param Http $response
+     * @param \Magento\Framework\App\Response\Http $response
      * @param Json $serializer
-     * @param Escaper $escaper
      */
-    public function __construct(
-        Http $response,
-        Json $serializer = null,
-        Escaper $escaper = null
-    ) {
+    public function __construct(\Magento\Framework\App\Response\Http $response, Json $serializer = null)
+    {
         $this->_response = $response;
         $this->_errorDir  = __DIR__ . '/';
         $this->_reportDir = dirname(dirname($this->_errorDir)) . '/var/report/';
-        $this->serializer = $serializer ?: ObjectManager::getInstance()->get(Json::class);
-        $this->escaper = $escaper ?: ObjectManager::getInstance()->get(Escaper::class);
+        $this->serializer = $serializer ?: \Magento\Framework\App\ObjectManager::getInstance()->get(Json::class);
 
         if (!empty($_SERVER['SCRIPT_NAME'])) {
             if (in_array(basename($_SERVER['SCRIPT_NAME'], '.php'), ['404', '503', 'report'])) {
@@ -170,16 +155,17 @@ class Processor
             }
         }
 
+        $reportId = (isset($_GET['id'])) ? (int)$_GET['id'] : null;
+        if ($reportId) {
+            $this->loadReport($reportId);
+        }
+
         $this->_indexDir = $this->_getIndexDir();
         $this->_root  = is_dir($this->_indexDir . 'app');
 
         $this->_prepareConfig();
         if (isset($_GET['skin'])) {
             $this->_setSkin($_GET['skin']);
-        }
-
-        if (isset($_GET['id'])) {
-            $this->loadReport($_GET['id']);
         }
     }
 
@@ -229,7 +215,7 @@ class Processor
     public function processReport()
     {
         $this->pageTitle = 'There has been an error processing your request';
-        $this->_response->setHttpResponseCode(503);
+        $this->_response->setHttpResponseCode(500);
 
         $this->showErrorMsg = false;
         $this->showSentMsg  = false;
@@ -370,9 +356,6 @@ class Processor
             if ((string)$local->report->trash) {
                 $config->trash = $local->report->trash;
             }
-            if ($local->report->dir_nesting_level) {
-                $config->dir_nesting_level = (int)$local->report->dir_nesting_level;
-            }
             if ((string)$local->skin) {
                 $this->_setSkin((string)$local->skin, $config);
             }
@@ -469,7 +452,7 @@ class Processor
             $this->reportData['url'] = $this->getHostUrl() . $reportData['url'];
         }
 
-        if (isset($this->reportData['script_name'])) {
+        if ($this->reportData['script_name']) {
             $this->_scriptName = $this->reportData['script_name'];
         }
     }
@@ -480,18 +463,16 @@ class Processor
      * @param array $reportData
      * @return string
      */
-    public function saveReport(array $reportData): string
+    public function saveReport($reportData)
     {
-        $this->reportId = $reportData['report_id'];
-        $this->_reportFile = $this->getReportPath(
-            $this->getReportDirNestingLevel($this->reportId),
-            $this->reportId
-        );
-        $reportDirName = dirname($this->_reportFile);
-        if (!file_exists($reportDirName)) {
-            @mkdir($reportDirName, 0777, true);
-        }
+        $this->reportData = $reportData;
+        $this->reportId   = abs((int)microtime(true) * random_int(100, 1000));
+        $this->_reportFile = $this->_reportDir . '/' . $this->reportId;
         $this->_setReportData($reportData);
+
+        if (!file_exists($this->_reportDir)) {
+            @mkdir($this->_reportDir, 0777, true);
+        }
 
         @file_put_contents($this->_reportFile, $this->serializer->serialize($reportData));
 
@@ -506,118 +487,20 @@ class Processor
     /**
      * Get report
      *
-     * @param string $reportId
-     * @return void
-     */
-    public function loadReport($reportId)
-    {
-        try {
-            if (!$this->isReportIdValid($reportId)) {
-                throw new \RuntimeException("Report Id is invalid");
-            }
-            $reportFile = $this->findReportFile($reportId);
-            if (!is_readable($reportFile)) {
-                throw new \RuntimeException("Report file cannot be read");
-            }
-            $this->reportId = $reportId;
-            $this->_reportFile = $reportFile;
-            $this->_setReportData($this->serializer->unserialize(file_get_contents($this->_reportFile)));
-        } catch (\RuntimeException $e) {
-            $this->redirectToBaseUrl();
-        }
-    }
-
-    /**
-     * Searches for the report file and returns the path to it
-     *
-     * @param string $reportId
-     * @return string
-     * @throws \RuntimeException
-     */
-    private function findReportFile(string $reportId): string
-    {
-        $reportFile = $this->getReportPath(
-            $this->getReportDirNestingLevel($reportId),
-            $reportId
-        );
-        if (file_exists($reportFile)) {
-            return $reportFile;
-        }
-        $maxReportDirNestingLevel = $this->getMaxReportDirNestingLevel($reportId);
-        for ($i = 0; $i <= $maxReportDirNestingLevel; $i++) {
-            $reportFile = $this->getReportPath($i, $reportId);
-            if (file_exists($reportFile)) {
-                return $reportFile;
-            }
-        }
-        throw new \RuntimeException("Report file not found");
-    }
-
-    /**
-     * Redirect to a base url
+     * @param int $reportId
      * @return void
      * @SuppressWarnings(PHPMD.ExitExpression)
      */
-    private function redirectToBaseUrl()
+    public function loadReport($reportId)
     {
-        header("Location: " . $this->getBaseUrl());
-        die();
-    }
+        $this->reportId = $reportId;
+        $this->_reportFile = $this->_reportDir . '/' . $reportId;
 
-    /**
-     * Checks report id
-     *
-     * @param string $reportId
-     * @return bool
-     */
-    private function isReportIdValid(string $reportId): bool
-    {
-        return (bool)preg_match('/[a-fA-F0-9]{64}/', $reportId);
-    }
-
-    /**
-     * Returns nesting Level for the report files
-     *
-     * @var $reportId
-     * @return int
-     */
-    private function getReportDirNestingLevel(string $reportId): int
-    {
-        $envName = 'MAGE_ERROR_REPORT_DIR_NESTING_LEVEL';
-        $value = $_ENV[$envName] ?? getenv($envName);
-        if (false === $value && property_exists($this->_config, 'dir_nesting_level')) {
-            $value = $this->_config->dir_nesting_level;
+        if (!file_exists($this->_reportFile) || !is_readable($this->_reportFile)) {
+            header("Location: " . $this->getBaseUrl());
+            die();
         }
-        $value = (int)$value;
-        $maxValue = $this->getMaxReportDirNestingLevel($reportId);
-        return 0 < $value && $maxValue >= $value ? $value : 0;
-    }
-
-    /**
-     * Returns maximum nesting level directories of report files
-     *
-     * @param string $reportId
-     * @return integer
-     */
-    private function getMaxReportDirNestingLevel(string $reportId): int
-    {
-        return (int)floor(strlen($reportId) / self::NUMBER_SYMBOLS_IN_SUBDIR_NAME);
-    }
-
-    /**
-     * Get path to reports
-     *
-     * @param integer $reportDirNestingLevel
-     * @param string $reportId
-     * @return string
-     */
-    private function getReportPath(int $reportDirNestingLevel, string $reportId): string
-    {
-        $reportDirPath = $this->_reportDir;
-        for ($i = 0, $j = 0; $j < $reportDirNestingLevel; $i += 2, $j++) {
-            $reportDirPath .= $reportId[$i] . $reportId[$i + 1] . '/';
-        }
-        return $reportDirPath . $reportId;
+        $this->_setReportData($this->serializer->unserialize(file_get_contents($this->_reportFile)));
     }
 
     /**
@@ -631,16 +514,11 @@ class Processor
     {
         $this->pageTitle = 'Error Submission Form';
 
-        $this->postData['firstName'] = (isset($_POST['firstname']))
-            ? trim($this->escaper->escapeHtml($_POST['firstname'])) : '';
-        $this->postData['lastName'] = (isset($_POST['lastname']))
-            ? trim($this->escaper->escapeHtml($_POST['lastname'])) : '';
-        $this->postData['email'] = (isset($_POST['email']))
-            ? trim($this->escaper->escapeHtml($_POST['email'])) : '';
-        $this->postData['telephone'] = (isset($_POST['telephone']))
-            ? trim($this->escaper->escapeHtml($_POST['telephone'])) : '';
-        $this->postData['comment'] = (isset($_POST['comment']))
-            ? trim($this->escaper->escapeHtml($_POST['comment'])) : '';
+        $this->postData['firstName'] = (isset($_POST['firstname'])) ? trim(htmlspecialchars($_POST['firstname'])) : '';
+        $this->postData['lastName']  = (isset($_POST['lastname'])) ? trim(htmlspecialchars($_POST['lastname'])) : '';
+        $this->postData['email']     = (isset($_POST['email'])) ? trim(htmlspecialchars($_POST['email'])) : '';
+        $this->postData['telephone'] = (isset($_POST['telephone'])) ? trim(htmlspecialchars($_POST['telephone'])) : '';
+        $this->postData['comment']   = (isset($_POST['comment'])) ? trim(htmlspecialchars($_POST['comment'])) : '';
 
         if (isset($_POST['submit'])) {
             if ($this->_validate()) {

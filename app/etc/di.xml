@@ -37,13 +37,13 @@
     <preference for="Magento\Framework\Locale\ListsInterface" type="Magento\Framework\Locale\TranslatedLists" />
     <preference for="Magento\Framework\Locale\AvailableLocalesInterface" type="Magento\Framework\Locale\Deployed\Codes" />
     <preference for="Magento\Framework\Locale\OptionInterface" type="Magento\Framework\Locale\Deployed\Options" />
+    <preference for="Magento\Framework\Lock\LockManagerInterface" type="Magento\Framework\Lock\Proxy" />
     <preference for="Magento\Framework\Api\AttributeTypeResolverInterface" type="Magento\Framework\Reflection\AttributeTypeResolver" />
     <preference for="Magento\Framework\Api\Search\SearchResultInterface" type="Magento\Framework\Api\Search\SearchResult" />
     <preference for="Magento\Framework\Api\Search\SearchCriteriaInterface" type="Magento\Framework\Api\Search\SearchCriteria"/>
     <preference for="Magento\Framework\Api\Search\DocumentInterface" type="Magento\Framework\Api\Search\Document" />
     <preference for="Magento\Framework\Api\Search\AggregationInterface" type="Magento\Framework\Search\Response\Aggregation" />
     <preference for="Magento\Framework\App\RequestSafetyInterface" type="Magento\Framework\App\Request\Http" />
-    <preference for="Magento\Framework\App\ExceptionHandlerInterface" type="Magento\Framework\App\ExceptionHandler" />
     <type name="Magento\Store\Model\Store">
         <arguments>
             <argument name="currencyInstalled" xsi:type="string">system/currency/installed</argument>
@@ -173,6 +173,7 @@
     <preference for="Magento\Framework\View\Page\FaviconInterface" type="Magento\Theme\Model\Favicon\Favicon" />
     <preference for="Magento\Framework\View\Element\Message\InterpretationStrategyInterface" type="Magento\Framework\View\Element\Message\InterpretationMediator" />
     <preference for="Magento\Framework\Indexer\Config\DependencyInfoProviderInterface" type="Magento\Framework\Indexer\Config\DependencyInfoProvider" />
+    <preference for="Magento\Framework\Search\Request\IndexScopeResolverInterface" type="Magento\Framework\Indexer\ScopeResolver\IndexScopeResolver"/>
     <type name="Magento\Framework\Model\ResourceModel\Db\TransactionManager" shared="false" />
     <type name="Magento\Framework\Acl\Data\Cache">
         <arguments>
@@ -233,12 +234,24 @@
             <argument name="pathInfoProcessor" xsi:type="object">Magento\Backend\App\Request\PathInfoProcessor\Proxy</argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\App\Response\Http">
+        <arguments>
+            <argument name="sessionConfig" xsi:type="object">Magento\Framework\Session\Config\ConfigInterface\Proxy</argument>
+        </arguments>
+    </type>
     <preference for="Magento\Framework\Session\SaveHandlerInterface" type="Magento\Framework\Session\SaveHandler" />
     <type name="Magento\Framework\Session\SaveHandlerFactory">
         <arguments>
             <argument name="handlers" xsi:type="array">
                 <item name="db" xsi:type="string">Magento\Framework\Session\SaveHandler\DbTable</item>
                 <item name="redis" xsi:type="string">Magento\Framework\Session\SaveHandler\Redis</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\App\FeedFactory">
+        <arguments>
+            <argument name="formats" xsi:type="array">
+                <item name="rss" xsi:type="string">Magento\Framework\App\Feed</item>
             </argument>
         </arguments>
     </type>
@@ -593,6 +606,14 @@
             <argument name="argumentInterpreter" xsi:type="object">layoutArgumentGeneratorInterpreter</argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\View\Element\UiComponent\Argument\Interpreter\ConfigurableObject">
+        <arguments>
+            <argument name="classWhitelist" xsi:type="array">
+                <item name="0" xsi:type="string">Magento\Framework\Data\OptionSourceInterface</item>
+                <item name="1" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProviderInterface</item>
+            </argument>
+        </arguments>
+    </type>
     <type name="Magento\Framework\Mview\View">
         <arguments>
             <argument name="state" xsi:type="object" shared="false">Magento\Indexer\Model\Mview\View\State</argument>
@@ -623,6 +644,16 @@
             <argument name="publisher" xsi:type="object">developerPublisher</argument>
         </arguments>
     </type>
+    <virtualType name="Magento\Framework\Config\ValidationState\Required" type="Magento\Framework\Config\ValidationState\Configurable">
+        <arguments>
+            <argument name="required" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\Framework\Config\ValidationState\NotRequired" type="Magento\Framework\Config\ValidationState\Configurable">
+        <arguments>
+            <argument name="required" xsi:type="boolean">false</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="AlternativeSourceProcessors" type="Magento\Framework\View\Asset\PreProcessor\AlternativeSource">
         <arguments>
             <argument name="filenameResolver" xsi:type="object">Magento\Framework\View\Asset\PreProcessor\MinificationFilenameResolver</argument>
@@ -1345,4 +1376,17 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\Session\Config">
+        <arguments>
+            <argument name="scopeType" xsi:type="const">Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\App\ScopeResolverPool">
+        <arguments>
+            <argument name="scopeResolvers" xsi:type="array">
+                <item name="default" xsi:type="object">Magento\Framework\App\ScopeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Magento\Framework\Filter\VariableResolverInterface" type="Magento\Framework\Filter\VariableResolver\StrategyResolver"/>
 </config>

@@ -8,7 +8,7 @@
         "AFL-3.0"
     ],
     "require": {
-        "magento/product-community-edition": "2.2.2",
+        "magento/product-community-edition": "2.2.11",
         "composer/composer": "@alpha",
         "magefan/module-geoip": "^2.0",
         "mailchimp/mc-magento2": "*",

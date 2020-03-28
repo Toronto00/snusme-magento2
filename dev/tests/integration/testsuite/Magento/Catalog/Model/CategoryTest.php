@@ -5,6 +5,10 @@
  */
 namespace Magento\Catalog\Model;
 
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Api\Data\CategoryInterface;
+use Magento\Catalog\Api\Data\CategoryInterfaceFactory;
+
 /**
  * Test class for \Magento\Catalog\Model\Category.
  * - general behaviour is tested
@@ -320,6 +324,43 @@ class CategoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->_model->getId(), null);
     }
 
+    /**
+     * @magentoDataFixture Magento/Store/_files/second_store.php
+     * @magentoDataFixture Magento/Catalog/_files/categories.php
+     * @magentoDbIsolation disabled
+     */
+    public function testCreateSubcategoryWithMultipleStores()
+    {
+        $parentCategoryId = 3;
+        $storeManager = $this->objectManager->get(\Magento\Store\Model\StoreManagerInterface::class);
+        $storeManager->setCurrentStore(\Magento\Store\Model\Store::ADMIN_CODE);
+        /** @var \Magento\Store\Api\StoreRepositoryInterface $storeRepository */
+        $storeRepository = $this->objectManager->get(\Magento\Store\Api\StoreRepositoryInterface::class);
+        $storeId = $storeRepository->get('fixture_second_store')->getId();
+        /** @var \Magento\Catalog\Api\CategoryRepositoryInterface $repository */
+        $repository = $this->objectManager->get(\Magento\Catalog\Api\CategoryRepositoryInterface::class);
+        $parentCategory = $repository->get($parentCategoryId, $storeId);
+        $parentAllStoresPath = $parentCategory->getUrlPath();
+        $parentSecondStoreKey = 'parent-category-url-key-second-store';
+        $parentCategory->setUrlKey($parentSecondStoreKey);
+        $repository->save($parentCategory);
+        /** @var \Magento\Catalog\Model\Category $childCategory */
+        $childCategory = $this->objectManager->create(\Magento\Catalog\Model\Category::class);
+        $childCategory->setName('Test Category 100')
+            ->setParentId($parentCategoryId)
+            ->setLevel(2)
+            ->setAvailableSortBy(['position', 'name'])
+            ->setDefaultSortBy('name')
+            ->setIsActive(true)
+            ->setPosition(1)
+            ->isObjectNew(true);
+        $repository->save($childCategory);
+        $childCategorySecondStore = $repository->get($childCategory->getId(), $storeId);
+
+        $this->assertEquals($parentAllStoresPath . '/test-category-100', $childCategory->getUrlPath());
+        $this->assertEquals($parentSecondStoreKey . '/test-category-100', $childCategorySecondStore->getUrlPath());
+    }
+
     protected function getCategoryByName($categoryName)
     {
         /* @var \Magento\Catalog\Model\ResourceModel\Category\Collection $collection */
@@ -327,5 +368,36 @@ class CategoryTest extends \PHPUnit\Framework\TestCase
         $collection = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Category\Collection::class);
         $collection->addNameToResult()->load();
         return $collection->getItemByColumnValue('name', $categoryName);
+    }
+
+    /**
+     * @return void
+     */
+    public function testSaveCategoryWithWrongPath()
+    {
+        /** @var CategoryRepositoryInterface $categoryRepository */
+        $categoryRepository = $this->objectManager->get(CategoryRepositoryInterface::class);
+        $categoryFactory = $this->objectManager->get(CategoryInterfaceFactory::class);
+
+        /** @var CategoryInterface $category */
+        $category = $categoryFactory->create(
+            [
+                'data' => [
+                    'name' => 'Category With Wrong Path',
+                    'parent_id' => 2,
+                    'path' => 'wrong/path',
+                    'level' => 2,
+                    'available_sort_by' =>['position', 'name'],
+                    'default_sort_by' => 'name',
+                    'is_active' => true,
+                    'position' => 1,
+                ],
+            ]
+        );
+        $category->isObjectNew(true);
+        $category->save();
+
+        $createdCategory = $categoryRepository->get($category->getId());
+        $this->assertEquals('0/0/'. $createdCategory->getId(), $createdCategory->getPath());
     }
 }

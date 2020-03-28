@@ -8,6 +8,7 @@ namespace Magento\Theme\Controller\Adminhtml\System\Design\Config;
 
 use Magento\Framework\Data\Form\FormKey;
 use Magento\TestFramework\TestCase\AbstractBackendController;
+use Magento\Framework\App\Request\Http;
 
 /**
  * Class SaveTest @covers \Magento\Theme\Controller\Adminhtml\Design\Config\Save
@@ -23,6 +24,11 @@ class SaveTest extends AbstractBackendController
      * @inheritdoc
      */
     protected $uri = 'backend/theme/design_config/save';
+
+    /**
+     * @var string
+     */
+    protected $httpMethod = Http::METHOD_POST;
 
     /**
      * Test design configuration save valid values.
@@ -67,7 +73,7 @@ class SaveTest extends AbstractBackendController
             'header_logo_height' => '',
             'header_logo_alt' => '',
             'header_welcome' => 'Default welcome msg!',
-            'footer_copyright' => 'Copyright © 2013-2017 Magento, Inc. All rights reserved.',
+            'footer_copyright' => 'Copyright © 2013-present Magento, Inc. All rights reserved.',
             'footer_absolute_footer' => '',
             'default_robots' => 'INDEX,FOLLOW',
             'custom_instructions' => '',

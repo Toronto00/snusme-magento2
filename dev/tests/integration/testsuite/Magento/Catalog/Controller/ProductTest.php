@@ -9,6 +9,15 @@
  */
 namespace Magento\Catalog\Controller;
 
+use Magento\Framework\App\ActionInterface;
+use Magento\TestFramework\ObjectManager;
+
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\TestFramework\Catalog\Model\CategoryLayoutUpdateManager;
+use Magento\TestFramework\Catalog\Model\ProductLayoutUpdateManager;
+use Magento\TestFramework\Helper\Bootstrap;
+
 /**
  * @magentoAppIsolation enabled
  */
@@ -25,7 +34,7 @@ class ProductTest extends \Magento\TestFramework\TestCase\AbstractController
     public function assert404NotFound()
     {
         parent::assert404NotFound();
-        /** @var $objectManager \Magento\TestFramework\ObjectManager */
+        /** @var $objectManager ObjectManager */
         $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $this->assertNull($objectManager->get(\Magento\Framework\Registry::class)->registry('current_product'));
     }
@@ -49,7 +58,7 @@ class ProductTest extends \Magento\TestFramework\TestCase\AbstractController
      */
     public function testViewAction()
     {
-        /** @var $objectManager \Magento\TestFramework\ObjectManager */
+        /** @var $objectManager ObjectManager */
         $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         /**
          * @var $repository \Magento\Catalog\Model\ProductRepository
@@ -100,7 +109,7 @@ class ProductTest extends \Magento\TestFramework\TestCase\AbstractController
      */
     public function testViewActionConfigurable()
     {
-        /** @var $objectManager \Magento\TestFramework\ObjectManager */
+        /** @var $objectManager ObjectManager */
         $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         /**
          * @var $repository \Magento\Catalog\Model\ProductRepository
@@ -136,7 +145,7 @@ class ProductTest extends \Magento\TestFramework\TestCase\AbstractController
      */
     public function testGalleryAction()
     {
-        /** @var $objectManager \Magento\TestFramework\ObjectManager */
+        /** @var $objectManager ObjectManager */
         $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         /**
          * @var $repository \Magento\Catalog\Model\ProductRepository
@@ -185,5 +194,59 @@ class ProductTest extends \Magento\TestFramework\TestCase\AbstractController
         $this->dispatch('catalog/product/image/');
 
         $this->assert404NotFound();
+    }
+
+    /**
+     * Test changing Store View on Product page.
+     *
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     * @magentoDataFixture Magento/Catalog/_files/enable_using_store_codes.php
+     * @magentoDataFixture Magento/Catalog/_files/product_simple_multistore.php
+     */
+    public function testChangeStoreView()
+    {
+        /** @var $objectManager ObjectManager */
+        $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+
+        /** @var $repository \Magento\Catalog\Model\ProductRepository */
+        $repository = $objectManager->create(\Magento\Catalog\Model\ProductRepository::class);
+        $product = $repository->get('simple');
+        $this->getRequest()->setMethod('POST');
+        $this->getRequest()->setPostValue([ActionInterface::PARAM_NAME_URL_ENCODED => 1]);
+        $this->dispatch(sprintf('fixturestore/catalog/product/view/id/%s?___from_store=default', $product->getId()));
+        $html = $this->getResponse()->getBody();
+        $this->assertContains('<span>Fixture Store</span>', $html);
+    }
+
+    /**
+     * Check that custom layout update files is employed.
+     *
+     * @magentoDataFixture Magento/Catalog/controllers/_files/products.php
+     * @return void
+     */
+    public function testViewWithCustomUpdate()
+    {
+        //Setting a fake file for the product.
+        $file = 'test-file';
+        /** @var ProductRepositoryInterface $repository */
+        $repository = Bootstrap::getObjectManager()->create(ProductRepositoryInterface::class);
+        $sku = 'simple_product_1';
+        $product = $repository->get($sku);
+        $productId = $product->getId();
+        /** @var ProductLayoutUpdateManager $layoutManager */
+        $layoutManager = Bootstrap::getObjectManager()->get(ProductLayoutUpdateManager::class);
+        $layoutManager->setFakeFiles((int)$productId, [$file]);
+        //Updating the custom attribute.
+        $product->setCustomAttribute('custom_layout_update_file', $file);
+        $repository->save($product);
+
+        //Viewing the product
+        $this->dispatch("catalog/product/view/id/$productId");
+        //Layout handles must contain the file.
+        $handles = Bootstrap::getObjectManager()->get(\Magento\Framework\View\LayoutInterface::class)
+            ->getUpdate()
+            ->getHandles();
+        $this->assertContains("catalog_product_view_selectable_{$sku}_{$file}", $handles);
     }
 }

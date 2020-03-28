@@ -55,8 +55,8 @@ class ObserverTest extends \PHPUnit\Framework\TestCase
             \Magento\TestFramework\Mail\Template\TransportBuilderMock::class
         );
         $this->assertContains(
-            'John Smith,',
-            $transportBuilder->getSentMessage()->getBodyHtml()->getRawContent()
+            'ohn Smith,',
+            $transportBuilder->getSentMessage()->getRawMessage()
         );
     }
 }

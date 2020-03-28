@@ -8,6 +8,7 @@ namespace Magento\Email\Model;
 use Magento\Backend\App\Area\FrontNameResolver as BackendFrontNameResolver;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\TemplateTypesInterface;
 use Magento\Framework\View\DesignInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -315,30 +316,100 @@ class TemplateTest extends \PHPUnit\Framework\TestCase
                 Area::AREA_FRONTEND,
                 TemplateTypesInterface::TYPE_HTML,
                 '{{template config_path="customer/create_account/email_template"}}',
-                '<b>customer_create_account_email_template template from Vendor/custom_theme</b>',
+                '<strong>customer_create_account_email_template template from Vendor/custom_theme</strong>',
             ],
             'Template from parent theme - frontend' => [
                 Area::AREA_FRONTEND,
                 TemplateTypesInterface::TYPE_HTML,
                 '{{template config_path="customer/create_account/email_confirmation_template"}}',
-                '<b>customer_create_account_email_confirmation_template template from Vendor/default</b>',
+                '<strong>customer_create_account_email_confirmation_template template from Vendor/default</strong',
             ],
             'Template from grandparent theme - frontend' => [
                 Area::AREA_FRONTEND,
                 TemplateTypesInterface::TYPE_HTML,
                 '{{template config_path="customer/create_account/email_confirmed_template"}}',
-                '<b>customer_create_account_email_confirmed_template template from Magento/default</b>',
+                '<strong>customer_create_account_email_confirmed_template template from Magento/default</strong',
             ],
             'Template from grandparent theme - adminhtml' => [
                 BackendFrontNameResolver::AREA_CODE,
                 TemplateTypesInterface::TYPE_HTML,
                 '{{template config_path="catalog/productalert_cron/error_email_template"}}',
-                '<b>catalog_productalert_cron_error_email_template template from Magento/default</b>',
+                '<strong>catalog_productalert_cron_error_email_template template from Magento/default</strong',
                 null,
                 null,
                 true,
             ],
         ];
+    }
+
+    /**
+     * @magentoDataFixture Magento/Store/_files/core_fixturestore.php
+     * @magentoComponentsDir Magento/Email/Model/_files/design
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     */
+    public function testTemplateLoadedFromDbIsFilteredInStrictMode()
+    {
+        $this->mockModel();
+
+        $this->setUpThemeFallback(BackendFrontNameResolver::AREA_CODE);
+
+        $this->model->setTemplateType(TemplateTypesInterface::TYPE_HTML);
+        // The first variable should be processed because it didn't come from the DB
+        $template = '{{var store.isSaveAllowed()}} - {{template config_path="design/email/footer_template"}}';
+        $this->model->setTemplateText($template);
+
+        // Allows for testing of templates overridden in backend
+        $template = $this->objectManager->create(\Magento\Email\Model\Template::class);
+        $templateData = [
+            'template_code' => 'some_unique_code',
+            'template_type' => TemplateTypesInterface::TYPE_HTML,
+            // This template will be processed in strict mode
+            'template_text' => '{{var this.template_code}}'
+                . ' - {{var store.isSaveAllowed()}} - {{var this.getTemplateCode()}}',
+        ];
+        $template->setData($templateData);
+        $template->save();
+
+        // Store the ID of the newly created template in the system config so that this template will be loaded
+        $this->objectManager->get(\Magento\Framework\App\Config\MutableScopeConfigInterface::class)
+            ->setValue('design/email/footer_template', $template->getId(), ScopeInterface::SCOPE_STORE, 'fixturestore');
+
+        self::assertEquals('1 - some_unique_code -  - some_unique_code', $this->model->getProcessedTemplate());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Store/_files/core_fixturestore.php
+     * @magentoComponentsDir Magento/Email/Model/_files/design
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     */
+    public function testLegacyTemplateLoadedFromDbIsFilteredInLegacyMode()
+    {
+        $this->mockModel();
+
+        $this->setUpThemeFallback(BackendFrontNameResolver::AREA_CODE);
+
+        $this->model->setTemplateType(TemplateTypesInterface::TYPE_HTML);
+        $template = '{{var store.isSaveAllowed()}} - {{template config_path="design/email/footer_template"}}';
+        $this->model->setTemplateText($template);
+
+        $template = $this->objectManager->create(\Magento\Email\Model\Template::class);
+        $templateData = [
+            'is_legacy' => '1',
+            'template_code' => 'some_unique_code',
+            'template_type' => TemplateTypesInterface::TYPE_HTML,
+            'template_text' => '{{var this.template_code}}'
+                . ' - {{var store.isSaveAllowed()}} - {{var this.getTemplateCode()}}',
+        ];
+        $template->setData($templateData);
+        $template->save();
+
+        // Store the ID of the newly created template in the system config so that this template will be loaded
+        $this->objectManager->get(\Magento\Framework\App\Config\MutableScopeConfigInterface::class)
+            ->setValue('design/email/footer_template', $template->getId(), ScopeInterface::SCOPE_STORE, 'fixturestore');
+
+        self::assertEquals('1 - some_unique_code - 1 - some_unique_code', $this->model->getProcessedTemplate());
     }
 
     /**

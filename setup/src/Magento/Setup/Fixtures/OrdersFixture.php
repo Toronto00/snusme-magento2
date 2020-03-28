@@ -11,10 +11,11 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 /**
  * Fixture generator for Order entities with configurable number of different types of order items.
+ *
  * Optionally generates inactive quotes for generated orders.
  *
  * Support the following format:
- * <!-- Is is nescessary to enable quotes for orders -->
+ * <!-- It is necessary to enable quotes for orders -->
  * <order_quotes_enable>{bool}</order_quotes_enable>
  *
  * <!-- Min number of simple products per each order -->
@@ -232,6 +233,12 @@ class OrdersFixture extends Fixture
             return;
         }
 
+        $ruleId = $this->getMaxEntityId(
+            'salesrule',
+            \Magento\SalesRule\Model\ResourceModel\Rule::class,
+            'rule_id'
+        );
+
         $maxItemId = $this->getMaxEntityId(
             'sales_order_item',
             \Magento\Sales\Model\ResourceModel\Order\Item::class,
@@ -330,6 +337,7 @@ class OrdersFixture extends Fixture
                 '%productStoreId%' => $productStoreId($entityId),
                 '%productStoreName%' => $productStoreName($entityId),
                 '%entityId%' => $entityId,
+                '%ruleId%' => $ruleId,
             ];
             $shippingAddress = ['%orderAddressId%' => $entityId * 2 - 1, '%addressType%' => 'shipping'];
             $billingAddress = ['%orderAddressId%' => $entityId * 2, '%addressType%' => 'billing'];
@@ -516,7 +524,7 @@ class OrdersFixture extends Fixture
      * DB connection (if setup). Additionally filters out quote-related queries, if appropriate flag is set.
      *
      * @param string $table
-     * @param array ...$replacements
+     * @param array $replacements
      * @return void
      */
     protected function query($table, ... $replacements)
@@ -711,7 +719,7 @@ class OrdersFixture extends Fixture
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getActionTitle()
     {
@@ -719,7 +727,7 @@ class OrdersFixture extends Fixture
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function introduceParamLabels()
     {
@@ -730,6 +738,7 @@ class OrdersFixture extends Fixture
 
     /**
      * Get real table name for db table, validated by db adapter.
+     *
      * In case prefix or other features mutating default table names are used.
      *
      * @param string $tableName
