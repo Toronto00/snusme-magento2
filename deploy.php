@@ -23,10 +23,7 @@ set('shared_files', [
 
 set('shared_dirs', [
     '{{magento_dir}}/pub/media',
-    '{{magento_dir}}/var/log',
-    '{{magento_dir}}/var/backups',
-    '{{magento_dir}}/var/session',
-    '{{magento_dir}}/var/tmp',
+    '{{magento_dir}}/var',
 ]);
 
 task(
