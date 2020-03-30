@@ -26,6 +26,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
 {
     public $_filesystem;
     public $_directoryList;
+    private $productRepository;
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -69,10 +70,12 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         Config $configHelper,
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
+        \Magento\Catalog\Model\ProductRepository $productRepository,
         array $data = []
     ) {
         $this->_filesystem = $filesystem;
         $this->_directoryList = $directoryList;
+        $this->productRepository = $productRepository;
         parent::__construct(
             $scopeConfig,
             $rateErrorFactory,
@@ -315,6 +318,9 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $productWeight = $product->addChild('ProductWeight');
             $productWeight->addChild('UnitOfMeasurement')->addChild('Code', 'KGS');
             $productWeight->addChild('Weight', round($item['weight'], 1));
+            $productObject = $this->productRepository->getById($item['product_id']);
+            $nicotineWeight = $productObject->getNicotineWeight();
+            $product->addChild('MarksAndNumbers', "Content: $nicotineWeight g");
         }
 
         $totalCalculated    = $totalItemCost + $shippingAmount - $discountAmount;
