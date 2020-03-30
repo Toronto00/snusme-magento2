@@ -314,7 +314,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
 
             $productWeight = $product->addChild('ProductWeight');
             $productWeight->addChild('UnitOfMeasurement')->addChild('Code', 'KGS');
-            $productWeight->addChild('Weight', round($product->getWeight(), 1));
+            $productWeight->addChild('Weight', round($item['weight'], 1));
         }
 
         $totalCalculated    = $totalItemCost + $shippingAmount - $discountAmount;

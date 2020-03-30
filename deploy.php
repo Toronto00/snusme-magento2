@@ -21,6 +21,14 @@ set('shared_files', [
     '{{magento_dir}}/var/sitemap.xml',
 ]);
 
+set('shared_dirs', [
+    '{{magento_dir}}/pub/media',
+    '{{magento_dir}}/var/log',
+    '{{magento_dir}}/var/backups',
+    '{{magento_dir}}/var/session',
+    '{{magento_dir}}/var/tmp',
+]);
+
 task(
     'files:permissions',
     'cd {{magento_dir}} && sudo chmod -R g+w var vendor pub/static pub/media app/etc && chmod u+x bin/magento'
