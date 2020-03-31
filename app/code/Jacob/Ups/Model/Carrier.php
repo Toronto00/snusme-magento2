@@ -304,7 +304,11 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $totalItemCost += (float)$item['price'];
             $name = strlen($item['name']) > 35 ? substr($item['name'], 0, 35) : $item['name'];
 
+            $productObject = $this->productRepository->getById($item['product_id']);
+            $nicotineWeight = $productObject->getNicotineWeight();
+
             $product->addChild('Description', $name);
+            $product->addChild('Description', "Content: $nicotineWeight g");
             //$product->addChild('CommodityCode', '24039910');
             //$product->addChild('PartNumber', $item['product_id']);
             $product->addChild('OriginCountryCode', $request->getShipperAddressCountryCode());
@@ -318,9 +322,6 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $productWeight = $product->addChild('ProductWeight');
             $productWeight->addChild('UnitOfMeasurement')->addChild('Code', 'KGS');
             $productWeight->addChild('Weight', round($item['weight'], 1));
-            $productObject = $this->productRepository->getById($item['product_id']);
-            $nicotineWeight = $productObject->getNicotineWeight();
-            $product->addChild('MarksAndNumbers', "Content: $nicotineWeight g");
         }
 
         $totalCalculated    = $totalItemCost + $shippingAmount - $discountAmount;
