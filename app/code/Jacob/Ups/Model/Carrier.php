@@ -308,7 +308,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $nicotineWeight = $productObject->getNicotineWeight();
 
             $product->addChild('Description', $name);
-            $product->addChild('Description', "\nContent: $nicotineWeight g");
+            $product->addChild('Description', "\r\nContent: $nicotineWeight g");
             //$product->addChild('CommodityCode', '24039910');
             //$product->addChild('PartNumber', $item['product_id']);
             $product->addChild('OriginCountryCode', $request->getShipperAddressCountryCode());
