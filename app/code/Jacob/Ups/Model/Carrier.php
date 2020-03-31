@@ -334,7 +334,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         if ($diff > 0) {
             $otherCharges = $internationalForms->addChild('OtherCharges');
 
-            $otherCharges->addChild('MonetaryValue', $diff);
+            $otherCharges->addChild('MonetaryValue', round($diff, 2));
             $otherCharges->addChild('Description', 'Other');
         }
 
