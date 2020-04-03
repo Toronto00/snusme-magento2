@@ -16,9 +16,9 @@ set('repository', 'git@github.com:proxify-ab/snusme-magento2.git');
 // Space separated list of languages for static-content:deploy
 set('languages', 'de_CH  en_US  ru_RU');
 
-set('shared_files', [
-    '{{magento_dir}}/app/etc/env.php',
-    '{{magento_dir}}/var/sitemap.xml',
+set('shared_dirs', [
+    '{{magento_dir}}/pub/media',
+    '{{magento_dir}}/var',
 ]);
 
 task(

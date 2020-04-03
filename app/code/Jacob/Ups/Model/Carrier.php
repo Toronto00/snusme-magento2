@@ -27,6 +27,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
 {
     public $_filesystem;
     public $_directoryList;
+    private $productRepository;
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -71,10 +72,12 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         ClientFactory $httpClientFactory,
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Framework\App\Filesystem\DirectoryList $directoryList,
+        \Magento\Catalog\Model\ProductRepository $productRepository,
         array $data = []
     ) {
         $this->_filesystem = $filesystem;
         $this->_directoryList = $directoryList;
+        $this->productRepository = $productRepository;
         parent::__construct(
             $scopeConfig,
             $rateErrorFactory,
@@ -137,7 +140,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             // UPS Print Return Label
             $returnPart->addChild('Code', '9');
         }
-        $shipmentPart->addChild('Description', 'Swedish goods');
+        $shipmentPart->addChild('Description', $this->getConfigData('description'));
         //empirical
 
         $shipperPart = $shipmentPart->addChild('Shipper');
@@ -232,7 +235,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         $servicePart = $shipmentPart->addChild('Service');
         $servicePart->addChild('Code', $request->getShippingMethod());
         $packagePart = $shipmentPart->addChild('Package');
-        $packagePart->addChild('Description', 'Swedish Snus for personal use');
+        $packagePart->addChild('Description', $this->getConfigData('description'));
         //empirical
         $packagePart->addChild('PackagingType')->addChild('Code', $request->getPackagingType());
         $packageWeight = $packagePart->addChild('PackageWeight');
@@ -289,7 +292,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         $internationalForms->addChild('InvoiceNumber', $request->getOrderShipment()->getOrder()->getIncrementId());
         $internationalForms->addChild('InvoiceDate', $invoiceDate);
         $internationalForms->addChild('PurchaseOrderNumber', $request->getOrderShipment()->getOrder()->getIncrementId());
-        $internationalForms->addChild('ReasonForExport', 'OTHER');
+        $internationalForms->addChild('ReasonForExport', 'For personal use');
         $internationalForms->addChild('CurrencyCode', $request->getBaseCurrencyCode());
         $internationalForms->addChild('DeclarationStatement', "I hereby certify that the information on this invoice is true and correct and the contents and value of this shipment is as stated above. The exporter of the products covered by this document declares that except where otherwise clearly indicated these products are of EEA preferential origin.");
 
@@ -304,9 +307,13 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $totalItemCost += (float)$item['price'];
             $name = strlen($item['name']) > 35 ? substr($item['name'], 0, 35) : $item['name'];
 
+            $productObject = $this->productRepository->getById($item['product_id']);
+            $nicotineWeight = $productObject->getNicotineWeight();
+
             $product->addChild('Description', $name);
+            $product->addChild('Description', "\r\nContent: $nicotineWeight g");
             //$product->addChild('CommodityCode', '24039910');
-            $product->addChild('PartNumber', $item['product_id']);
+            //$product->addChild('PartNumber', $item['product_id']);
             $product->addChild('OriginCountryCode', $request->getShipperAddressCountryCode());
             $productUnit = $product->addChild('Unit');
 
@@ -314,6 +321,10 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $productUnit->addChild('Value', $item['customs_value']);
             $productUnit->addChild('UnitOfMeasurement')
                 ->addChild('Code', 'PCS');
+
+            $productWeight = $product->addChild('ProductWeight');
+            $productWeight->addChild('UnitOfMeasurement')->addChild('Code', 'KGS');
+            $productWeight->addChild('Weight', round($item['weight'], 1));
         }
 
         $totalCalculated    = $totalItemCost + $shippingAmount - $discountAmount;
@@ -327,7 +338,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
         if ($diff > 0) {
             $otherCharges = $internationalForms->addChild('OtherCharges');
 
-            $otherCharges->addChild('MonetaryValue', $diff);
+            $otherCharges->addChild('MonetaryValue', round($diff, 2));
             $otherCharges->addChild('Description', 'Other');
         }
 
