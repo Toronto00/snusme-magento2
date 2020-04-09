@@ -161,6 +161,13 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
             $shipperPart->addChild('AttentionName', $request->getShipperContactPersonName());
             $shipperPart->addChild('ShipperNumber', $this->getConfigData('shipper_number'));
             $shipperPart->addChild('PhoneNumber', $request->getShipperContactPhoneNumber());
+            $shipperPart->addChild('TaxIdentificationNumber',
+                $this->_scopeConfig->getValue(
+                    \Magento\Store\Model\Information::XML_PATH_STORE_INFO_VAT_NUMBER,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $request->getStoreId()
+                )
+            );
 
             $addressPart = $shipperPart->addChild('Address');
             $addressPart->addChild('AddressLine1', $request->getShipperAddressStreet());
