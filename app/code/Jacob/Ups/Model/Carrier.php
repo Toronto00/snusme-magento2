@@ -302,7 +302,7 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
 
         $totalItemCost = 0;
 
-        if ($request->getRecipientAddressCountryCode() == 'US') {
+        if ($request->getRecipientAddressCountryCode() == self::USA_COUNTRY_ID) {
             $internationalForms->addChild('TermsOfShipment', 'DDP');
         }
 
@@ -355,17 +355,34 @@ class Carrier extends \Magento\Ups\Model\Carrier implements CarrierInterface
                 ->addChild('DCISType', $packageParams->getDeliveryConfirmation());
         }
 
+        if ($request->getRecipientAddressCountryCode() == self::USA_COUNTRY_ID) {
+            $paymentInformation = $shipmentPart->addChild('ItemizedPaymentInformation');
+            $shipmentCharge = $paymentInformation->addChild('ShipmentCharge');
+            $shipmentCharge->addChild('Type', '01');
+            $shipmentCharge->addChild('BillShipper')->addChild(
+                'AccountNumber',
+                $this->getConfigData('shipper_number')
+            );
 
-        $shipmentPart->addChild(
-            'PaymentInformation'
-        )->addChild(
-            'Prepaid'
-        )->addChild(
-            'BillShipper'
-        )->addChild(
-            'AccountNumber',
-            $this->getConfigData('shipper_number')
-        );
+            $shipmentCharge = $paymentInformation->addChild('ShipmentCharge');
+            $shipmentCharge->addChild('Type', '02');
+            $shipmentCharge->addChild('BillShipper')->addChild(
+                'AccountNumber',
+                $this->getConfigData('shipper_number')
+            );
+        } else {
+            $shipmentPart->addChild(
+                'PaymentInformation'
+            )->addChild(
+                'Prepaid'
+            )->addChild(
+                'BillShipper'
+            )->addChild(
+                'AccountNumber',
+                $this->getConfigData('shipper_number')
+            );
+        }
+
 
         if ($request->getPackagingType() != $this->configHelper->getCode(
                 'container',
