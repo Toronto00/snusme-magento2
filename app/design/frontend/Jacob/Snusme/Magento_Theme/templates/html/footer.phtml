@@ -11,7 +11,7 @@
                 <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer_info')->toHtml() ?>
             </div>
             <div class="footer-info-right">
-                <img src="<?php echo $this->getViewFileUrl('images/partnerlogos.png') ?>" />
+                <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('partnerlogos')->toHtml() ?>
             </div>
         </div>
         <div class="footer-social">
